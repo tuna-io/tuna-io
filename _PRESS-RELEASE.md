@@ -17,28 +17,28 @@ Once the project moves into development, the press release can be used as a touc
  -->
  
 ## Heading ##
-  > Name the product in a way the reader (i.e. your target customers) will understand.
+  > tuna.io, a next-generation video platform
 
 ## Sub-Heading ##
-  > Describe who the market for the product is and what benefit they get. One sentence only underneath the title.
+  > Speed through videos with live search and highlight reel generation
 
 ## Summary ##
-  > Give a summary of the product and the benefit. Assume the reader will not read anything else so make this paragraph good.
+  > tuna.io is a full service video platform that allows users to upload and watch videos. We transcribe and index all videos uploaded to our platform to provide you with an efficient way of scanning through videos and cut through the noise to find exactly what you're looking for.
 
 ## Problem ##
-  > Describe the problem your product solves.
+  > High quality video content (for news, education, etc.) is being created at an exponential rate, but our means of video consumption has not kept up with this rate of growth.
 
 ## Solution ##
-  > Describe how your product elegantly solves the problem.
+  > By applying machine learning principles to analyzing videos, we are able to provide users with dynamic live search, automated highlight reel generation, and other amazing features that will greatly enhance your video consumption experience.
 
 ## Quote from You ##
-  > A quote from a spokesperson in your company.
+  > We are the sixth fastest fish in the sea, but commonly misrepresented as the fastest (we're cool with that).
 
 ## How to Get Started ##
-  > Describe how easy it is to get started.
+  > Visit tuna.io to begin browsing and uploading awesome content!
 
 ## Customer Quote ##
-  > Provide a quote from a hypothetical customer that describes how they experienced the benefit.
+  > "This is dope. I can finally find my shit." - Bill Zito
 
 ## Closing and Call to Action ##
-  > Wrap it up and give pointers where the reader should go next.
+  > Link: tuna.io, Feedback: [TODO]
