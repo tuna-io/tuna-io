@@ -24,7 +24,7 @@
 
 ## Requirements
 
-- Go
+- GoLang 1.7.3
 - Redis
 - AWS
 - React
@@ -36,8 +36,35 @@
 
 From within the root directory:
 
+Install Homebrew package manager (if required)
 ```
-TODO: Installation instructions
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew update
+```
+
+Install Go Version Manager (GVM)
+Replace `bash` with `zsh` based on shell
+```
+bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+```
+
+Mac OSX Dependencies
+```
+xcode-select --install
+brew install mercurial
+```
+
+Debian/Ubuntu Dependencies
+```
+sudo apt-get install curl git mercurial make binutils bison gcc build-essential
+```
+
+Install GoLang (Note: Go 1.5+ removed the C compilers from the toolchain so in order to compile Go 1.5+, you need to have an existing Go install)
+```
+gvm install go.1.4 -B
+gvm use go1.4
+export GOROOT_BOOTSTRAP=$GOROOT
+gvm install go1.7.3
 ```
 
 ### Roadmap
