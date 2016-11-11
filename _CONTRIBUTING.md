@@ -33,7 +33,7 @@
 Use github’s interface to make a fork of the repo, then add that repo as an upstream remote:
 
 ```
-git remote add upstream https://github.com/reactorcore/<NAME_OF_REPO>.git
+git remote add upstream https://github.com/tuna-io/tuna-io.git
 ```
 
 ### Cut a namespaced feature branch from master
