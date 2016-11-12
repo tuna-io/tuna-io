@@ -1,2 +1,6 @@
 # Compiled Go files
 /server/go/bin
+
+# Go dependencies
+/server/go/src/github.com
+/server/go/pkg/darwin_amd64/github.com
