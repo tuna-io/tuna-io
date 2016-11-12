@@ -52,5 +52,4 @@ func main() {
   // fmt.Println(unencoded.Name)
   http.HandleFunc("/", connect)
   http.ListenAndServe(":8080", nil)
-
 }
