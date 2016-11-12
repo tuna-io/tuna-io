@@ -86,6 +86,19 @@ Use the `pkgset` to instantiate our environment
 gvm pkgset use tuna
 ```
 
+Install Redis
+```
+wget http://download.redis.io/releases/redis-3.2.5.tar.gz
+tar xzf redis-3.2.5.tar.gz
+cd redis-3.2.5
+make
+```
+
+Startup Redis Server
+```
+redis-server
+```
+
 Install all Go dependencies and start up the server!
 ```
 go get
