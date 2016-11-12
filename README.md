@@ -83,7 +83,7 @@ export PATH; PATH="/root/pathtothisrepo/server/go/bin:$PATH"
 
 Use the `pkgset` to instantiate our environment
 ```
-gvm pkgset use work
+gvm pkgset use tuna
 ```
 
 Install all Go dependencies and start up the server!
