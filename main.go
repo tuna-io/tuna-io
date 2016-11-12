@@ -4,9 +4,11 @@ import (
   "log"
   "net/http"
   "github.com/gorilla/mux"
+  "main/routes"
 )
 
 func main() {
+  routes.Printme()
   r := mux.NewRouter()
   
   r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("client"))))
