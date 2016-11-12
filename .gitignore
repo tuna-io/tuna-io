@@ -7,3 +7,6 @@
 
 # Node dependencies
 /node_modules
+
+# Redis disk flush
+dump.rdb
