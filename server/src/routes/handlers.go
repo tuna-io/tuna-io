@@ -4,6 +4,7 @@ import (
   "net/http"
   "github.com/gorilla/mux"
   "fmt"
+  "db"
 )
 
 /**
@@ -28,6 +29,13 @@ func UserHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 func CreateVideo(w http.ResponseWriter, req *http.Request) {
+  videos.CreateVideo(videos.Video {
+    Title: "Test2",
+    Url: "test2",
+    Hash: "test2",
+    Author_id: 1,
+    Private: true,
+  })
   w.Write([]byte("Creating Video"))
 }
 
