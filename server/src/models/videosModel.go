@@ -1,6 +1,6 @@
 package videoSchema
 
-type User struct {
+type Video struct {
   Name string
   Age int
 }

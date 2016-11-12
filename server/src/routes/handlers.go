@@ -2,6 +2,8 @@ package routes
 
 import (
   "net/http"
+  "github.com/gorilla/mux"
+  "fmt"
 )
 
 /**
@@ -19,6 +21,19 @@ import (
  */
 func IsAlive(w http.ResponseWriter, req *http.Request) {
   w.Write([]byte("I'm Alive"))
+}
+
+func UserHandler(w http.ResponseWriter, req *http.Request) {
+  w.Write([]byte("Test User Endpoint"))
+}
+
+func CreateVideo(w http.ResponseWriter, req *http.Request) {
+  w.Write([]byte("Creating Video"))
+}
+
+func GetVideo(w http.ResponseWriter, req *http.Request) {
+  id := mux.Vars(req)["id"]
+  fmt.Fprintln(w, "showing post", id)
 }
 
 func main() {
