@@ -19,7 +19,7 @@ func main() {
    *     `/api/isalive` test route
    *------------------------------------*/
   t := api.Path("/isalive").Subrouter()
-  t.Methods("GET").HandlerFunc(routes.IsAlive)
+  t.Methods("GET").HandlerFunc(routes.IsAlive)xw
 
   /*-------------------------------------
    *      `/api/videos` sub-router

@@ -15,3 +15,4 @@ type Video struct {
 }
 
 type Videos []Video
+
