@@ -1,13 +1,12 @@
 package routes
 
 import (
-  "fmt"
+  "net/http"
 )
 
-func IsAlive() {
-  
+func IsAlive(w http.ResponseWriter, req *http.Request) {
+  w.Write([]byte("I'm Alive"))
 }
 
 func main() {
-  fmt.Println("Imported routes handler")
 }
