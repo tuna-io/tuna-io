@@ -61,21 +61,40 @@ sudo apt-get install curl git mercurial make binutils bison gcc build-essential
 
 Install GoLang (Note: Go 1.5+ removed the C compilers from the toolchain so in order to compile Go 1.5+, you need to have an existing Go install)
 ```
-gvm install go.1.4 -B
+gvm install go1.4 -B
 gvm use go1.4
 export GOROOT_BOOTSTRAP=$GOROOT
 gvm install go1.7.3
+gvm use go1.7.3 --default
 ```
 
-Install all Go dependencies
+Set up `GOPATH` and `PATH` to access `go` executable
+```
+gvm pkgset create tuna
+gvm pkgset use tuna --default
+gvm pkgenv tuna
+```
+
+Inside the environment, edit the following
+```
+export GOPATH; GOPATH="/root/pathtothisrepo/server/go:$GOPATH"
+export PATH; PATH="/root/pathtothisrepo/server/go/bin:$PATH"
+```
+
+Use the `pkgset` to instantiate our environment
+```
+gvm pkgset use work
+```
+
+Install all Go dependencies and start up the server!
 ```
 go get
+go run main.go
 ```
 
 ### Roadmap
 
 View the project roadmap [here](https://github.com/tuna-io/tuna-io/issues)
-
 
 ## Contributing
 
