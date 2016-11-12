@@ -17,7 +17,7 @@ Once the project moves into development, the press release can be used as a touc
  -->
  
 ## Heading ##
-  > tuna.io, a next-generation video platform
+  > tunavid.io, a next-generation video platform
 
 ## Sub-Heading ##
   > Speed through videos with live search and highlight reel generation
@@ -41,4 +41,4 @@ Once the project moves into development, the press release can be used as a touc
   > "This is dope. I can finally find my shit." - Bill Zito
 
 ## Closing and Call to Action ##
-  > Link: tuna.io, Feedback: [TODO]
+  > Link: [tunavid.io](http://tunavid.io) or [tunavid.com](http://tunavid.com), Feedback: [TODO]

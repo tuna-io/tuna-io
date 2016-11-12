@@ -4,13 +4,13 @@ import (
   "log"
   "net/http"
   "github.com/gorilla/mux"
-  "main/routes"
+  "routes"
 )
 
 func main() {
   r := mux.NewRouter().StrictSlash(true)
-  
-  // TODO: Consider if we can refactor all API routing into a single file
+
+		// TODO: Consider if we can refactor all API routing into a single file
   // i.e. r.HandleFunc("/api", APIHandler)
   // and abstract all the API handling to another `.go` file
   r.HandleFunc("/api/isalive", routes.IsAlive)

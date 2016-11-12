@@ -1,12 +1,13 @@
 # tuna.io
 
 > The sixth fastest fish in the sea
+> [tunavid.io](http://tunavid.io)
 
 ## Team
 
   - __Product Owners__: Bill Zito, Christopher Tham
   - __Scrum Master__: Bobby Wei
-  - __Development Team Members__: 
+  - __Development Team Members__:
 
 ## Table of Contents
 
@@ -25,7 +26,7 @@
 ## Requirements
 
 - GoLang 1.7.3
-- Redis
+- Redis 3.2.5
 - AWS
 - React
 - etc (TODO: include versions)
@@ -77,8 +78,8 @@ gvm pkgenv tuna
 
 Inside the environment, edit the following
 ```
-export GOPATH; GOPATH="/root/pathtothisrepo/server/go:$GOPATH"
-export PATH; PATH="/root/pathtothisrepo/server/go/bin:$PATH"
+export GOPATH; GOPATH="/root/pathtothisrepo/server:$GOPATH"
+export PATH; PATH="/root/pathtothisrepo/server/bin:$PATH"
 ```
 
 Use the `pkgset` to instantiate our environment
@@ -97,6 +98,11 @@ make
 Startup Redis Server
 ```
 redis-server
+```
+
+Install all NPM dependencies
+```
+npm install
 ```
 
 Install all Go dependencies and start up the server!
