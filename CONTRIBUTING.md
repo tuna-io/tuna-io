@@ -10,8 +10,8 @@
   - doc/...
   - refactor/...
 1. Make commits to your feature branch. Prefix each commit like so:
-  - (feat) Added a new feature
-  - (fix) Fixed inconsistent tests [Fixes #0]
+  - (feat) Add a new feature
+  - (fix) Fix inconsistent tests [Fixes #0]
   - (refactor) ...
   - (cleanup) ...
   - (test) ...
@@ -27,6 +27,12 @@
 1. Once the pull request has been reviewed, it will be merged by another member of the team. Do not merge your own commits.
 
 ## Detailed Workflow
+
+### Documentation
+
+For any new features made on the backend (server and database related), please be sure to document all your functions.
+
+Instructions regarding syntax are available at [apidocjs.com](apidocjs.com). After including inline documentation, simply run `apidoc` from anywhere inside the project repository to update the current documentation to reflect all changes.
 
 ### Fork the repo
 
