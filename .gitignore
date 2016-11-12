@@ -4,3 +4,6 @@
 # Go dependencies
 /server/go/src/github.com
 /server/go/pkg/darwin_amd64/github.com
+
+# Node dependencies
+/node_modules

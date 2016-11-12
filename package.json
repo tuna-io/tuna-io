@@ -2,7 +2,7 @@
   "name": "tuna.io",
   "version": "1.0.0",
   "description": "",
-  "main": "server/go/src/main/main.go",
+  "main": "main.go",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/tuna-io/tuna-io/issues"
   },
-  "homepage": "https://github.com/tuna-io/tuna-io#readme"
+  "homepage": "https://github.com/tuna-io/tuna-io#readme",
+  "dependencies": {
+    "api-doc": "^4.0.0"
+  }
 }
