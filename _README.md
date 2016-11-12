@@ -67,6 +67,11 @@ export GOROOT_BOOTSTRAP=$GOROOT
 gvm install go1.7.3
 ```
 
+Install all Go dependencies
+```
+go get
+```
+
 ### Roadmap
 
 View the project roadmap [here](https://github.com/tuna-io/tuna-io/issues)
