@@ -25,7 +25,7 @@
 ## Requirements
 
 - GoLang 1.7.3
-- Redis
+- Redis 3.2.5
 - AWS
 - React
 - etc (TODO: include versions)
