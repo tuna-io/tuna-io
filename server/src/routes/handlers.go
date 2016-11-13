@@ -30,6 +30,25 @@ func IsAlive(w http.ResponseWriter, req *http.Request) {
  *          VIDEO HANDLERS
  *------------------------------------*/
 
+/**
+* @api {post} /api/videos Create and store a new video
+* @apiName CreateVideo
+* @apiGroup Videos
+*
+* @apiParam {String} title Title of video
+* @apiParam {String} url Link to CDN URL where video is stored
+* @apiParam {String} hash Hashed path to URL (for client routing)
+* @apiParam {Number} author_id Unique ID of video uploader
+* @apiParam {Boolean} private True/False, whether the video is private
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   OK
+* 
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 404 Not Found
+*   Redigo failed to create and store the video
+*/
 func CreateVideo(w http.ResponseWriter, req *http.Request) {
   err := req.ParseForm()
   video := new(videos.Video)
@@ -51,6 +70,30 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   }
 }
 
+/**
+* @api {get} /api/videos/{url} Retrieve a stored video
+* @apiName GetVideo
+* @apiGroup Videos
+*
+* @apiParam {String} url Link to CDN URL where video is stored
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   {
+*     "title": "44413",
+*     "url": "new",
+*     "hash": "testhash",
+*     "author_id": 1,
+*     "timestamp": "2016-11-12T17:17:19.308362547-08:00",
+*     "private": true,
+*     "likes": null,
+*     "dislikes": null
+*   }
+* 
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 404 Not Found
+*   redigo: nil return
+*/
 func GetVideo(w http.ResponseWriter, req *http.Request) {
   url := mux.Vars(req)["url"]
 
