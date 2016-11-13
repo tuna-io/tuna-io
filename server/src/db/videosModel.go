@@ -2,7 +2,6 @@ package videos
 
 import (
   "time"
-  "fmt"
   "github.com/garyburd/redigo/redis"
   "encoding/json"
 )
@@ -38,7 +37,7 @@ func HandleError(err error) {
   }
 }
 
-func CreateVideo(v Video) {
+func CreateVideo(v Video) (string, error) {
   conn := Pool.Get()
   defer conn.Close()
 
@@ -53,18 +52,16 @@ func CreateVideo(v Video) {
 
   // TODO: when CDN links are defined, set video's key
   // as the hash identifier rather than entire url
-  reply, err := conn.Do("SET", "video:" + v.Url, b)
-  HandleError(err)
+  reply, err := redis.String(conn.Do("SET", "video:" + v.Url, b))
 
-  fmt.Println(reply)
+  return reply, err
 }
 
-func GetVideo(url string) {
+func GetVideo(url string) (string, error) {
   conn := Pool.Get()
   defer conn.Close()
 
-  reply, err := redis.String(conn.Do("GET", url))
-  HandleError(err)
+  reply, err := redis.String(conn.Do("GET", "video:" + url))
 
-  fmt.Println("GET", reply)
+  return reply, err
 }

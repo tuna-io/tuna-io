@@ -39,12 +39,29 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
     panic(err)
   }
 
-  videos.CreateVideo(*video)
-  // TODO: write reply instead of generic text (e.g. 200 OK)
-  w.Write([]byte("Creating Video"))
+  status, err := videos.CreateVideo(*video)
+  w.Header().Set("Content-Type", "application/json")
+  
+  if (err != nil) {
+    w.WriteHeader(http.StatusNotFound)
+    fmt.Fprintln(w, err)
+  } else {
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintln(w, status)
+  }
 }
 
 func GetVideo(w http.ResponseWriter, req *http.Request) {
-  id := mux.Vars(req)["id"]
-  fmt.Fprintln(w, "showing post", id)
+  url := mux.Vars(req)["url"]
+
+  video, err := videos.GetVideo(url)
+  w.Header().Set("Content-Type", "application/json")
+
+  if (err != nil) {
+    w.WriteHeader(http.StatusNotFound)
+    fmt.Fprintln(w, err)
+  } else {
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintln(w, video)
+  }
 }

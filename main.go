@@ -26,7 +26,7 @@ func main() {
    *------------------------------------*/
   v := api.PathPrefix("/videos").Subrouter()
   v.Methods("POST").HandlerFunc(routes.CreateVideo)
-  v.Methods("GET").Path("/{id}").HandlerFunc(routes.GetVideo)
+  v.Methods("GET").Path("/{url}").HandlerFunc(routes.GetVideo)
 
   /*-------------------------------------
    *      `/` static file server
