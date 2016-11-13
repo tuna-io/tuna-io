@@ -57,7 +57,6 @@ func CreateVideo(v Video) {
   HandleError(err)
 
   fmt.Println(reply)
-  // return reply
 }
 
 func GetVideo(url string) {
@@ -68,16 +67,4 @@ func GetVideo(url string) {
   HandleError(err)
 
   fmt.Println("GET", reply)
-}
-
-func main() {
-  // CreateVideo(Video {
-  //   Title: "Test",
-  //   Url: "test",
-  //   Hash: "test",
-  //   Author_id: 1,
-  //   Private: true,
-  // })
-
-  // GetVideo("video:test")
 }

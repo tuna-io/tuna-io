@@ -5,6 +5,7 @@ import (
   "github.com/gorilla/mux"
   "fmt"
   "db"
+  "github.com/gorilla/schema"
 )
 
 /**
@@ -24,25 +25,25 @@ func IsAlive(w http.ResponseWriter, req *http.Request) {
   w.Write([]byte("I'm Alive"))
 }
 
-func UserHandler(w http.ResponseWriter, req *http.Request) {
-  w.Write([]byte("Test User Endpoint"))
-}
+
+/*-------------------------------------
+ *          VIDEO HANDLERS
+ *------------------------------------*/
 
 func CreateVideo(w http.ResponseWriter, req *http.Request) {
-  videos.CreateVideo(videos.Video {
-    Title: "Test2",
-    Url: "test2",
-    Hash: "test2",
-    Author_id: 1,
-    Private: true,
-  })
+  err := req.ParseForm()
+  video := new(videos.Video)
+  decoder := schema.NewDecoder()
+  err = decoder.Decode(video, req.Form)
+  if err != nil {
+    panic(err)
+  }
+
+  videos.CreateVideo(*video)
   w.Write([]byte("Creating Video"))
 }
 
 func GetVideo(w http.ResponseWriter, req *http.Request) {
   id := mux.Vars(req)["id"]
   fmt.Fprintln(w, "showing post", id)
-}
-
-func main() {
 }

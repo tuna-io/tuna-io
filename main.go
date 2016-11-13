@@ -29,12 +29,6 @@ func main() {
   v.Methods("GET").Path("/{id}").HandlerFunc(routes.GetVideo)
 
   /*-------------------------------------
-   *       `/api/users` sub-router
-   *------------------------------------*/
-  u := api.PathPrefix("/users").Subrouter()
-  u.Methods("GET").HandlerFunc(routes.UserHandler)
-
-  /*-------------------------------------
    *      `/` static file server
    *------------------------------------*/
   r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("client"))))
