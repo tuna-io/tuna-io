@@ -40,6 +40,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   }
 
   videos.CreateVideo(*video)
+  // TODO: write reply instead of generic text (e.g. 200 OK)
   w.Write([]byte("Creating Video"))
 }
 
