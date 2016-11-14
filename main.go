@@ -10,8 +10,6 @@ import (
 func main() {
   r := mux.NewRouter().StrictSlash(true)
 
-  r.PathPrefix("/api/docs/").Handler(http.StripPrefix("/api/docs/",http.FileServer(http.Dir("./doc/"))))
-
   /*-------------------------------------
    *         `/api` router
    *------------------------------------*/
@@ -33,7 +31,7 @@ func main() {
   /*-------------------------------------
    *      `/` static file server
    *------------------------------------*/
-  r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./client/"))))
+  r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./doc/"))))
 
   // Start up server and error log
   log.Println("Listening at port 3000")
