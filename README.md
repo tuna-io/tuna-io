@@ -103,6 +103,7 @@ redis-server
 Install all NPM dependencies
 ```
 npm install
+npm install -g mocha
 ```
 
 Install all Go dependencies and start up the server!
