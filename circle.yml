@@ -1,14 +1,10 @@
 machine:
+  node: 6.9.1
 dependencies:
   pre:
-    - npm install -g reactorcore/problemify
-    - git clone git@github.com:reactorcore/utils.scripts.git ../scripts
+    - npm install
+    - npm install -g mocha
 test:
   override:
-    - echo "skipping tests..."
-deployment:
-  master:
-    branch: master
-    commands:
-      # - ../scripts/circle-ci/deploy/checkout-latest-tag.sh
-      - ../scripts/circle-ci/deploy/publish-to-hackreactor.sh
+    - mocha server/test/ApiTest.js
+
