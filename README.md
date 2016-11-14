@@ -29,6 +29,7 @@
 - Redis 3.2.5
 - AWS
 - React
+- FFMPEG 3.2
 - etc (TODO: include versions)
 
 ## Development
@@ -98,6 +99,11 @@ make
 Startup Redis Server
 ```
 redis-server
+```
+
+Install FFmpeg (for server-side conversion of video files to audio files)
+```
+brew install ffmpeg --with-fdk-aac --with-ffplay --with-freetype --with-frei0r --with-libass --with-libvo-aacenc --with-libvorbis --with-libvpx --with-opencore-amr --with-openjpeg --with-opus --with-rtmpdump --with-schroedinger --with-speex --with-theora --with-tools
 ```
 
 Install all NPM dependencies
