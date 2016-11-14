@@ -10,3 +10,6 @@
 
 # Redis disk flush
 dump.rdb
+
+#NPM debug log
+npm-debug.log
