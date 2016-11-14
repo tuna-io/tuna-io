@@ -1,4 +1,4 @@
-# Project Name #
+# tunavid.io #
 
 <!-- 
 > This material was originally posted [here](http://www.quora.com/What-is-Amazons-approach-to-product-development-and-product-management). It is reproduced here for posterities sake.
@@ -23,7 +23,7 @@ Once the project moves into development, the press release can be used as a touc
   > Speed through videos with live search and highlight reel generation
 
 ## Summary ##
-  > tuna.io is a full service video platform that allows users to upload and watch videos. We transcribe and index all videos uploaded to our platform to provide you with an efficient way of scanning through videos and cut through the noise to find exactly what you're looking for.
+  > tunavid.io is a full service video platform that allows users to upload and watch videos. We transcribe and index all videos uploaded to our platform to provide you with an efficient way of scanning through videos and cut through the noise to find exactly what you're looking for.
 
 ## Problem ##
   > High quality video content (for news, education, etc.) is being created at an exponential rate, but our means of video consumption has not kept up with this rate of growth.
@@ -35,7 +35,7 @@ Once the project moves into development, the press release can be used as a touc
   > We are the sixth fastest fish in the sea, but commonly misrepresented as the fastest (we're cool with that).
 
 ## How to Get Started ##
-  > Visit tuna.io to begin browsing and uploading awesome content!
+  > Visit [tunavid.io](http://tunavid.io) to begin browsing and uploading awesome content!
 
 ## Customer Quote ##
   > "This is dope. I can finally find my shit." - Bill Zito
