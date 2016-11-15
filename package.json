@@ -1,7 +1,8 @@
 {
   "name": "tuna.io",
   "version": "1.0.0",
-  "description": "",
+  "description": "Search for video",
+  "main": "",
   "scripts": {
     "test": "mocha server/test/ApiTest.js"
   },
