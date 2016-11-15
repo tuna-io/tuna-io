@@ -192,4 +192,23 @@ func GetKeys() (string, string) {
   return cfg.User, cfg.Pass
 }
 
+func TranscribeAudio(audioPath string) {
+  user, pass := GetKeys()
+  w := watson.New(user, pass)
 
+  is, err := os.Open(audioPath)
+  if err != nil {
+    log.Fatal(err)
+  }
+  defer is.Close()
+
+  tt, err := w.Recognize(is, "en-US_BroadbandModel", "wav")
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  for _, w := range tt.Words {
+    // TODO return object
+    fmt.Printf("%v\n", w)
+  }
+}
