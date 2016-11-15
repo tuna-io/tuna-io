@@ -11,20 +11,31 @@ import (
  *------------------------------------*/
 
 type Video struct {
-  Title       string    `json:"title"`
-  Url         string    `json:"url"`
-  Hash        string    `json:"hash"`
-  Creator     string    `json:"creator"`
-  Timestamp   time.Time `json:"timestamp"`
-  Private     bool      `json:"private"`
-  Views       int       `json:"views"`
-  Likes       []string  `json:"likes"`
-  Dislikes    []string  `json:"dislikes"`
-  Comments    []int     `json:"comments"`
-  Transcript  
+  Title       string      `json:"title"`
+  Url         string      `json:"url"`
+  Hash        string      `json:"hash"`
+  Creator     string      `json:"creator"`
+  Timestamp   time.Time   `json:"timestamp"`
+  Private     bool        `json:"private"`
+  Views       int         `json:"views"`
+  Likes       []string    `json:"likes"`
+  Dislikes    []string    `json:"dislikes"`
+  Comments    []int       `json:"comments"`
+  Transcript  Transcript  `json:"transcript"`
 }
 
 type Videos []Video
+
+type Word struct {
+  Token string
+  Begin float64
+  End float64
+  Confidence float64
+}
+
+type Transcript struct {
+  Words []Word
+}
 
 /*-------------------------------------
  *     REDIGO POOL INSTANTIATION
@@ -56,11 +67,7 @@ func CreateVideo(v Video) (string, error) {
   conn := Pool.Get()
   defer conn.Close()
 
-  var init []int
-
   v.Timestamp = time.Now()
-  v.Likes = init
-  v.Dislikes = init
 
   b, err := json.Marshal(v)
   HandleError(err)
