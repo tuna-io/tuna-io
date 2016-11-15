@@ -22,9 +22,13 @@ func main() {
   t.Methods("GET").HandlerFunc(routes.IsAlive)
 
   /*-------------------------------------
-   *      `/api/videos` sub-router
+   *      `/api/videos` sub-route
    *------------------------------------*/
   v := api.PathPrefix("/videos").Subrouter()
+
+  v.Methods("POST").HandlerFunc(routes.CreateVideo)
+  v.Methods("OPTIONS").Path("/sign").HandlerFunc(routes.AllowAccess)
+  v.Methods("POST").Path("/sign").HandlerFunc(routes.SignVideo)
   v.Methods("GET").Path("/{url}").HandlerFunc(routes.GetVideo)
   v.Methods("POST").Path("/process").HandlerFunc(routes.ProcessVideo)
   v.Methods("POST").HandlerFunc(routes.CreateVideo)
@@ -35,6 +39,6 @@ func main() {
   r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./doc/"))))
 
   // Start up server and error log
-  log.Println("Listening at port 3000")
-  log.Fatal(http.ListenAndServe(":3000", r))
+  log.Println("Listening at port 3001")
+  log.Fatal(http.ListenAndServe(":3001", r))
 }

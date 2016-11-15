@@ -12,6 +12,10 @@ import (
   "os"
   "log"
   "encoding/json"
+  "github.com/aws/aws-sdk-go/aws"
+  "github.com/aws/aws-sdk-go/aws/session"
+  "github.com/aws/aws-sdk-go/service/s3"
+  "time"
 )
 
 /**
@@ -115,6 +119,7 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
   }
 }
 
+<<<<<<< HEAD
 /**
 * @api {post} /api/videos/process Processes a video and returns the transcript
 * @apiName ProcessVideo
@@ -220,4 +225,33 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
   }
 
   return tt
+}
+
+func SignVideo(w http.ResponseWriter, request *http.Request) {
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+
+  fmt.Println("the request filename is", request)
+
+  svc := s3.New(session.New(&aws.Config{Region: aws.String("us-west-1")}))
+  req, _ := svc.PutObjectRequest(&s3.PutObjectInput{
+      Bucket: aws.String("invalidmemories"),
+      Key:    aws.String("test.mp4"),
+  })
+  urlStr, err := req.Presign(15 * time.Minute)
+
+  if err != nil {
+      fmt.Println("Failed to sign request", err)
+  }
+
+  w.Write([]byte(urlStr))
+  fmt.Println("The URL is", urlStr)
+}
+
+func AllowAccess(rw http.ResponseWriter, req *http.Request) {
+    rw.Header().Set("Access-Control-Allow-Origin", "*")
+    rw.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+    rw.Header().Set("Access-Control-Allow-Headers",
+        "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+  // Stop here if its Preflighted OPTIONS request
+    return
 }
