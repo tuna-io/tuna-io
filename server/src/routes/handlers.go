@@ -160,3 +160,8 @@ type Word struct {
   End float64
   Confidence float64
 }
+
+type Text struct {
+  Words []Word
+}
+
