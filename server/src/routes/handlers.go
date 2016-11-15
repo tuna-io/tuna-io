@@ -82,9 +82,9 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 * @apiSuccessExample Success-Response:
 *   HTTP/1.1 200 OK
 *   {
-*     "title": "44413",
-*     "url": "new",
-*     "hash": "testhash",
+*     "title": "Sample Title",
+*     "url": "https://amazoncdn.com/bucketname/videotitle.webm",
+*     "hash": "a1b2c3d4-e5f6g7h8",
 *     "author_id": 1,
 *     "timestamp": "2016-11-12T17:17:19.308362547-08:00",
 *     "private": true,
@@ -111,6 +111,21 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
   }
 }
 
+/**
+* @api {post} /api/videos/convert Convert a video file to a .mp3 file
+* @apiName ConvertVideo
+* @apiGroup Videos
+*
+* @apiParam {String} url Link to CDN URL where video is stored
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   samplevideo1.mp3
+* 
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 404 Not Found
+*   exit code 1
+*/
 func ConvertVideo(w http.ResponseWriter, req *http.Request) {
   url := req.FormValue("url")
   applicationName := "ffmpeg"
