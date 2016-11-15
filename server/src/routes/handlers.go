@@ -57,14 +57,14 @@ func IsAlive(w http.ResponseWriter, req *http.Request) {
 */
 func CreateVideo(w http.ResponseWriter, req *http.Request) {
   err := req.ParseForm()
-  video := new(videos.Video)
+  video := new(db.Video)
   decoder := schema.NewDecoder()
   err = decoder.Decode(video, req.Form)
   if err != nil {
     panic(err)
   }
 
-  status, err := videos.CreateVideo(*video)
+  status, err := db.CreateVideo(*video)
   w.Header().Set("Content-Type", "application/json")
 
   if (err != nil) {
@@ -103,7 +103,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 func GetVideo(w http.ResponseWriter, req *http.Request) {
   url := mux.Vars(req)["url"]
 
-  video, err := videos.GetVideo(url)
+  video, err := db.GetVideo(url)
   w.Header().Set("Content-Type", "application/json")
 
   if (err != nil) {
