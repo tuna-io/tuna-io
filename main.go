@@ -11,18 +11,18 @@ func main() {
   r := mux.NewRouter().StrictSlash(true)
 
   /*-------------------------------------
-   *         `/api` router
+   *         `/api` ROUTER
    *------------------------------------*/
   api := r.PathPrefix("/api").Subrouter()
 
   /*-------------------------------------
-   *     `/api/isalive` test route
+   *     `/api/isalive` TEST ROUTE
    *------------------------------------*/
   t := api.Path("/isalive").Subrouter()
   t.Methods("GET").HandlerFunc(routes.IsAlive)
 
   /*-------------------------------------
-   *      `/api/videos` sub-route
+   *      `/api/videos` SUB-ROUTER
    *------------------------------------*/
   v := api.PathPrefix("/videos").Subrouter()
 
@@ -38,7 +38,7 @@ func main() {
   s.Methods("POST").HandlerFunc(routes.SignVideo)
 
   /*-------------------------------------
-   *      `/` static file server
+   *      `/` STATIC FILE SERVER
    *------------------------------------*/
   r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./doc/"))))
 

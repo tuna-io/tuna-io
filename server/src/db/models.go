@@ -6,20 +6,29 @@ import (
   "encoding/json"
 )
 
+/*-------------------------------------
+ *      VIDEO MODEL STRUCTURE
+ *------------------------------------*/
+
 type Video struct {
-  Title     string    `json:"title"`
-  Url       string    `json:"url"`
-  Hash      string    `json:"hash"`
-  Creator   string    `json:"creator"`
-  Timestamp time.Time `json:"timestamp"`
-  Private   bool      `json:"private"`
-  Views     int       `json:"views"`
-  Likes     []string  `json:"likes"`
-  Dislikes  []string  `json:"dislikes"`
-  Comments  []int     `json:"comments"`
+  Title       string    `json:"title"`
+  Url         string    `json:"url"`
+  Hash        string    `json:"hash"`
+  Creator     string    `json:"creator"`
+  Timestamp   time.Time `json:"timestamp"`
+  Private     bool      `json:"private"`
+  Views       int       `json:"views"`
+  Likes       []string  `json:"likes"`
+  Dislikes    []string  `json:"dislikes"`
+  Comments    []int     `json:"comments"`
+  Transcript  
 }
 
 type Videos []Video
+
+/*-------------------------------------
+ *     REDIGO POOL INSTANTIATION
+ *------------------------------------*/
 
 var Pool = newPool()
 
@@ -38,6 +47,10 @@ func HandleError(err error) {
     panic(err)
   }
 }
+
+/*-------------------------------------
+ *        VIDEO DB CONTROLLERS
+ *------------------------------------*/
 
 func CreateVideo(v Video) (string, error) {
   conn := Pool.Get()
