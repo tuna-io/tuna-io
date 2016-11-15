@@ -156,8 +156,18 @@ func ProcessVideo(w http.ResponseWriter, req *http.Request) {
     fmt.Fprintln(w, t)
   }
 
-  // TODO: at some future point (i.e. after we get the transcript),
-  // we should delete this temporary .mp3 file (space constraints)
+  cmd = exec.Command("rm", destination)
+  out, err = cmd.Output()
+
+  if err != nil {
+    fmt.Println("error deleting file", err)
+  } else {
+    fmt.Println("successfully deleted file", out)
+  }
+
+  // TODO: thought process error: we should not be returning the transcript
+  // to client. rather, there should be a database process that writes 
+  // the transcript to the database for a given video (work in db/models)
 }
 
 /*-------------------------------------
@@ -187,7 +197,7 @@ func GetKeys() (string, string) {
   err := decoder.Decode(&cfg)
 
   if (err != nil) {
-    fmt.Println("error1:", err)
+    fmt.Println("err:", err)
   }
 
   fmt.Println(cfg.User, cfg.Pass)
@@ -206,7 +216,7 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
 
   tt, err := w.Recognize(is, "en-US_BroadbandModel", "wav")
   if err != nil {
-    fmt.Println("error2:", err)
+    fmt.Println("err:", err)
   }
 
   return tt
