@@ -20,8 +20,6 @@
   },
   "homepage": "https://github.com/tuna-io/tuna-io#readme",
   "dependencies": {
-    "api-doc": "^4.0.0",
-    "redis-commander": "^0.4.2"
   },
   "devDependencies": {
     "chai": "^3.5.0",
