@@ -150,3 +150,13 @@ func ConvertVideo(w http.ResponseWriter, req *http.Request) {
   // we should delete this temporary .mp3 file (space constraints)
 }
 
+/*-------------------------------------
+ *      AUDIO FILE TRANSCRIPTION
+ *------------------------------------*/
+
+type Word struct {
+  Token string
+  Begin float64
+  End float64
+  Confidence float64
+}
