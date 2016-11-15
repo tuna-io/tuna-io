@@ -43,6 +43,6 @@ func main() {
   r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./doc/"))))
 
   // Start up server and error log
-  log.Println("Listening at port 3001")
-  log.Fatal(http.ListenAndServe(":3001", r))
+  log.Println("Listening at port 3000")
+  log.Fatal(http.ListenAndServe(":3000", r))
 }

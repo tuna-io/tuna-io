@@ -6,8 +6,6 @@
     "react-scripts": "0.7.0"
   },
   "dependencies": {
-    "aws-sdk": "^2.7.0",
-    "axios": "^0.15.2",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-dropzone": "^3.7.3",

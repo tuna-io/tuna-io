@@ -8,7 +8,7 @@ export default React.createClass({
   upload(files) {
     var file = files[0];
 
-    fetch('http://localhost:3001/api/s3', {
+    fetch('http://localhost:3000/api/s3', {
       method: 'POST',
       body: JSON.stringify({
         'filename': file.name,
