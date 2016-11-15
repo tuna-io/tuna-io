@@ -2,7 +2,6 @@
   "name": "tuna.io",
   "version": "1.0.0",
   "description": "",
-  "main": "main.go",
   "scripts": {
     "test": "mocha server/test/ApiTest.js"
   },

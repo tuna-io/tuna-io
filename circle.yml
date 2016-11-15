@@ -1,14 +1,17 @@
 machine:
+  node:
+    version: 6.9.1
+
 dependencies:
   pre:
-    - npm install -g reactorcore/problemify
-    - git clone git@github.com:reactorcore/utils.scripts.git ../scripts
+    - npm install
+    - npm install -g mocha
+  override:
+      - mkdir -p $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME
+      - ln -fs $HOME/$CIRCLE_PROJECT_REPONAME $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+      - |
+        echo 'export GOPATH=$GOPATH:$HOME/.go_project' >> ~/.circlerc
 test:
   override:
-    - echo "skipping tests..."
-deployment:
-  master:
-    branch: master
-    commands:
-      # - ../scripts/circle-ci/deploy/checkout-latest-tag.sh
-      - ../scripts/circle-ci/deploy/publish-to-hackreactor.sh
+    - mocha server/test/ApiTest.js
+
