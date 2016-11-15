@@ -22,12 +22,20 @@ func main() {
   t.Methods("GET").HandlerFunc(routes.IsAlive)
 
   /*-------------------------------------
-   *      `/api/videos` sub-router
+   *      `/api/videos` sub-route
    *------------------------------------*/
   v := api.PathPrefix("/videos").Subrouter()
+
+  v.Methods("POST").HandlerFunc(routes.CreateVideo)
   v.Methods("GET").Path("/{url}").HandlerFunc(routes.GetVideo)
   v.Methods("POST").Path("/process").HandlerFunc(routes.ProcessVideo)
-  v.Methods("POST").HandlerFunc(routes.CreateVideo)
+
+  /*-------------------------------------
+   *      `/api/s3` sub-route
+   *------------------------------------*/
+  s := api.PathPrefix("/s3").Subrouter()
+  s.Methods("OPTIONS").HandlerFunc(routes.AllowAccess)
+  s.Methods("POST").HandlerFunc(routes.SignVideo)
 
   /*-------------------------------------
    *      `/` static file server

@@ -1,7 +1,7 @@
 import React from 'react'
 import Nav from './Nav'
 import Home from './Home'
-import { Link } from 'react-router'
+// import { Link } from 'react-router'
 
 export default React.createClass({
   render() {
