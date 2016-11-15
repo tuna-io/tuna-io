@@ -29,6 +29,7 @@
 - Redis 3.2.5
 - AWS
 - React
+- FFmpeg 3.2
 - etc (TODO: include versions)
 
 ## Development
@@ -98,6 +99,36 @@ make
 Startup Redis Server
 ```
 redis-server
+```
+
+Install FFmpeg (for server-side conversion of video files to audio files) - for Mac OSX
+```
+brew install ffmpeg --with-fdk-aac --with-ffplay --with-freetype --with-frei0r --with-libass --with-libvo-aacenc --with-libvorbis --with-libvpx --with-opencore-amr --with-openjpeg --with-opus --with-rtmpdump --with-schroedinger --with-speex --with-theora --with-tools
+```
+
+Install FFmpeg - for Ubuntu (tested on v14.04)
+```
+// Allow `add-apt-repository` command
+sudo apt-get install software-properties-common python-software-properties
+
+// Press [enter] after to confirm
+sudo add-apt-repository ppa:mc3man/trusty-media
+sudo apt-get update
+sudo apt-get dist-upgrade
+sudo apt-get install ffmpeg
+```
+
+(Dev only) Dependencies:
+- For API documentation generation, we use [APIDOC](http://apidocjs.com)
+```
+npm install -g apidoc
+apidoc
+```
+
+- For Redis GUI, we use [REDIS COMMANDER](https://github.com/joeferner/redis-commander)
+```
+npm install -g redis-commander
+redis-commander
 ```
 
 Install all NPM dependencies

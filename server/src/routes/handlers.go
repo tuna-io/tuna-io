@@ -6,6 +6,8 @@ import (
   "fmt"
   "db"
   "github.com/gorilla/schema"
+  "strings"
+  "os/exec"
 )
 
 /**
@@ -60,7 +62,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 
   status, err := videos.CreateVideo(*video)
   w.Header().Set("Content-Type", "application/json")
-  
+
   if (err != nil) {
     w.WriteHeader(http.StatusNotFound)
     fmt.Fprintln(w, err)
@@ -80,9 +82,9 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 * @apiSuccessExample Success-Response:
 *   HTTP/1.1 200 OK
 *   {
-*     "title": "44413",
-*     "url": "new",
-*     "hash": "testhash",
+*     "title": "Sample Title",
+*     "url": "https://amazoncdn.com/bucketname/videotitle.webm",
+*     "hash": "a1b2c3d4-e5f6g7h8",
 *     "author_id": 1,
 *     "timestamp": "2016-11-12T17:17:19.308362547-08:00",
 *     "private": true,
@@ -107,4 +109,42 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
     w.WriteHeader(http.StatusOK)
     fmt.Fprintln(w, video)
   }
+}
+
+/**
+* @api {post} /api/videos/convert Convert a video file to a .mp3 file
+* @apiName ConvertVideo
+* @apiGroup Videos
+*
+* @apiParam {String} url Link to CDN URL where video is stored
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   samplevideo1.mp3
+* 
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 404 Not Found
+*   exit code 1
+*/
+func ConvertVideo(w http.ResponseWriter, req *http.Request) {
+  url := req.FormValue("url")
+  applicationName := "ffmpeg"
+  arg0 := "-i"
+  destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".mp3"
+
+  cmd := exec.Command(applicationName, arg0, url, destination)
+  out, err := cmd.Output()
+
+  w.Header().Set("Content-Type", "application/json")
+
+  if err != nil {
+    w.WriteHeader(http.StatusNotFound)
+    fmt.Fprintf(w, err.Error())
+  } else {
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintf(w, string(out) + destination)
+  }
+
+  // TODO: at some future point (i.e. after we get the transcript),
+  // we should delete this temporary .mp3 file (space constraints)
 }
