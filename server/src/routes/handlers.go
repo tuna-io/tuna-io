@@ -9,6 +9,9 @@ import (
   "strings"
   "os/exec"
   "github.com/mediawen/watson-go-sdk"
+  "os"
+  "log"
+  "encoding/json"
 )
 
 /**
@@ -136,11 +139,16 @@ func ConvertVideo(w http.ResponseWriter, req *http.Request) {
   cmd := exec.Command(applicationName, arg0, url, destination)
   out, err := cmd.Output()
 
+  TranscribeAudio("test.wav")
+
+  // TODO wait for thread
+
   w.Header().Set("Content-Type", "application/json")
 
   if err != nil {
     w.WriteHeader(http.StatusNotFound)
     fmt.Fprintf(w, err.Error())
+    return
   } else {
     w.WriteHeader(http.StatusOK)
     fmt.Fprintf(w, string(out) + destination)
@@ -154,6 +162,11 @@ func ConvertVideo(w http.ResponseWriter, req *http.Request) {
  *      AUDIO FILE TRANSCRIPTION
  *------------------------------------*/
 
+type Configuration struct {
+  User string
+  Pass string
+}
+
 type Word struct {
   Token string
   Begin float64
@@ -164,4 +177,19 @@ type Word struct {
 type Text struct {
   Words []Word
 }
+
+func GetKeys() (string, string) {
+  file, _ := os.Open("server/src/cfg/keys.json")
+  decoder := json.NewDecoder(file)
+  cfg := Configuration{}
+  err := decoder.Decode(&configuration)
+
+  if (err != nil) {
+    fmt.Println("error:", err)
+  }
+
+  fmt.Println(cfg.User, cfg.Pass)
+  return cfg.User, cfg.Pass
+}
+
 
