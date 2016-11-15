@@ -145,6 +145,10 @@ Update IBM Watson API Keys
 - Register for a user and pass for the speech-to-text service
 - Update `keys.json` with your API keys
 
+Export AWS Environment Variables
+export AWS_SECRET_ACCESS_KEY=KEEP_ME_SECRET
+export AWS_ACCESS_KEY_ID=MORE_SECRETS
+
 Install all NPM dependencies
 ```
 npm install
