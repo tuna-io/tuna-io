@@ -116,21 +116,26 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 }
 
 /**
-* @api {post} /api/videos/convert Convert a video file to a .mp3 file
-* @apiName ConvertVideo
+* @api {post} /api/videos/convert Convert a video file to a .wav file
+* @apiName ProcessVideo
 * @apiGroup Videos
 *
 * @apiParam {String} url Link to CDN URL where video is stored
 *
 * @apiSuccessExample Success-Response:
 *   HTTP/1.1 200 OK
-*   samplevideo1.mp3
+*   (truncated for brevity)
+*   [
+*     {word start_time end_time confidence},
+*     {word start_time end_time confidence}, ...
+*   ]
 * 
 * @apiErrorExample Error-Response:
 *   HTTP/1.1 404 Not Found
-*   exit status 1
+*   exit status 1 (Note that this error typically means that ffmpeg has failed)
+*   Watson says, "not authorized" (signifies IBM Watson authorization error)
 */
-func ConvertVideo(w http.ResponseWriter, req *http.Request) {
+func ProcessVideo(w http.ResponseWriter, req *http.Request) {
   url := req.FormValue("url")
   applicationName := "ffmpeg"
   arg0 := "-i"
