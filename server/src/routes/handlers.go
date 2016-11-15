@@ -232,7 +232,8 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
 * @apiName SignVideo
 * @apiGroup s3
 *
-* @apiParam {filename, filetype} file name and type for upload
+* @apiParam {String} file name for upload
+* @apiParam {String} file type
 *
 * @apiSuccessExample Success-Response:
 *   HTTP/1.1 200 OK
@@ -296,7 +297,6 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
 * @apiName AllowAccess
 * @apiGroup s3
 *
-* @apiParam {} 
 *
 * @apiSuccessExample Success-Response:
 *   HTTP/1.1 200 OK
