@@ -1,1 +1,1 @@
-define({  "name": "tuna.io",  "version": "1.0.0",  "description": "",  "sampleUrl": false,  "apidoc": "0.2.0",  "generator": {    "name": "apidoc",    "time": "2016-11-13T01:31:04.974Z",    "url": "http://apidocjs.com",    "version": "0.16.1"  }});
+define({  "name": "tuna.io",  "version": "1.0.0",  "description": "",  "sampleUrl": false,  "apidoc": "0.2.0",  "generator": {    "name": "apidoc",    "time": "2016-11-15T01:24:56.167Z",    "url": "http://apidocjs.com",    "version": "0.16.1"  }});
