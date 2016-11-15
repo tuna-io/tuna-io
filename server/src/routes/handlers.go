@@ -16,7 +16,7 @@ import (
 
 /**
  * @api {get} /api/isalive Check if server is running
- * @apiName IsAlive
+ * @apiName IsAlivea
  * @apiGroup Miscellaneous
  *
  * @apiSuccessExample Success-Response:
@@ -146,9 +146,9 @@ func ConvertVideo(w http.ResponseWriter, req *http.Request) {
     fmt.Fprintf(w, err.Error())
     return
   } else {
-    TranscribeAudio("test.wav")
+    t := TranscribeAudio(destination)
     w.WriteHeader(http.StatusOK)
-    fmt.Fprintf(w, string(out) + destination)
+    fmt.Fprintln(w, t)
   }
 
   // TODO: at some future point (i.e. after we get the transcript),
@@ -182,14 +182,14 @@ func GetKeys() (string, string) {
   err := decoder.Decode(&cfg)
 
   if (err != nil) {
-    fmt.Println("error:", err)
+    fmt.Println("error1:", err)
   }
 
   fmt.Println(cfg.User, cfg.Pass)
   return cfg.User, cfg.Pass
 }
 
-func TranscribeAudio(audioPath string) {
+func TranscribeAudio(audioPath string) (*watson.Text) {
   user, pass := GetKeys()
   w := watson.New(user, pass)
 
@@ -201,12 +201,8 @@ func TranscribeAudio(audioPath string) {
 
   tt, err := w.Recognize(is, "en-US_BroadbandModel", "wav")
   if err != nil {
-    log.Fatal(err)
+    fmt.Println("error2:", err)
   }
 
-  fmt.Println(tt)
-  // for _, w := range tt.Words {
-  //   // TODO return object
-  //   fmt.Printf("%v\n", w)
-  // }
+  return tt
 }
