@@ -16,6 +16,7 @@ import (
   "github.com/aws/aws-sdk-go/aws/session"
   "github.com/aws/aws-sdk-go/service/s3"
   "time"
+  // "encoding/json"
 )
 
 /**
@@ -235,16 +236,22 @@ func SignVideo(w http.ResponseWriter, request *http.Request) {
   svc := s3.New(session.New(&aws.Config{Region: aws.String("us-west-1")}))
   req, _ := svc.PutObjectRequest(&s3.PutObjectInput{
       Bucket: aws.String("invalidmemories"),
-      Key:    aws.String("test.mp4"),
+      Key:    aws.String("test4.mp4"),
   })
-  urlStr, err := req.Presign(15 * time.Minute)
+
+  urlStr, err := req.Presign(60 * time.Minute)
 
   if err != nil {
       fmt.Println("Failed to sign request", err)
   }
+  
+  // j, err := json.Marshal(urlStr)
+  // if err != nil {
+  //   fmt.Println("failed to convert to json", err)
+  // }
 
-  w.Write([]byte(urlStr))
   fmt.Println("The URL is", urlStr)
+  w.Write([]byte(urlStr))
 }
 
 func AllowAccess(rw http.ResponseWriter, req *http.Request) {

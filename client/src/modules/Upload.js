@@ -7,24 +7,17 @@ export default React.createClass({
     var file = files[0];
     // console.log('file type and name', file.name, file.type);
 
-
-    // var params = {
-    //   Bucket: 'invalidmemories',
-    //   Key: file.name,
-    //   Expires: 300,
-    //   ContentType: file.type
-    // };
-
     fetch('http://localhost:3001/api/videos/sign', {
-      method: 'GET',
+      method: 'POST',
       body: {
         'filename': file.name,
         'filetype': file.type
       }
     })
-    .then((signedUrl) => {
-      console.log('signedUrl is', signedUrl);
-      return fetch('https://invalidmemories.s3-us-west-1.amazonaws.com/test.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAJL6WCO6QEBOZCTQA%2F20161115%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20161115T054525Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=8284486127d84f1ccf080e2b1732d8cbbcaf280d6a436046fdbe755d8a900e7a', {
+    .then((data) => {
+      console.log('signedUrl is', data);
+      console.log('json is', data.json);
+      return fetch('https://invalidmemories.s3-us-west-1.amazonaws.com/test.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAJL6WCO6QEBOZCTQA%2F20161115%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20161115T184651Z&X-Amz-Expires=900&X-Amz-SignedHeaders=host&X-Amz-Signature=1ebeb11dee8b36d85abafe8009cf958385fa5f6aa1b4ed6baa24d818253c5c3f', {
           method: 'PUT',
           headers: {
             'Content-Type': file.type
