@@ -6,6 +6,8 @@ import (
   "fmt"
   "db"
   "github.com/gorilla/schema"
+  "strings"
+  "os/exec"
 )
 
 /**
@@ -60,7 +62,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 
   status, err := videos.CreateVideo(*video)
   w.Header().Set("Content-Type", "application/json")
-  
+
   if (err != nil) {
     w.WriteHeader(http.StatusNotFound)
     fmt.Fprintln(w, err)
@@ -106,5 +108,28 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
   } else {
     w.WriteHeader(http.StatusOK)
     fmt.Fprintln(w, video)
+  }
+}
+
+func ConvertVideo(w http.ResponseWriter, req *http.Request) {
+  url := req.FormValue("url")
+  applicationName := "ffmpeg"
+  arg0 := "-i"
+  fmt.Println(url)
+  destination := strings.Split(url, ".")[0] + ".mp3"
+
+  fmt.Println(applicationName, arg0, url, destination)
+
+  cmd := exec.Command(applicationName, arg0, url, "test.mp3")
+  out, err := cmd.Output()
+
+  w.Header().Set("Content-Type", "application/json")
+
+  if err != nil {
+    w.WriteHeader(http.StatusNotFound)
+    fmt.Fprintf(w, err.Error())
+  } else {
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintf(w, string(out) + destination)
   }
 }
