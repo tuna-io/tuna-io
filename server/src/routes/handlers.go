@@ -8,6 +8,7 @@ import (
   "github.com/gorilla/schema"
   "strings"
   "os/exec"
+  "github.com/mediawen/watson-go-sdk"
 )
 
 /**
@@ -148,3 +149,4 @@ func ConvertVideo(w http.ResponseWriter, req *http.Request) {
   // TODO: at some future point (i.e. after we get the transcript),
   // we should delete this temporary .mp3 file (space constraints)
 }
+
