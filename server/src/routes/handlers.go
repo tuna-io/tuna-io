@@ -116,7 +116,7 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 }
 
 /**
-* @api {post} /api/videos/convert Convert a video file to a .wav file
+* @api {post} /api/videos/process Processes a video and returns the transcript
 * @apiName ProcessVideo
 * @apiGroup Videos
 *
