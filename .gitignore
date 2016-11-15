@@ -11,5 +11,8 @@
 # Redis disk flush
 dump.rdb
 
-#NPM debug log
+# NPM debug log
 npm-debug.log
+
+# API keys
+/server/src/cfg/keys.json

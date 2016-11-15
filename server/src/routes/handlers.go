@@ -8,11 +8,15 @@ import (
   "github.com/gorilla/schema"
   "strings"
   "os/exec"
+  "github.com/mediawen/watson-go-sdk"
+  "os"
+  "log"
+  "encoding/json"
 )
 
 /**
  * @api {get} /api/isalive Check if server is running
- * @apiName IsAlive
+ * @apiName IsAlivea
  * @apiGroup Miscellaneous
  *
  * @apiSuccessExample Success-Response:
@@ -53,14 +57,14 @@ func IsAlive(w http.ResponseWriter, req *http.Request) {
 */
 func CreateVideo(w http.ResponseWriter, req *http.Request) {
   err := req.ParseForm()
-  video := new(videos.Video)
+  video := new(db.Video)
   decoder := schema.NewDecoder()
   err = decoder.Decode(video, req.Form)
   if err != nil {
     panic(err)
   }
 
-  status, err := videos.CreateVideo(*video)
+  status, err := db.CreateVideo(*video)
   w.Header().Set("Content-Type", "application/json")
 
   if (err != nil) {
@@ -99,7 +103,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 func GetVideo(w http.ResponseWriter, req *http.Request) {
   url := mux.Vars(req)["url"]
 
-  video, err := videos.GetVideo(url)
+  video, err := db.GetVideo(url)
   w.Header().Set("Content-Type", "application/json")
 
   if (err != nil) {
@@ -112,25 +116,30 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 }
 
 /**
-* @api {post} /api/videos/convert Convert a video file to a .mp3 file
-* @apiName ConvertVideo
+* @api {post} /api/videos/process Processes a video and returns the transcript
+* @apiName ProcessVideo
 * @apiGroup Videos
 *
 * @apiParam {String} url Link to CDN URL where video is stored
 *
 * @apiSuccessExample Success-Response:
 *   HTTP/1.1 200 OK
-*   samplevideo1.mp3
+*   (truncated for brevity)
+*   [
+*     {word start_time end_time confidence},
+*     {word start_time end_time confidence}, ...
+*   ]
 * 
 * @apiErrorExample Error-Response:
 *   HTTP/1.1 404 Not Found
-*   exit code 1
+*   exit status 1 (Note that this error typically means that ffmpeg has failed)
+*   Watson says, "not authorized" (signifies IBM Watson authorization error)
 */
-func ConvertVideo(w http.ResponseWriter, req *http.Request) {
+func ProcessVideo(w http.ResponseWriter, req *http.Request) {
   url := req.FormValue("url")
   applicationName := "ffmpeg"
   arg0 := "-i"
-  destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".mp3"
+  destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
 
   cmd := exec.Command(applicationName, arg0, url, destination)
   out, err := cmd.Output()
@@ -140,11 +149,75 @@ func ConvertVideo(w http.ResponseWriter, req *http.Request) {
   if err != nil {
     w.WriteHeader(http.StatusNotFound)
     fmt.Fprintf(w, err.Error())
+    return
   } else {
+    t := TranscribeAudio(destination)
     w.WriteHeader(http.StatusOK)
-    fmt.Fprintf(w, string(out) + destination)
+    fmt.Fprintln(w, t)
   }
 
-  // TODO: at some future point (i.e. after we get the transcript),
-  // we should delete this temporary .mp3 file (space constraints)
+  cmd = exec.Command("rm", destination)
+  out, err = cmd.Output()
+
+  if err != nil {
+    fmt.Println("error deleting file", err)
+  } else {
+    fmt.Println("successfully deleted file", out)
+  }
+
+  // TODO: thought process error: we should not be returning the transcript
+  // to client. rather, there should be a database process that writes 
+  // the transcript to the database for a given video (work in db/models)
+}
+
+/*-------------------------------------
+ *      AUDIO FILE TRANSCRIPTION
+ *------------------------------------*/
+
+type Configuration struct {
+  User string
+  Pass string
+}
+
+type Word struct {
+  Token string
+  Begin float64
+  End float64
+  Confidence float64
+}
+
+type Text struct {
+  Words []Word
+}
+
+func GetKeys() (string, string) {
+  file, _ := os.Open("server/src/cfg/keys.json")
+  decoder := json.NewDecoder(file)
+  cfg := Configuration{}
+  err := decoder.Decode(&cfg)
+
+  if (err != nil) {
+    fmt.Println("err:", err)
+  }
+
+  fmt.Println(cfg.User, cfg.Pass)
+  return cfg.User, cfg.Pass
+}
+
+func TranscribeAudio(audioPath string) (*watson.Text) {
+  user, pass := GetKeys()
+  w := watson.New(user, pass)
+
+  is, err := os.Open(audioPath)
+  if err != nil {
+    log.Fatal(err)
+  }
+  defer is.Close()
+
+  tt, err := w.Recognize(is, "en-US_BroadbandModel", "wav")
+  if err != nil {
+    fmt.Println("err:", err)
+  }
+
+  return tt
 }

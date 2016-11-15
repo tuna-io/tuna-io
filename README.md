@@ -26,11 +26,19 @@
 ## Requirements
 
 - GoLang 1.7.3
+  - [Gorilla Web Toolkit](http://www.gorillatoolkit.org/)
+    - Gorilla Mux
+    - Gorilla Schema
+  - [Redigo](https://github.com/garyburd/redigo)
 - Redis 3.2.5
-- AWS
+- AWS S3
 - React
 - FFmpeg 3.2
-- etc (TODO: include versions)
+- IBM Watson
+
+Dev Dependencies
+- [APIDoc](https://github.com/apidoc/apidoc) 0.16.1
+- [Redis Commander](https://github.com/joeferner/redis-commander)
 
 ## Development
 
@@ -130,6 +138,12 @@ apidoc
 npm install -g redis-commander
 redis-commander
 ```
+
+Update IBM Watson API Keys
+- Duplicate `keys-example.json` and rename the file to: `keys.json`
+- Sign up for an IBM BlueMix account
+- Register for a user and pass for the speech-to-text service
+- Update `keys.json` with your API keys
 
 Install all NPM dependencies
 ```
