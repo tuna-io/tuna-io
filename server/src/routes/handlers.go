@@ -128,20 +128,16 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 * 
 * @apiErrorExample Error-Response:
 *   HTTP/1.1 404 Not Found
-*   exit code 1
+*   exit status 1
 */
 func ConvertVideo(w http.ResponseWriter, req *http.Request) {
   url := req.FormValue("url")
   applicationName := "ffmpeg"
   arg0 := "-i"
-  destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".mp3"
+  destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
 
   cmd := exec.Command(applicationName, arg0, url, destination)
   out, err := cmd.Output()
-
-  TranscribeAudio("test.wav")
-
-  // TODO wait for thread
 
   w.Header().Set("Content-Type", "application/json")
 
@@ -150,6 +146,7 @@ func ConvertVideo(w http.ResponseWriter, req *http.Request) {
     fmt.Fprintf(w, err.Error())
     return
   } else {
+    TranscribeAudio("test.wav")
     w.WriteHeader(http.StatusOK)
     fmt.Fprintf(w, string(out) + destination)
   }
@@ -182,7 +179,7 @@ func GetKeys() (string, string) {
   file, _ := os.Open("server/src/cfg/keys.json")
   decoder := json.NewDecoder(file)
   cfg := Configuration{}
-  err := decoder.Decode(&configuration)
+  err := decoder.Decode(&cfg)
 
   if (err != nil) {
     fmt.Println("error:", err)
@@ -207,8 +204,9 @@ func TranscribeAudio(audioPath string) {
     log.Fatal(err)
   }
 
-  for _, w := range tt.Words {
-    // TODO return object
-    fmt.Printf("%v\n", w)
-  }
+  fmt.Println(tt)
+  // for _, w := range tt.Words {
+  //   // TODO return object
+  //   fmt.Printf("%v\n", w)
+  // }
 }
