@@ -16,7 +16,7 @@ import (
   "github.com/aws/aws-sdk-go/aws/session"
   "github.com/aws/aws-sdk-go/service/s3"
   "time"
-  // "encoding/json"
+  "encoding/json"
 )
 
 /**
@@ -120,7 +120,6 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
   }
 }
 
-<<<<<<< HEAD
 /**
 * @api {post} /api/videos/process Processes a video and returns the transcript
 * @apiName ProcessVideo
@@ -228,32 +227,89 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
   return tt
 }
 
-func SignVideo(w http.ResponseWriter, request *http.Request) {
-  w.Header().Set("Access-Control-Allow-Origin", "*")
+/**
+* @api {POST} /api/s3 Generate a signed url for uploading to s3
+* @apiName SignVideo
+* @apiGroup s3
+*
+* @apiParam {filename, filetype} file name and type for upload
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   {
+*     "https://invalidmemories.s3-us-west-1.amazonaws.com/test4.mp4
+      ?X-Amz-Algorithm=AWS4-HMAC-SHA256
+      &X-Amz-Credential=NOT_FOR_OTHERS_TO_SEEus-west-1%2Fs3%2Faws4_request
+      &X-Amz-Date=20161115T202301Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host
+      &X-Amz-Signature=SUPER_SECRET"
+    }
+* 
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 403 Permission denied (check your credentials!)
+*/
+func SignVideo(w http.ResponseWriter, r *http.Request) {
 
-  fmt.Println("the request filename is", request)
+  // create new video object from given request json
+  decoder := json.NewDecoder(r.Body)
 
+  type Vidfile struct {
+    Filename string `json:"filename"`
+    Filetype string `json:"filetype"`
+  }
+
+  var v = new(Vidfile)
+  err := decoder.Decode(&v)
+
+  if err != nil {
+    panic(err)
+  }
+  // fmt.Println("got something", v, v.Filename, v.Filetype)
+
+  // get presigned url to allow upload on client side
   svc := s3.New(session.New(&aws.Config{Region: aws.String("us-west-1")}))
   req, _ := svc.PutObjectRequest(&s3.PutObjectInput{
       Bucket: aws.String("invalidmemories"),
-      Key:    aws.String("test4.mp4"),
+      Key:    aws.String(v.Filename),
   })
 
-  urlStr, err := req.Presign(60 * time.Minute)
+  // allow upload with url for 5min
+  urlStr, err := req.Presign(5 * time.Minute)
 
   if err != nil {
-      fmt.Println("Failed to sign request", err)
+      fmt.Println("Failed to sign r", err)
   }
   
-  // j, err := json.Marshal(urlStr)
-  // if err != nil {
-  //   fmt.Println("failed to convert to json", err)
-  // }
+  j, err := json.Marshal(urlStr)
+  if err != nil {
+    fmt.Println("failed to convert to json", err)
+  }
 
-  fmt.Println("The URL is", urlStr)
-  w.Write([]byte(urlStr))
+  // fmt.Println("The URL is", urlStr)
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Header().Set("Content-Type", "application/json")
+  w.Write(j)
 }
 
+
+/**
+* @api {OPTIONS} /api/s3 Allow cross-origin requests
+* @apiName AllowAccess
+* @apiGroup s3
+*
+* @apiParam {} 
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   {
+*     "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE"
+      "Access-Control-Allow-Headers":
+      "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
+    }
+* 
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 404 Not Found
+*/
 func AllowAccess(rw http.ResponseWriter, req *http.Request) {
     rw.Header().Set("Access-Control-Allow-Origin", "*")
     rw.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")

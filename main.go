@@ -27,12 +27,15 @@ func main() {
   v := api.PathPrefix("/videos").Subrouter()
 
   v.Methods("POST").HandlerFunc(routes.CreateVideo)
-  v.Methods("OPTIONS").Path("/sign").HandlerFunc(routes.AllowAccess)
-  v.Methods("POST").Path("/sign").HandlerFunc(routes.SignVideo)
   v.Methods("GET").Path("/{url}").HandlerFunc(routes.GetVideo)
   v.Methods("POST").Path("/process").HandlerFunc(routes.ProcessVideo)
-  v.Methods("POST").HandlerFunc(routes.CreateVideo)
 
+  /*-------------------------------------
+   *      `/api/s3` sub-route
+   *------------------------------------*/
+  s := api.PathPrefix("/s3").Subrouter()
+  s.Methods("OPTIONS").HandlerFunc(routes.AllowAccess)
+  s.Methods("POST").HandlerFunc(routes.SignVideo)
 
   /*-------------------------------------
    *      `/` static file server
