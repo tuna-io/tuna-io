@@ -115,12 +115,9 @@ func ConvertVideo(w http.ResponseWriter, req *http.Request) {
   url := req.FormValue("url")
   applicationName := "ffmpeg"
   arg0 := "-i"
-  fmt.Println(url)
-  destination := strings.Split(url, ".")[0] + ".mp3"
+  destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".mp3"
 
-  fmt.Println(applicationName, arg0, url, destination)
-
-  cmd := exec.Command(applicationName, arg0, url, "test.mp3")
+  cmd := exec.Command(applicationName, arg0, url, destination)
   out, err := cmd.Output()
 
   w.Header().Set("Content-Type", "application/json")
