@@ -118,6 +118,19 @@ sudo apt-get dist-upgrade
 sudo apt-get install ffmpeg
 ```
 
+(Dev only) Dependencies:
+- For API documentation generation, we use [APIDOC](http://apidocjs.com)
+```
+npm install -g apidoc
+apidoc
+```
+
+- For Redis GUI, we use [REDIS COMMANDER](https://github.com/joeferner/redis-commander)
+```
+npm install -g redis-commander
+redis-commander
+```
+
 Install all NPM dependencies
 ```
 npm install
