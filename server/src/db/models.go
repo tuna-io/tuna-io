@@ -10,11 +10,13 @@ type Video struct {
   Title     string    `json:"title"`
   Url       string    `json:"url"`
   Hash      string    `json:"hash"`
-  Author_id int       `json:"author_id"`
+  Creator   string    `json:"creator"`
   Timestamp time.Time `json:"timestamp"`
   Private   bool      `json:"private"`
-  Likes     []int     `json:"likes"`
-  Dislikes  []int     `json:"dislikes"`
+  Views     int       `json:"views"`
+  Likes     []string  `json:"likes"`
+  Dislikes  []string  `json:"dislikes"`
+  Comments  []int     `json:"comments"`
 }
 
 type Videos []Video
