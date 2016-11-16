@@ -27,8 +27,8 @@ func main() {
   v := api.PathPrefix("/videos").Subrouter()
 
   v.Methods("POST").HandlerFunc(routes.CreateVideo)
-  v.Methods("GET").Path("/{url}").HandlerFunc(routes.GetVideo)
   v.Methods("POST").Path("/process").HandlerFunc(routes.ProcessVideo)
+  v.Methods("GET").Path("/{hash}").HandlerFunc(routes.GetVideo)
 
   /*-------------------------------------
    *      `/api/s3` sub-route

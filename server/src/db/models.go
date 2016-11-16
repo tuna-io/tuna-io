@@ -87,11 +87,11 @@ func CreateVideo(v Video) (interface{}, error) {
   return reply, err
 }
 
-func GetVideo(url string) (string, error) {
+func GetVideo(hash string) (string, error) {
   conn := Pool.Get()
   defer conn.Close()
 
-  reply, err := redis.StringMap(conn.Do("HGETALL", "video:" + url))
+  reply, err := redis.StringMap(conn.Do("HGETALL", "video:" + hash))
 
   rep, _ := json.Marshal(reply)
 
