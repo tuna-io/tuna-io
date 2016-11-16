@@ -76,22 +76,31 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 
   fmt.Println("Generating hash for video:", hash)
 
-  status, err := db.CreateVideo(*video)
-
-
+  db.CreateVideo(*video)
 
   w.Header().Set("Content-Type", "application/json")
 
-  // TODO: push video hash into user's videos' array
+  t, err := ProcessVideo(video.Url, hash)
 
-    if (err != nil) {
+  if err != nil {
     w.WriteHeader(http.StatusNotFound)
     fmt.Fprintln(w, err)
   } else {
     w.WriteHeader(http.StatusOK)
-    fmt.Fprintln(w, status)
+    fmt.Fprintln(w, t)
   }
 }
+
+  // TODO: push video hash into user's videos' array
+
+//     if (err != nil) {
+//     w.WriteHeader(http.StatusNotFound)
+//     fmt.Fprintln(w, err)
+//   } else {
+//     w.WriteHeader(http.StatusOK)
+//     fmt.Fprintln(w, status)
+//   }
+// }
 
 /**
 * @api {get} /api/videos/{url} Retrieve a stored video
@@ -152,17 +161,13 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 *   exit status 1 (Note that this error typically means that ffmpeg has failed)
 *   Watson says, "not authorized" (signifies IBM Watson authorization error)
 */
-func ProcessVideo(url string, hash string) (string, error) {
+func ProcessVideo(url string, hash string) (*watson.Text, error) {
   applicationName := "ffmpeg"
   arg0 := "-i"
   destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
 
   cmd := exec.Command(applicationName, arg0, url, destination)
   out, err := cmd.Output()
-
-  if err != nil {
-    return nil, err
-  }
 
   t := TranscribeAudio(destination)
   db.AddTranscript(hash, t)
