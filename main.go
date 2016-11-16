@@ -38,6 +38,14 @@ func main() {
   s.Methods("POST").HandlerFunc(routes.SignVideo)
 
   /*-------------------------------------
+   *      `/api/users` SUB-ROUTER
+   *------------------------------------*/
+  u := api.PathPrefix("/users").Subrouter()
+  u.Methods("POST").Path("/register").HandlerFunc(routes.RegisterUser)
+  u.Methods("GET").Path("/authenticate").HandlerFunc(routes.AuthenticateUser)
+  u.Methods("GET").Path("/logout").HandlerFunc(routes.LogoutUser)
+
+  /*-------------------------------------
    *      `/` STATIC FILE SERVER
    *------------------------------------*/
   r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./doc/"))))
