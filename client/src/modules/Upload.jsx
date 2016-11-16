@@ -1,6 +1,11 @@
 import React from 'react';
 import Dropzone from 'react-dropzone';
 
+const videoStyle = {
+  'width': '600px',
+  'height': '600px',
+};
+
 export default React.createClass({
   
   // upload params: file dragged into dropzone
@@ -21,7 +26,8 @@ export default React.createClass({
     .then((data) => {
       // need to get json of response
       return data.json();
-    }).then((signedUrl) => {
+    })
+    .then((signedUrl) => {
 
       return fetch(signedUrl, {
           method: 'PUT',
@@ -30,6 +36,10 @@ export default React.createClass({
     })
     .then((data) => {
       console.log('we got data', data);
+      return data.json();
+    })
+    .then((awsUrl) => {
+      console.log('response is', awsUrl);
     })
     .catch((err) => {
       console.log('error uploading', err);
@@ -47,7 +57,8 @@ export default React.createClass({
             Drop some files here!
           </div>
         </Dropzone>
+        <video autoPlay='true' src="https://s3-us-west-1.amazonaws.com/invalidmemories/test.mp4" style={videoStyle}/>
       </div>
       );
   }
-})
+});
