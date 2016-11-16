@@ -16,6 +16,8 @@ import (
   "github.com/aws/aws-sdk-go/aws/session"
   "github.com/aws/aws-sdk-go/service/s3"
   "time"
+  "crypto/md5"
+  "encoding/hex"
 )
 
 /**
@@ -40,20 +42,38 @@ func IsAlive(w http.ResponseWriter, req *http.Request) {
  *          VIDEO HANDLERS
  *------------------------------------*/
 
+type Response struct {
+  Success     string        `json:"success"`
+  Hash        string        `json:"hash"`
+  Url         string        `json:"url"`
+  Transcript  *watson.Text  `json:"transcript"`
+}
+
 /**
-* @api {post} /api/videos Create and store a new video
+* @api {post} /api/videos Create, transcribe, and store a new video
 * @apiName CreateVideo
 * @apiGroup Videos
 *
 * @apiParam {String} title Title of video
 * @apiParam {String} url Link to CDN URL where video is stored
-* @apiParam {String} hash Hashed path to URL (for client routing)
-* @apiParam {Number} author_id Unique ID of video uploader
+* @apiParam {String} creator Username of video uploader
 * @apiParam {Boolean} private True/False, whether the video is private
 *
 * @apiSuccessExample Success-Response:
 *   HTTP/1.1 200 OK
-*   OK
+*   (Response truncated for brevity)
+*   {
+*     "success": "Successfully uploaded and transcribed video file"
+*     "hash": b12c8a16bbe30b9d79cbaab81a82151d"
+*     "url": "https://s3-us-west-1.amazonaws.com/invalidmemories/bill_10s.mp4"
+*     "transcript": "{
+*       "Words":[
+*         {"Token":"do","Begin":2.4,"End":2.47,"Confidence":0.09763},
+*         {"Token":"you","Begin":2.47,"End":2.58,"Confidence":0.45060},
+*         ...
+*       ]
+*     }"
+*
 * 
 * @apiErrorExample Error-Response:
 *   HTTP/1.1 404 Not Found
@@ -64,40 +84,63 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   video := new(db.Video)
   decoder := schema.NewDecoder()
   err = decoder.Decode(video, req.Form)
+
   if err != nil {
     panic(err)
   }
 
-  status, err := db.CreateVideo(*video)
+  hasher := md5.New()
+  hasher.Write([]byte(video.Url))
+  hash := hex.EncodeToString(hasher.Sum(nil))
+  video.Hash = hash
+
+  fmt.Println("Generating hash for video:", hash)
+
+  db.CreateVideo(*video)
+
   w.Header().Set("Content-Type", "application/json")
 
-  if (err != nil) {
+  t, err := ProcessVideo(video.Url, hash)
+
+  u := Response{
+    Success: "Successfully uploaded and transcribed video file",
+    Hash: hash,
+    Url: video.Url,
+    Transcript: t,
+  }
+
+  j, err := json.Marshal(u)
+
+  if err != nil {
     w.WriteHeader(http.StatusNotFound)
     fmt.Fprintln(w, err)
   } else {
     w.WriteHeader(http.StatusOK)
-    fmt.Fprintln(w, status)
+    fmt.Fprintln(w, string(j))
   }
 }
 
 /**
-* @api {get} /api/videos/{url} Retrieve a stored video
+* @api {get} /api/videos/{hash} Retrieve a stored video
 * @apiName GetVideo
 * @apiGroup Videos
 *
-* @apiParam {String} url Link to CDN URL where video is stored
+* @apiParam {String} hash Video hash
 *
 * @apiSuccessExample Success-Response:
 *   HTTP/1.1 200 OK
 *   {
 *     "title": "Sample Title",
-*     "url": "https://amazoncdn.com/bucketname/videotitle.webm",
-*     "hash": "a1b2c3d4-e5f6g7h8",
-*     "author_id": 1,
+*     "url": "https://s3-us-west-1.amazonaws.com/invalidmemories/bill_10s.mp4",
+*     "hash": "b12c8a16bbe30b9d79cbaab81a82151d",
+*     "creator": "chris",
 *     "timestamp": "2016-11-12T17:17:19.308362547-08:00",
-*     "private": true,
-*     "likes": null,
-*     "dislikes": null
+*     "private": "1",
+*     "likes": "[]",
+*     "dislikes": "[]",
+*     "comments": "[]"
+*     "views": "0",
+*     "transcript": (refer to example in `CreateVideo`)
 *   }
 * 
 * @apiErrorExample Error-Response:
@@ -105,9 +148,9 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 *   redigo: nil return
 */
 func GetVideo(w http.ResponseWriter, req *http.Request) {
-  url := mux.Vars(req)["url"]
+  hash := mux.Vars(req)["hash"]
 
-  video, err := db.GetVideo(url)
+  video, err := db.GetVideo(hash)
   w.Header().Set("Content-Type", "application/json")
 
   if (err != nil) {
@@ -119,28 +162,7 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
   }
 }
 
-/**
-* @api {post} /api/videos/process Processes a video and returns the transcript
-* @apiName ProcessVideo
-* @apiGroup Videos
-*
-* @apiParam {String} url Link to CDN URL where video is stored
-*
-* @apiSuccessExample Success-Response:
-*   HTTP/1.1 200 OK
-*   (truncated for brevity)
-*   [
-*     {word start_time end_time confidence},
-*     {word start_time end_time confidence}, ...
-*   ]
-* 
-* @apiErrorExample Error-Response:
-*   HTTP/1.1 404 Not Found
-*   exit status 1 (Note that this error typically means that ffmpeg has failed)
-*   Watson says, "not authorized" (signifies IBM Watson authorization error)
-*/
-func ProcessVideo(w http.ResponseWriter, req *http.Request) {
-  url := req.FormValue("url")
+func ProcessVideo(url string, hash string) (*watson.Text, error) {
   applicationName := "ffmpeg"
   arg0 := "-i"
   destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
@@ -148,17 +170,8 @@ func ProcessVideo(w http.ResponseWriter, req *http.Request) {
   cmd := exec.Command(applicationName, arg0, url, destination)
   out, err := cmd.Output()
 
-  w.Header().Set("Content-Type", "application/json")
-
-  if err != nil {
-    w.WriteHeader(http.StatusNotFound)
-    fmt.Fprintf(w, err.Error())
-    return
-  } else {
-    t := TranscribeAudio(destination)
-    w.WriteHeader(http.StatusOK)
-    fmt.Fprintln(w, t)
-  }
+  t := TranscribeAudio(destination)
+  db.AddTranscript(hash, t)
 
   cmd = exec.Command("rm", destination)
   out, err = cmd.Output()
@@ -169,9 +182,7 @@ func ProcessVideo(w http.ResponseWriter, req *http.Request) {
     fmt.Println("successfully deleted file", out)
   }
 
-  // TODO: thought process error: we should not be returning the transcript
-  // to client. rather, there should be a database process that writes 
-  // the transcript to the database for a given video (work in db/models)
+  return t, err
 }
 
 /*-------------------------------------
@@ -184,10 +195,10 @@ type Configuration struct {
 }
 
 type Word struct {
-  Token string
-  Begin float64
-  End float64
-  Confidence float64
+  Token       string
+  Begin       float64
+  End         float64
+  Confidence  float64
 }
 
 type Text struct {
@@ -226,8 +237,13 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
   return tt
 }
 
+
+/*-------------------------------------
+ *         S3 VIDEO UPLOADING
+ *------------------------------------*/
+
 /**
-* @api {POST} /api/s3 Generate a signed url for uploading to s3
+* @api {post} /api/s3 Generate a signed url for uploading to s3
 * @apiName SignVideo
 * @apiGroup s3
 *
@@ -238,11 +254,11 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
 *   HTTP/1.1 200 OK
 *   {
 *     "https://invalidmemories.s3-us-west-1.amazonaws.com/test4.mp4
-      ?X-Amz-Algorithm=AWS4-HMAC-SHA256
-      &X-Amz-Credential=NOT_FOR_OTHERS_TO_SEEus-west-1%2Fs3%2Faws4_request
-      &X-Amz-Date=20161115T202301Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host
-      &X-Amz-Signature=SUPER_SECRET"
-    }
+*     ?X-Amz-Algorithm=AWS4-HMAC-SHA256
+*     &X-Amz-Credential=NOT_FOR_OTHERS_TO_SEEus-west-1%2Fs3%2Faws4_request
+*     &X-Amz-Date=20161115T202301Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host
+*     &X-Amz-Signature=SUPER_SECRET"
+*   }
 * 
 * @apiErrorExample Error-Response:
 *   HTTP/1.1 403 Permission denied (check your credentials!)
@@ -257,26 +273,23 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
     Filetype string `json:"filetype"`
   }
 
-  var v = new(Vidfile)
+  v := new(Vidfile)
   err := decoder.Decode(&v)
-
   if err != nil {
     panic(err)
   }
-  // fmt.Println("got something", v, v.Filename, v.Filetype)
 
   // get presigned url to allow upload on client side
   svc := s3.New(session.New(&aws.Config{Region: aws.String("us-west-1")}))
   req, _ := svc.PutObjectRequest(&s3.PutObjectInput{
-      Bucket: aws.String("invalidmemories"),
-      Key:    aws.String(v.Filename),
+    Bucket: aws.String("invalidmemories"),
+    Key:    aws.String(v.Filename),
   })
 
   // allow upload with url for 5min
   urlStr, err := req.Presign(5 * time.Minute)
-
   if err != nil {
-      fmt.Println("Failed to sign r", err)
+    fmt.Println("Failed to sign r", err)
   }
   
   j, err := json.Marshal(urlStr)
@@ -284,15 +297,13 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
     fmt.Println("failed to convert to json", err)
   }
 
-  // fmt.Println("The URL is", urlStr)
   w.Header().Set("Access-Control-Allow-Origin", "*")
   w.Header().Set("Content-Type", "application/json")
   w.Write(j)
 }
 
-
 /**
-* @api {OPTIONS} /api/s3 Allow cross-origin requests
+* @api {options} /api/s3 Allow cross-origin requests
 * @apiName AllowAccess
 * @apiGroup s3
 *
@@ -301,19 +312,19 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
 *   HTTP/1.1 200 OK
 *   {
 *     "Access-Control-Allow-Origin": "*"
-      "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE"
-      "Access-Control-Allow-Headers":
-      "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization"
-    }
+*     "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE"
+*     "Access-Control-Allow-Headers":
+*       "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token,
+*        Authorization"
+*   }
 * 
 * @apiErrorExample Error-Response:
 *   HTTP/1.1 404 Not Found
 */
 func AllowAccess(rw http.ResponseWriter, req *http.Request) {
-    rw.Header().Set("Access-Control-Allow-Origin", "*")
-    rw.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-    rw.Header().Set("Access-Control-Allow-Headers",
-        "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-  // Stop here if its Preflighted OPTIONS request
-    return
+  rw.Header().Set("Access-Control-Allow-Origin", "*")
+  rw.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+  rw.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+  
+  return
 }

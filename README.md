@@ -30,6 +30,8 @@
     - Gorilla Mux
     - Gorilla Schema
   - [Redigo](https://github.com/garyburd/redigo)
+  - Amazon AWS SDK
+  - Watson Go SDK
 - Redis 3.2.5
 - AWS S3
 - React
@@ -146,8 +148,10 @@ Update IBM Watson API Keys
 - Update `keys.json` with your API keys
 
 Export AWS Environment Variables
+```
 export AWS_SECRET_ACCESS_KEY=KEEP_ME_SECRET
 export AWS_ACCESS_KEY_ID=MORE_SECRETS
+```
 
 Install all NPM dependencies
 ```

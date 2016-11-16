@@ -4,20 +4,43 @@ import (
   "time"
   "github.com/garyburd/redigo/redis"
   "encoding/json"
+  "github.com/mediawen/watson-go-sdk"
 )
 
+/*-------------------------------------
+ *      VIDEO MODEL STRUCTURE
+ *------------------------------------*/
+
 type Video struct {
-  Title     string    `json:"title"`
-  Url       string    `json:"url"`
-  Hash      string    `json:"hash"`
-  Author_id int       `json:"author_id"`
-  Timestamp time.Time `json:"timestamp"`
-  Private   bool      `json:"private"`
-  Likes     []int     `json:"likes"`
-  Dislikes  []int     `json:"dislikes"`
+  Title       string      `json:"title"`
+  Url         string      `json:"url"`
+  Hash        string      `json:"hash"`
+  Creator     string      `json:"creator"`
+  Timestamp   time.Time   `json:"timestamp"`
+  Private     bool        `json:"private"`
+  Views       int         `json:"views"`
+  Likes       []string    `json:"likes"`
+  Dislikes    []string    `json:"dislikes"`
+  Comments    []int       `json:"comments"`
+  Transcript  Transcript  `json:"transcript"`
 }
 
 type Videos []Video
+
+type Word struct {
+  Token       string    `json:"token"`
+  Begin       float64   `json:"begin"`
+  End         float64   `json:"end"`
+  Confidence  float64   `json:"confidence"`
+}
+
+type Transcript struct {
+  Words []Word  `json:"words"`
+}
+
+/*-------------------------------------
+ *     REDIGO POOL INSTANTIATION
+ *------------------------------------*/
 
 var Pool = newPool()
 
@@ -37,31 +60,55 @@ func HandleError(err error) {
   }
 }
 
+/*-------------------------------------
+ *        VIDEO DB CONTROLLERS
+ *------------------------------------*/
+
 func CreateVideo(v Video) (string, error) {
   conn := Pool.Get()
   defer conn.Close()
 
-  var init []int
-
   v.Timestamp = time.Now()
-  v.Likes = init
-  v.Dislikes = init
 
-  b, err := json.Marshal(v)
-  HandleError(err)
+  conn.Send("MULTI")
+  conn.Send("HSET", "video:" + v.Hash, "title", v.Title)
+  conn.Send("HSET", "video:" + v.Hash, "url", v.Url)
+  conn.Send("HSET", "video:" + v.Hash, "hash", v.Hash)
+  conn.Send("HSET", "video:" + v.Hash, "creator", v.Creator)
+  conn.Send("HSET", "video:" + v.Hash, "timestamp", v.Timestamp)
+  conn.Send("HSET", "video:" + v.Hash, "private", v.Private)
+  conn.Send("HSET", "video:" + v.Hash, "views", 0)
+  conn.Send("HSET", "video:" + v.Hash, "likes", []string{})
+  conn.Send("HSET", "video:" + v.Hash, "dislikes", []string{})
+  conn.Send("HSET", "video:" + v.Hash, "comments", []int{})
 
-  // TODO: when CDN links are defined, set video's key
-  // as the hash identifier rather than entire url
-  reply, err := redis.String(conn.Do("SET", "video:" + v.Url, b))
+  reply, err := redis.Values(conn.Do("EXEC"))
 
-  return reply, err
+  rep, _ := json.Marshal(reply)
+
+  return string(rep), err
 }
 
-func GetVideo(url string) (string, error) {
+func GetVideo(hash string) (string, error) {
   conn := Pool.Get()
   defer conn.Close()
 
-  reply, err := redis.String(conn.Do("GET", "video:" + url))
+  reply, err := redis.StringMap(conn.Do("HGETALL", "video:" + hash))
 
-  return reply, err
+  rep, _ := json.Marshal(reply)
+
+  return string(rep), err
+}
+
+func AddTranscript(hash string, transcript *watson.Text) (string, error) {
+  conn := Pool.Get()
+  defer conn.Close()
+
+  t, _ := json.Marshal(transcript)
+
+  reply, err := redis.StringMap(conn.Do("HSET", "video:" + hash, "transcript", t))
+
+  rep, _ := json.Marshal(reply)
+
+  return string(rep), err
 }
