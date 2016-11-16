@@ -4,7 +4,8 @@
   "description": "Search for video",
   "main": "",
   "scripts": {
-    "test": "mocha server/test/ApiTest.js"
+    "test": "grunt build",
+    "start": "go run main.go"
   },
   "repository": {
     "type": "git",
@@ -21,10 +22,24 @@
   },
   "homepage": "https://github.com/tuna-io/tuna-io#readme",
   "dependencies": {
+    "api-doc": "^4.0.0",
+    "chai": "^3.5.0",
+    "eslint": "^3.10.1",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.7.0",
+    "grunt": "^1.0.1",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-eslint": "^19.0.0",
+    "grunt-go": "^0.1.0",
+    "grunt-mocha-test": "^0.13.2",
+    "mocha": "^3.1.2",
+    "redis-commander": "^0.4.2",
+    "request": "^2.78.0"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^3.1.2",
-    "request": "^2.78.0"
+    "eslint": "^3.10.2",
+    "eslint-plugin-react": "^6.7.1"
   }
 }

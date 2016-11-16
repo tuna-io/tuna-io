@@ -1,6 +1,6 @@
-import React from 'react'
-import Nav from './Nav'
-import Home from './Home'
+import React from 'react';
+import Nav from './Nav';
+import Home from './Home';
 // import { Link } from 'react-router'
 
 export default React.createClass({
@@ -9,4 +9,6 @@ export default React.createClass({
       {this.props.children || <Home />}
     </div>)
   }
-})
+});
+
+// export default App;
