@@ -396,7 +396,9 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
 }
 
 func LogoutUser(w http.ResponseWriter, req *http.Request) {
-  
+
 }
 
+func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
 
+}
