@@ -74,8 +74,6 @@ type Response struct {
 *       ]
 *     }"
 *
-*
-*}
 * 
 * @apiErrorExample Error-Response:
 *   HTTP/1.1 404 Not Found
@@ -123,23 +121,26 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 }
 
 /**
-* @api {get} /api/videos/{url} Retrieve a stored video
+* @api {get} /api/videos/{hash} Retrieve a stored video
 * @apiName GetVideo
 * @apiGroup Videos
 *
-* @apiParam {String} url Link to CDN URL where video is stored
+* @apiParam {String} hash Video hash
 *
 * @apiSuccessExample Success-Response:
 *   HTTP/1.1 200 OK
 *   {
 *     "title": "Sample Title",
-*     "url": "https://amazoncdn.com/bucketname/videotitle.webm",
-*     "hash": "a1b2c3d4-e5f6g7h8",
-*     "author_id": 1,
+*     "url": "https://s3-us-west-1.amazonaws.com/invalidmemories/bill_10s.mp4",
+*     "hash": "b12c8a16bbe30b9d79cbaab81a82151d",
+*     "creator": "chris",
 *     "timestamp": "2016-11-12T17:17:19.308362547-08:00",
-*     "private": true,
-*     "likes": null,
-*     "dislikes": null
+*     "private": "1",
+*     "likes": "[]",
+*     "dislikes": "[]",
+*     "comments": "[]"
+*     "views": "0",
+*     "transcript": (refer to example in `CreateVideo`)
 *   }
 * 
 * @apiErrorExample Error-Response:
