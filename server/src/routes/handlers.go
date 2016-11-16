@@ -223,7 +223,7 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
 }
 
 /**
-* @api {POST} /api/s3 Generate a signed url for uploading to s3
+* @api {post} /api/s3 Generate a signed url for uploading to s3
 * @apiName SignVideo
 * @apiGroup s3
 *
@@ -284,7 +284,7 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
 
 
 /**
-* @api {OPTIONS} /api/s3 Allow cross-origin requests
+* @api {options} /api/s3 Allow cross-origin requests
 * @apiName AllowAccess
 * @apiGroup s3
 *
