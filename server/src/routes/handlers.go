@@ -43,10 +43,10 @@ func IsAlive(w http.ResponseWriter, req *http.Request) {
  *------------------------------------*/
 
 type Response struct {
-  Success     string
-  Hash        string
-  Url         string
-  Transcript  *watson.Text
+  Success     string        `json:"success"`
+  Hash        string        `json:"hash"`
+  Url         string        `json:"url"`
+  Transcript  *watson.Text  `json:"transcript"`
 }
 
 /**
@@ -97,12 +97,14 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
     Transcript: t,
   }
 
+  j, err := json.Marshal(u)
+
   if err != nil {
     w.WriteHeader(http.StatusNotFound)
     fmt.Fprintln(w, err)
   } else {
     w.WriteHeader(http.StatusOK)
-    fmt.Fprintln(w, u)
+    fmt.Fprintln(w, string(j))
   }
 }
 
