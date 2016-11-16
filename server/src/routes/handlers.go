@@ -61,7 +61,21 @@ type Response struct {
 *
 * @apiSuccessExample Success-Response:
 *   HTTP/1.1 200 OK
-*   OK
+*   (Response truncated for brevity)
+*   {
+*     "success": "Successfully uploaded and transcribed video file"
+*     "hash": b12c8a16bbe30b9d79cbaab81a82151d"
+*     "url": "https://s3-us-west-1.amazonaws.com/invalidmemories/bill_10s.mp4"
+*     "transcript": "{
+*       "Words":[
+*         {"Token":"do","Begin":2.4,"End":2.47,"Confidence":0.09763},
+*         {"Token":"you","Begin":2.47,"End":2.58,"Confidence":0.45060},
+*         ...
+*       ]
+*     }"
+*
+*
+*}
 * 
 * @apiErrorExample Error-Response:
 *   HTTP/1.1 404 Not Found
