@@ -110,22 +110,11 @@ func AddTranscript(hash string, transcript *watson.Text) (string, error) {
   conn := Pool.Get()
   defer conn.Close()
 
-  // do something with transcript
+  t, _ := json.Marshal(transcript)
 
-  reply, err := redis.StringMap(conn.Do("HSET", "video:" + hash, "transcript", transcript))
+  reply, err := redis.StringMap(conn.Do("HSET", "video:" + hash, "transcript", t))
 
   rep, _ := json.Marshal(reply)
 
   return string(rep), err
-}
-
-func main() {
-  conn := Pool.Get()
-  defer conn.Close()
-
-  reply, err := redis.String(conn.Do("TYPE", "video:http://www.mp4point.com/downloads/dc97d920c931.mp4"))
-  // reply, err := redis.String(conn.Do("HSET", "video:http://www.mp4point.com/downloads/dc97d920c931.mp4", "title", "HELL YES"))
-
-  fmt.Println("reply", reply)
-  fmt.Println("err:", err)
 }
