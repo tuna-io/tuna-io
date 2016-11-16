@@ -43,14 +43,13 @@ func IsAlive(w http.ResponseWriter, req *http.Request) {
  *------------------------------------*/
 
 /**
-* @api {post} /api/videos Create and store a new video
+* @api {post} /api/videos Create, transcribe, and store a new video
 * @apiName CreateVideo
 * @apiGroup Videos
 *
 * @apiParam {String} title Title of video
 * @apiParam {String} url Link to CDN URL where video is stored
-* @apiParam {String} hash Hashed path to URL (for client routing)
-* @apiParam {Number} author_id Unique ID of video uploader
+* @apiParam {String} creator Username of video uploader
 * @apiParam {Boolean} private True/False, whether the video is private
 *
 * @apiSuccessExample Success-Response:
@@ -71,11 +70,15 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   }
 
   hasher := md5.New()
-  hasher.Write([]byte(v.Url))
+  hasher.Write([]byte(video.Url))
   hash := hex.EncodeToString(hasher.Sum(nil))
-  v.Hash = hash
+  video.Hash = hash
+
+  fmt.Println("Generating hash for video:", hash)
 
   status, err := db.CreateVideo(*video)
+
+
 
   w.Header().Set("Content-Type", "application/json")
 
@@ -149,9 +152,7 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 *   exit status 1 (Note that this error typically means that ffmpeg has failed)
 *   Watson says, "not authorized" (signifies IBM Watson authorization error)
 */
-func ProcessVideo(w http.ResponseWriter, req *http.Request) {
-  url := req.FormValue("url")
-  hash := req.FormValue("hash")
+func ProcessVideo(url string, hash string) (string, error) {
   applicationName := "ffmpeg"
   arg0 := "-i"
   destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
@@ -159,18 +160,12 @@ func ProcessVideo(w http.ResponseWriter, req *http.Request) {
   cmd := exec.Command(applicationName, arg0, url, destination)
   out, err := cmd.Output()
 
-  w.Header().Set("Content-Type", "application/json")
-
   if err != nil {
-    w.WriteHeader(http.StatusNotFound)
-    fmt.Fprintf(w, err.Error())
-    return
-  } else {
-    t := TranscribeAudio(destination)
-    db.AddTranscript(hash, t)
-    w.WriteHeader(http.StatusOK)
-    fmt.Fprintln(w, t)
+    return nil, err
   }
+
+  t := TranscribeAudio(destination)
+  db.AddTranscript(hash, t)
 
   cmd = exec.Command("rm", destination)
   out, err = cmd.Output()
@@ -180,7 +175,42 @@ func ProcessVideo(w http.ResponseWriter, req *http.Request) {
   } else {
     fmt.Println("successfully deleted file", out)
   }
+
+  return t, err
 }
+
+// func ProcessVideo(w http.ResponseWriter, req *http.Request) {
+//   url := req.FormValue("url")
+//   hash := req.FormValue("hash")
+//   applicationName := "ffmpeg"
+//   arg0 := "-i"
+//   destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
+
+//   cmd := exec.Command(applicationName, arg0, url, destination)
+//   out, err := cmd.Output()
+
+//   w.Header().Set("Content-Type", "application/json")
+
+//   if err != nil {
+//     w.WriteHeader(http.StatusNotFound)
+//     fmt.Fprintf(w, err.Error())
+//     return
+//   } else {
+//     t := TranscribeAudio(destination)
+//     db.AddTranscript(hash, t)
+//     w.WriteHeader(http.StatusOK)
+//     fmt.Fprintln(w, t)
+//   }
+
+//   cmd = exec.Command("rm", destination)
+//   out, err = cmd.Output()
+
+//   if err != nil {
+//     fmt.Println("error deleting file", err)
+//   } else {
+//     fmt.Println("successfully deleted file", out)
+//   }
+// }
 
 /*-------------------------------------
  *      AUDIO FILE TRANSCRIPTION

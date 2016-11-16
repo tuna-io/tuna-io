@@ -4,7 +4,6 @@ import (
   "time"
   "github.com/garyburd/redigo/redis"
   "encoding/json"
-  "fmt"
   "github.com/mediawen/watson-go-sdk"
 )
 
