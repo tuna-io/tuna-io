@@ -5,7 +5,7 @@ import (
   "github.com/garyburd/redigo/redis"
   "encoding/json"
   "fmt"
-  "reflect"
+  "github.com/mediawen/watson-go-sdk"
 )
 
 /*-------------------------------------
@@ -65,7 +65,7 @@ func HandleError(err error) {
  *        VIDEO DB CONTROLLERS
  *------------------------------------*/
 
-func CreateVideo(v Video) (interface{}, error) {
+func CreateVideo(v Video) (string, error) {
   conn := Pool.Get()
   defer conn.Close()
 
@@ -88,12 +88,11 @@ func CreateVideo(v Video) (interface{}, error) {
   conn.Send("HSET", "video:" + v.Hash, "dislikes", []string{})
   conn.Send("HSET", "video:" + v.Hash, "comments", []int{})
 
-  reply, err := conn.Do("EXEC")
+  reply, err := redis.Values(conn.Do("EXEC"))
 
-  fmt.Println("typeof reply", reflect.TypeOf(reply))
+  rep, _ := json.Marshal(reply)
 
-
-  return reply, err
+  return string(rep), err
 }
 
 func GetVideo(hash string) (string, error) {
@@ -101,6 +100,19 @@ func GetVideo(hash string) (string, error) {
   defer conn.Close()
 
   reply, err := redis.StringMap(conn.Do("HGETALL", "video:" + hash))
+
+  rep, _ := json.Marshal(reply)
+
+  return string(rep), err
+}
+
+func AddTranscript(hash string, transcript *watson.Text) (string, error) {
+  conn := Pool.Get()
+  defer conn.Close()
+
+  // do something with transcript
+
+  reply, err := redis.StringMap(conn.Do("HSET", "video:" + hash, "transcript", transcript))
 
   rep, _ := json.Marshal(reply)
 

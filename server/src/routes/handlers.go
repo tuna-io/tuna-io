@@ -105,9 +105,9 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 *   redigo: nil return
 */
 func GetVideo(w http.ResponseWriter, req *http.Request) {
-  url := mux.Vars(req)["url"]
+  hash := mux.Vars(req)["hash"]
 
-  video, err := db.GetVideo(url)
+  video, err := db.GetVideo(hash)
   w.Header().Set("Content-Type", "application/json")
 
   if (err != nil) {
@@ -141,6 +141,7 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 */
 func ProcessVideo(w http.ResponseWriter, req *http.Request) {
   url := req.FormValue("url")
+  hash := req.FormValue("hash")
   applicationName := "ffmpeg"
   arg0 := "-i"
   destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
@@ -156,6 +157,7 @@ func ProcessVideo(w http.ResponseWriter, req *http.Request) {
     return
   } else {
     t := TranscribeAudio(destination)
+    db.AddTranscript(hash, t)
     w.WriteHeader(http.StatusOK)
     fmt.Fprintln(w, t)
   }
