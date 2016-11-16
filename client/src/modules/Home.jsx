@@ -1,9 +1,9 @@
-import React from 'react'
+import React from 'react';
 
 export default React.createClass({
   render() {
     return (
-      <div>Dashboard overview</div>
+      <div>Default homepage component</div>
       )
   }
-})
+});

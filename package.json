@@ -4,7 +4,7 @@
   "description": "Search for video",
   "main": "",
   "scripts": {
-    "test": "mocha server/test/ApiTest.js",
+    "test": "grunt test",
     "lint": "eslint ./"
   },
   "repository": {
@@ -39,8 +39,5 @@
     "request": "^2.78.0"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^3.1.2",
-    "request": "^2.78.0"
   }
 }

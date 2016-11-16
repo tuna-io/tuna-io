@@ -1,9 +1,9 @@
-import React from 'react'
+import React from 'react';
 
 export default React.createClass({
   render() {
     return (
-      <div>Repos</div>
+      <div>This is the signin page</div>
       )
   }
-})
+});

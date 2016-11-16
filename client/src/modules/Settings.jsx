@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export default React.createClass({
   render() {
@@ -6,4 +6,6 @@ export default React.createClass({
       <div>This is the settings subpage</div>
       )
   }
-})
+});
+
+// export default Settings;
