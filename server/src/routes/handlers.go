@@ -70,7 +70,13 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
     panic(err)
   }
 
+  hasher := md5.New()
+  hasher.Write([]byte(v.Url))
+  hash := hex.EncodeToString(hasher.Sum(nil))
+  v.Hash = hash
+
   status, err := db.CreateVideo(*video)
+
   w.Header().Set("Content-Type", "application/json")
 
   // TODO: push video hash into user's videos' array
