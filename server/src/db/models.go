@@ -71,11 +71,6 @@ func CreateVideo(v Video) (string, error) {
 
   v.Timestamp = time.Now()
 
-  // b, err := json.Marshal(v)
-  // HandleError(err)
-
-  // TODO: when CDN links are defined, set video's key
-  // as the hash identifier rather than entire url
   conn.Send("MULTI")
   conn.Send("HSET", "video:" + v.Hash, "title", v.Title)
   conn.Send("HSET", "video:" + v.Hash, "url", v.Url)

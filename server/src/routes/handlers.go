@@ -16,6 +16,8 @@ import (
   "github.com/aws/aws-sdk-go/aws/session"
   "github.com/aws/aws-sdk-go/service/s3"
   "time"
+  "crypto/md5"
+  "encoding/hex"
 )
 
 /**
@@ -71,7 +73,9 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   status, err := db.CreateVideo(*video)
   w.Header().Set("Content-Type", "application/json")
 
-  if (err != nil) {
+  // TODO: push video hash into user's videos' array
+
+    if (err != nil) {
     w.WriteHeader(http.StatusNotFound)
     fmt.Fprintln(w, err)
   } else {
@@ -224,6 +228,10 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
   return tt
 }
 
+/*-------------------------------------
+ *         S3 VIDEO UPLOADING
+ *------------------------------------*/
+
 /**
 * @api {post} /api/s3 Generate a signed url for uploading to s3
 * @apiName SignVideo
@@ -308,7 +316,6 @@ func AllowAccess(rw http.ResponseWriter, req *http.Request) {
   rw.Header().Set("Access-Control-Allow-Origin", "*")
   rw.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
   rw.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-  // Stop here if its Preflighted OPTIONS request
   
   return
 }
