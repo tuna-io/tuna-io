@@ -4,7 +4,8 @@ import (
   "net/http"
   "github.com/gorilla/mux"
   "fmt"
-  "db"
+  "dbModel" 
+  "videosModel"
   "github.com/gorilla/schema"
   "strings"
   "os/exec"
@@ -159,6 +160,20 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
   } else {
     w.WriteHeader(http.StatusOK)
     fmt.Fprintln(w, video)
+  }
+}
+
+func GetLatestVideos(w http.ResponseWriter, req *http.Request) {
+  videos, err := videos.GetLatestVideos()
+  w.Header().Set("Content-Type", "application/json")
+
+
+  if (err != nil) {
+    w.WriteHeader(http.StatusNotFound)
+    fmt.Fprintln(w, err)
+  } else {
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintln(w, videos)
   }
 }
 
