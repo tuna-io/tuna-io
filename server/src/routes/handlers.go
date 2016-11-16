@@ -42,6 +42,13 @@ func IsAlive(w http.ResponseWriter, req *http.Request) {
  *          VIDEO HANDLERS
  *------------------------------------*/
 
+type Response struct {
+  Success     string
+  Hash        string
+  Url         string
+  Transcript  *watson.Text
+}
+
 /**
 * @api {post} /api/videos Create, transcribe, and store a new video
 * @apiName CreateVideo
@@ -65,6 +72,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   video := new(db.Video)
   decoder := schema.NewDecoder()
   err = decoder.Decode(video, req.Form)
+
   if err != nil {
     panic(err)
   }
@@ -82,25 +90,21 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 
   t, err := ProcessVideo(video.Url, hash)
 
+  u := Response{
+    Success: "Successfully uploaded and transcribed video file",
+    Hash: hash,
+    Url: video.Url,
+    Transcript: t,
+  }
+
   if err != nil {
     w.WriteHeader(http.StatusNotFound)
     fmt.Fprintln(w, err)
   } else {
     w.WriteHeader(http.StatusOK)
-    fmt.Fprintln(w, t)
+    fmt.Fprintln(w, u)
   }
 }
-
-  // TODO: push video hash into user's videos' array
-
-//     if (err != nil) {
-//     w.WriteHeader(http.StatusNotFound)
-//     fmt.Fprintln(w, err)
-//   } else {
-//     w.WriteHeader(http.StatusOK)
-//     fmt.Fprintln(w, status)
-//   }
-// }
 
 /**
 * @api {get} /api/videos/{url} Retrieve a stored video
@@ -227,10 +231,10 @@ type Configuration struct {
 }
 
 type Word struct {
-  Token string
-  Begin float64
-  End float64
-  Confidence float64
+  Token       string
+  Begin       float64
+  End         float64
+  Confidence  float64
 }
 
 type Text struct {

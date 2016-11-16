@@ -28,14 +28,14 @@ type Video struct {
 type Videos []Video
 
 type Word struct {
-  Token string
-  Begin float64
-  End float64
-  Confidence float64
+  Token       string    `json:"token"`
+  Begin       float64   `json:"begin"`
+  End         float64   `json:"end"`
+  Confidence  float64   `json:"confidence"`
 }
 
 type Transcript struct {
-  Words []Word
+  Words []Word  `json:"words"`
 }
 
 /*-------------------------------------
