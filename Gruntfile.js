@@ -1,40 +1,20 @@
-module.exports = function(grunt) {
-
-  // Project configuration.
+module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    
     mochaTest: {
       test: {
         options: {
-          reporter: 'spec'
+          reporter: 'spec',
         },
-        src: ['server/test/*.js']
-      }
-    }
-
-    // eslint: {
-    //   target: ['client/src/moudles/*.js']
-    // }
-    // go: {
-    //   options: {
-    //     GOPATH: ["./server/"]
-    //   },
-
-    //   myapp: {
-    //     output: "app",
-    //     src: ["main.go"]
-    //   }
-    // }
-    // uglify: {
-    //   options: {
-    //     banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-    //   },
-    //   build: {
-    //     src: 'src/<%= pkg.name %>.js',
-    //     dest: 'build/<%= pkg.name %>.min.js'
-    //   }
-    // }
+        src: ['server/test/*.js'],
+      },
+    },
+    eslint: {
+      options: {
+        configFile: '.eslintrc.js',
+      },
+      target: ['*'],
+    },
   });
 
   grunt.loadNpmTasks('grunt-mocha-test');
@@ -42,14 +22,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-eslint');
 
   grunt.registerTask('test', [
-    'mochaTest'
+    'mochaTest',
   ]);
-
-  // grunt.registerTask('dev', [
-  //   'go'
-  // ]);
-
-  // grunt.registerTask('lint', [
-  //   'eslint'
-  // ]);
+  grunt.registerTask('build', [
+    'test', 'eslint',
+  ]);
 };
+

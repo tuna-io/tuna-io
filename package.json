@@ -4,8 +4,8 @@
   "description": "Search for video",
   "main": "",
   "scripts": {
-    "test": "grunt test",
-    "lint": "eslint ./"
+    "test": "grunt build",
+    "start": "go run main.go"
   },
   "repository": {
     "type": "git",
@@ -39,5 +39,7 @@
     "request": "^2.78.0"
   },
   "devDependencies": {
+    "eslint": "^3.10.2",
+    "eslint-plugin-react": "^6.7.1"
   }
 }

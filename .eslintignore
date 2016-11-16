@@ -2,3 +2,9 @@
 **/node_modules
 **/server
 **/doc
+*.go
+*.md
+client/src/index.js
+circle.yml
+LICENSE
+package.json
