@@ -162,26 +162,6 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
   }
 }
 
-/**
-* @api {post} /api/videos/process Process a video and generate a transcript
-* @apiName ProcessVideo
-* @apiGroup Videos
-*
-* @apiParam {String} url Link to CDN URL where video is stored
-*
-* @apiSuccessExample Success-Response:
-*   HTTP/1.1 200 OK
-*   (truncated for brevity)
-*   [
-*     {word start_time end_time confidence},
-*     {word start_time end_time confidence}, ...
-*   ]
-* 
-* @apiErrorExample Error-Response:
-*   HTTP/1.1 404 Not Found
-*   exit status 1 (Note that this error typically means that ffmpeg has failed)
-*   Watson says, "not authorized" (signifies IBM Watson authorization error)
-*/
 func ProcessVideo(url string, hash string) (*watson.Text, error) {
   applicationName := "ffmpeg"
   arg0 := "-i"
@@ -204,39 +184,6 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
 
   return t, err
 }
-
-// func ProcessVideo(w http.ResponseWriter, req *http.Request) {
-//   url := req.FormValue("url")
-//   hash := req.FormValue("hash")
-//   applicationName := "ffmpeg"
-//   arg0 := "-i"
-//   destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
-
-//   cmd := exec.Command(applicationName, arg0, url, destination)
-//   out, err := cmd.Output()
-
-//   w.Header().Set("Content-Type", "application/json")
-
-//   if err != nil {
-//     w.WriteHeader(http.StatusNotFound)
-//     fmt.Fprintf(w, err.Error())
-//     return
-//   } else {
-//     t := TranscribeAudio(destination)
-//     db.AddTranscript(hash, t)
-//     w.WriteHeader(http.StatusOK)
-//     fmt.Fprintln(w, t)
-//   }
-
-//   cmd = exec.Command("rm", destination)
-//   out, err = cmd.Output()
-
-//   if err != nil {
-//     fmt.Println("error deleting file", err)
-//   } else {
-//     fmt.Println("successfully deleted file", out)
-//   }
-// }
 
 /*-------------------------------------
  *      AUDIO FILE TRANSCRIPTION
@@ -289,6 +236,7 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
 
   return tt
 }
+
 
 /*-------------------------------------
  *         S3 VIDEO UPLOADING
@@ -353,7 +301,6 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
   w.Header().Set("Content-Type", "application/json")
   w.Write(j)
 }
-
 
 /**
 * @api {options} /api/s3 Allow cross-origin requests
