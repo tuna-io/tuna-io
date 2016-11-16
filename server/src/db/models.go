@@ -40,6 +40,22 @@ type Transcript struct {
 }
 
 /*-------------------------------------
+ *      USER MODEL STRUCTURE
+ *------------------------------------*/
+
+type User struct {
+  Username        string     `json:"username"`
+  Password        string     `json:"password"`
+  Email           string     `json:"email"`
+  Videos          []string   `json:"videos"`
+  Subscriptions   []string   `json:"subscriptions"`
+  LikedVideos     []string   `json:"liked_videos"`
+  Timestamp       time.Time  `json:"timestamp"`
+}
+
+type Users []User
+
+/*-------------------------------------
  *     REDIGO POOL INSTANTIATION
  *------------------------------------*/
 
