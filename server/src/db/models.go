@@ -77,8 +77,17 @@ func CreateVideo(v Video) (interface{}, error) {
   // TODO: when CDN links are defined, set video's key
   // as the hash identifier rather than entire url
   conn.Send("MULTI")
+  conn.Send("HSET", "video:" + v.Hash, "title", v.Title)
   conn.Send("HSET", "video:" + v.Hash, "url", v.Url)
   conn.Send("HSET", "video:" + v.Hash, "hash", v.Hash)
+  conn.Send("HSET", "video:" + v.Hash, "creator", v.Creator)
+  conn.Send("HSET", "video:" + v.Hash, "timestamp", v.Timestamp)
+  conn.Send("HSET", "video:" + v.Hash, "private", v.Private)
+  conn.Send("HSET", "video:" + v.Hash, "views", 0)
+  conn.Send("HSET", "video:" + v.Hash, "likes", []string{})
+  conn.Send("HSET", "video:" + v.Hash, "dislikes", []string{})
+  conn.Send("HSET", "video:" + v.Hash, "comments", []int{})
+
   reply, err := conn.Do("EXEC")
 
   fmt.Println("typeof reply", reflect.TypeOf(reply))
