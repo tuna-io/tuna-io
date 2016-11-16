@@ -381,3 +381,22 @@ func AllowAccess(rw http.ResponseWriter, req *http.Request) {
   
   return
 }
+
+
+/*-------------------------------------
+ *       CLIENT AUTHENTICATION
+ *------------------------------------*/
+
+func RegisterUser(w http.ResponseWriter, req *http.Request) {
+
+}
+
+func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
+
+}
+
+func LogoutUser(w http.ResponseWriter, req *http.Request) {
+  
+}
+
+
