@@ -16,3 +16,7 @@ npm-debug.log
 
 # API keys
 /server/src/cfg/keys.json
+
+# DS store
+server/.DS_Store
+server/src/.DS_Store

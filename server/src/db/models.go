@@ -5,6 +5,7 @@ import (
   "github.com/garyburd/redigo/redis"
   "encoding/json"
   "github.com/mediawen/watson-go-sdk"
+  "fmt"
 )
 
 /*-------------------------------------
@@ -112,3 +113,35 @@ func AddTranscript(hash string, transcript *watson.Text) (string, error) {
 
   return string(rep), err
 }
+
+func GetLatestVideos() (string, error) {
+  conn := Pool.Get()
+  defer conn.Close()
+
+  // Get all the video-specific keys within the array.
+  keys, err := redis.Strings(conn.Do("KEYS", "video:*"))
+  if err != nil {
+    fmt.Println("Error getting all the video keys:", err)
+  }
+
+  // Create an array of map of string => string to store video hash information
+  var resultData []map[string]string
+
+  for _, key := range keys {
+    // Get all key-value pairs within a hash and store as a map of string => string
+    keyValueMap, err := redis.StringMap(conn.Do("HGETALL", key))
+    if err != nil {
+      fmt.Println("Error getting hash information for", key, err)
+    }
+
+    resultData = append(resultData, keyValueMap)
+  }
+
+  // TODO sort by latest results eventually: https://golang.org/pkg/sort/
+
+  // Marshal the results array and cast to string before sending back
+  results, _ := json.Marshal(resultData) 
+
+  return string(results), err
+}
+
