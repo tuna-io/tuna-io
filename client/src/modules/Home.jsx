@@ -19,7 +19,6 @@ export default class Home extends React.Component {
     var url = 'http://localhost:3000/api/videos/latest';
     var requestOptions = {
       'method': 'GET', 
-      'mode': 'cors', 
       'headers' : new Headers({ 'Content-Type': 'application/json' })
     };
     var request = new Request(url, requestOptions);
