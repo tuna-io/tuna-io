@@ -203,9 +203,8 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 *   HTTP/1.1 500 Internal Server Error
 */
 func GetLatestVideos(w http.ResponseWriter, req *http.Request) {
+  AllowAccess(w, req)
   videos, err := db.GetLatestVideos()
-  w.Header().Set("Content-Type", "application/json")
-
 
   if (err != nil) {
     w.WriteHeader(http.StatusInternalServerError)
