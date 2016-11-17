@@ -18,6 +18,7 @@ import (
   "time"
   "crypto/md5"
   "encoding/hex"
+  "io"
 )
 
 /**
@@ -405,12 +406,13 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
   } else {
     w.WriteHeader(http.StatusCreated) // 201
     fmt.Fprintln(w, "User successfully registered!")
+    // TODO create session for user
   }
 
 }
 
 func LoginUser(w http.ResponseWriter, req *http.Request) {
-
+  
 }
 
 func LogoutUser(w http.ResponseWriter, req *http.Request) {
@@ -418,5 +420,16 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
 }
 
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
+  username := mux.Vars(req)["username"]
 
+  h := md5.New()
+  io.WriteString(h, "firstpassword")
+  digest := fmt.Sprintf("%x", h.Sum(nil))
+
+
+  t, err := db.RetrieveUser(username)
+  fmt.Println("retrieved pw:", t["password"])
+  fmt.Println("equivalence", t["password"] == digest)
+  // fmt.Println("equivalence2", t["password"] == string(h.Sum(nil)))
+  fmt.Println(t, err)
 }

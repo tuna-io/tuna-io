@@ -5,6 +5,8 @@ import (
   "github.com/garyburd/redigo/redis"
   "encoding/json"
   "github.com/mediawen/watson-go-sdk"
+  "crypto/md5"
+  "io"
   "fmt"
 )
 

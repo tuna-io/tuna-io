@@ -44,7 +44,7 @@ func main() {
   u.Methods("POST").Path("/register").HandlerFunc(routes.RegisterUser)
   u.Methods("GET").Path("/login").HandlerFunc(routes.LoginUser)
   u.Methods("GET").Path("/logout").HandlerFunc(routes.LogoutUser)
-  u.Methods("GET").Path("/authenticate").HandlerFunc(routes.AuthenticateUser)
+  u.Methods("GET").Path("/{username}").HandlerFunc(routes.AuthenticateUser)
 
   /*-------------------------------------
    *      `/` STATIC FILE SERVER
