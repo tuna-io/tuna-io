@@ -41,6 +41,7 @@ func main() {
    *      `/api/users` SUB-ROUTER
    *------------------------------------*/
   u := api.PathPrefix("/users").Subrouter()
+  u.Methods("OPTIONS").HandlerFunc(routes.AllowAccess)
   u.Methods("POST").Path("/register").HandlerFunc(routes.RegisterUser)
   u.Methods("POST").Path("/login").HandlerFunc(routes.LoginUser)
   u.Methods("GET").Path("/logout").HandlerFunc(routes.LogoutUser)

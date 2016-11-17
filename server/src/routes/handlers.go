@@ -541,6 +541,7 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
 *   http: named cookie not present
 */
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
+  AllowAccess(w, req)
   w.Header().Set("Content-Type", "application/json")
 
   if cookie, err := req.Cookie("session"); err == nil {
