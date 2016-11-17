@@ -35,11 +35,39 @@ export default React.createClass({
         });
     })
     .then((data) => {
-      console.log('we got data', data, typeof data, data.body);
-      return data.json();
+      console.log('we got data', data, 'and', data.body);
+      // return data.json();
+      // var params = {
+      //     'title': 'test',
+      //     'url': 'https://d2bezlfyzapny1.cloudfront.net/bill_10s.mp4',
+      //     'creator': 'bill',
+      //     'private': false
+      //   };
+      // var form = new FormData();
+
+      // for (var key in params) {
+      //   form.append(key, params[key]);
+      // }
+
+      return fetch('http://localhost:3000/api/videos', {
+        method: 'POST',
+        body: JSON.stringify({
+          'title': 'test',
+          'url': 'https://d2bezlfyzapny1.cloudfront.net/bill_10s.mp4',
+          'creator': 'bill',
+          'private': false
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
     })
-    .then((awsUrl) => {
-      console.log('response is', awsUrl);
+    .then((rawResp)=> {
+      console.log('raw resp returned');
+      return rawResp.json();
+    })
+    .then((resp)=> {
+      console.log('fetch returned', resp);
     })
     .catch((err) => {
       console.log('error uploading', err);
@@ -57,6 +85,7 @@ export default React.createClass({
             Drop some files here!
           </div>
         </Dropzone>
+        <video muted='true' src="https://d2bezlfyzapny1.cloudfront.net/bill_10s.mp4" style={videoStyle}/>
       </div>
       );
   }

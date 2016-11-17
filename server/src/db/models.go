@@ -8,6 +8,7 @@ import (
   "encoding/json"
   "github.com/garyburd/redigo/redis"
   "github.com/mediawen/watson-go-sdk"
+  "fmt"
 )
 
 /*-------------------------------------
@@ -87,6 +88,8 @@ func HandleError(err error) {
  *------------------------------------*/
 
 func CreateVideo(v Video) (string, error) {
+  fmt.Println("working")
+  
   conn := Pool.Get()
   defer conn.Close()
 

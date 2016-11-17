@@ -81,11 +81,17 @@ type Response struct {
 *   Redigo failed to create and store the video
 */
 func CreateVideo(w http.ResponseWriter, req *http.Request) {
-  err := req.ParseForm()
+  decoder := json.NewDecoder(req.Body)
   video := new(db.Video)
-  decoder := schema.NewDecoder()
-  err = decoder.Decode(video, req.Form)
+  err := decoder.Decode(&video)
 
+  // err := req.ParseForm()
+  // video := new(db.Video)
+  // decoder := schema.NewDecoder()
+  // err = decoder.Decode(video, req.Form)
+  
+  fmt.Println(video.Url, video.Title, video.Creator, video.Private)
+  
   if err != nil {
     panic(err)
   }
@@ -113,9 +119,15 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   j, err := json.Marshal(u)
 
   if err != nil {
+<<<<<<< HEAD
     w.WriteHeader(http.StatusInternalServerError)
+=======
+    fmt.Println("errored out", err)
+    w.WriteHeader(http.StatusNotFound)
+>>>>>>> 38b4ffd... Post createdvideo from client
     fmt.Fprintln(w, err)
   } else {
+    fmt.Println("successful", j)
     w.WriteHeader(http.StatusOK)
     fmt.Fprintln(w, string(j))
   }
@@ -323,11 +335,6 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
   // create new video object from given request json
   decoder := json.NewDecoder(r.Body)
 
-  type Vidfile struct {
-    Filename string `json:"filename"`
-    Filetype string `json:"filetype"`
-  }
-
   v := new(Vidfile)
   err := decoder.Decode(&v)
   if err != nil {
@@ -356,6 +363,12 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
   w.Header().Set("Content-Type", "application/json")
   w.Write(j)
 }
+
+type Vidfile struct {
+  Filename string `json:"filename"`
+  Filetype string `json:"filetype"`
+}
+
 
 /**
 * @api {options} /api/s3 Allow cross-origin requests
