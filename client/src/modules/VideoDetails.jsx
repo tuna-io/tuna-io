@@ -10,7 +10,15 @@ class VideoDetails extends Component {
     };
 
     // make API call
-    const url = 'http://localhost:3000/api/videos/' + props.params.videoId;
+    this.fetchVideoFromAPI(props.params.videoId);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.fetchVideoFromAPI(nextProps.params.videoId);
+  }
+
+  fetchVideoFromAPI(videoId) {
+    const url = 'http://localhost:3000/api/videos/' + videoId;
     const options = {
       method: 'GET',
       headers: new Headers({ 'Content-Type': 'application/json' }),
@@ -23,33 +31,19 @@ class VideoDetails extends Component {
       this.setState({ currentVideoDetails: jsonResponse });
     })
     .catch((err) => {
-      console.log('Error fetching video with ID', props.params.videoId, err);
+      console.log('Error fetching video with ID', videoId, err);
     });
   }
 
-  componentWillMount() {
-
-  }
-
-  componentWillReceiveProps(nextProps) {
-    console.log('future API calls');
-  }
-
-  componentWillUpdate(nextProps, nextState) {
-    // console.log(nextProps.params.videoId);
-  }
-
   render() {
-    console.log('rendering. props:', this.state);
+    console.log('rendering. state:', this.state);
 
     if (this.state.currentVideoDetails) {
       return (
         <div>
           <h1>{this.state.currentVideoDetails.title}</h1>
           <div>
-            <video width="400" controls>
-              <source src={this.state.currentVideoDetails.url} type="video/mp4" />
-            </video>
+            <video width="400" src={this.state.currentVideoDetails.url} controls />
           </div>
           <div>Creator: {this.state.currentVideoDetails.creator}</div>
           <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
