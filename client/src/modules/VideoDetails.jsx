@@ -45,9 +45,14 @@ class VideoDetails extends Component {
     if (this.state.currentVideoDetails) {
       return (
         <div>
-          <video width="400" controls>
-            <source src={this.state.currentVideoDetails.url} type="video/mp4" />
-          </video>
+          <h1>{this.state.currentVideoDetails.title}</h1>
+          <div>
+            <video width="400" controls>
+              <source src={this.state.currentVideoDetails.url} type="video/mp4" />
+            </video>
+          </div>
+          <div>Creator: {this.state.currentVideoDetails.creator}</div>
+          <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
         </div>
       );
     }
