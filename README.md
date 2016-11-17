@@ -147,10 +147,15 @@ Update IBM Watson API Keys
 - Register for a user and pass for the speech-to-text service
 - Update `keys.json` with your API keys
 
-Export AWS Environment Variables
+Save AWS Key to Config file
 ```
-export AWS_SECRET_ACCESS_KEY=KEEP_ME_SECRET
-export AWS_ACCESS_KEY_ID=MORE_SECRETS
+-Create a config file in your personal user directory (not the project directory) at ~/.aws/credentials 
+-Sign up for an AWS S3 account, go to security and copy over a new key
+-With the new info, save the credentials file in this format (aws sdk will do the rest!)
+[default]
+aws_access_key_id = SUPER_SECRET
+aws_secret_access_key = EVEN_MORE_SECRET
+
 ```
 
 Install all NPM dependencies

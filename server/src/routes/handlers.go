@@ -81,14 +81,20 @@ type Response struct {
 *   Redigo failed to create and store the video
 */
 func CreateVideo(w http.ResponseWriter, req *http.Request) {
-  err := req.ParseForm()
+  decoder := json.NewDecoder(req.Body)
   video := new(db.Video)
-  decoder := schema.NewDecoder()
-  err = decoder.Decode(video, req.Form)
+  err := decoder.Decode(&video)
 
+  // err := req.ParseForm()
+  // video := new(db.Video)
+  // decoder := schema.NewDecoder()
+  // err = decoder.Decode(video, req.Form)
   if err != nil {
     panic(err)
   }
+  
+  fmt.Println(video.Url, video.Title, video.Creator, video.Private)
+  
 
   hasher := md5.New()
   hasher.Write([]byte(video.Url))
@@ -102,6 +108,9 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "application/json")
 
   t, err := ProcessVideo(video.Url, hash)
+  if err != nil {
+    panic(err)
+  }
 
   u := Response{
     Success: "Successfully uploaded and transcribed video file",
@@ -112,8 +121,12 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 
   j, err := json.Marshal(u)
 
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Header().Set("Content-Type", "application/json")
+
   if err != nil {
     w.WriteHeader(http.StatusInternalServerError)
+    fmt.Println("errored out", err)
     fmt.Fprintln(w, err)
   } else {
     w.WriteHeader(http.StatusOK)
@@ -217,12 +230,16 @@ func GetLatestVideos(w http.ResponseWriter, req *http.Request) {
 }
 
 func ProcessVideo(url string, hash string) (*watson.Text, error) {
+
   applicationName := "ffmpeg"
   arg0 := "-i"
   destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
-
   cmd := exec.Command(applicationName, arg0, url, destination)
   out, err := cmd.Output()
+
+  if err != nil {
+    panic(err)
+  }
 
   t := TranscribeAudio(destination)
   db.AddTranscript(hash, t)
@@ -323,11 +340,6 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
   // create new video object from given request json
   decoder := json.NewDecoder(r.Body)
 
-  type Vidfile struct {
-    Filename string `json:"filename"`
-    Filetype string `json:"filetype"`
-  }
-
   v := new(Vidfile)
   err := decoder.Decode(&v)
   if err != nil {
@@ -339,6 +351,7 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
   req, _ := svc.PutObjectRequest(&s3.PutObjectInput{
     Bucket: aws.String("invalidmemories"),
     Key:    aws.String(v.Filename),
+    ACL:    aws.String("public-read"),
   })
 
   // allow upload with url for 5min
@@ -346,16 +359,22 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
   if err != nil {
     fmt.Println("Failed to sign r", err)
   }
-  
+
   j, err := json.Marshal(urlStr)
   if err != nil {
     fmt.Println("failed to convert to json", err)
   }
-
+  
   w.Header().Set("Access-Control-Allow-Origin", "*")
   w.Header().Set("Content-Type", "application/json")
   w.Write(j)
 }
+
+type Vidfile struct {
+  Filename string `json:"filename"`
+  Filetype string `json:"filetype"`
+}
+
 
 /**
 * @api {options} /api/s3 Allow cross-origin requests
