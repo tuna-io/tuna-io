@@ -8,6 +8,7 @@ export default React.createClass({
         <ul>
           <li><Link to="/about">About</Link></li>
           <li><Link to="/signin">Sign in</Link></li>
+          <li><Link to="/register">Register</Link></li>
           <li><Link to="/dashboard">Dashboard</Link></li>
         </ul>
       </div>
