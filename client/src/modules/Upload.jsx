@@ -35,7 +35,7 @@ export default React.createClass({
         });
     })
     .then((data) => {
-      console.log('we got data', data);
+      console.log('we got data', data, typeof data, data.body);
       return data.json();
     })
     .then((awsUrl) => {
@@ -57,7 +57,6 @@ export default React.createClass({
             Drop some files here!
           </div>
         </Dropzone>
-        <video autoPlay='true' src="https://s3-us-west-1.amazonaws.com/invalidmemories/test.mp4" style={videoStyle}/>
       </div>
       );
   }
