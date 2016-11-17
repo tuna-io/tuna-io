@@ -503,7 +503,7 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
   http.SetCookie(w, cookie)
   w.Header().Set("Content-Type", "application/json")
   w.WriteHeader(http.StatusOK)
-  fmt.Fprintln("Cookies successfully cleared!")
+  fmt.Fprintln(w, "Cookies successfully cleared!")
 }
 
 /**
