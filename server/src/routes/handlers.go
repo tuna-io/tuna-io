@@ -19,6 +19,7 @@ import (
   "crypto/md5"
   "encoding/hex"
   "io"
+  "github.com/gorilla/sessions"
 )
 
 /**
@@ -388,6 +389,8 @@ func AllowAccess(rw http.ResponseWriter, req *http.Request) {
  *       CLIENT AUTHENTICATION
  *------------------------------------*/
 
+var store = sessions.NewCookieStore([]byte("b6UBmKpdmU"))
+
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
   username := req.FormValue("username")
   email := req.FormValue("email")
@@ -408,7 +411,6 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
     fmt.Fprintln(w, "User successfully registered!")
     // TODO create session for user
   }
-
 }
 
 func LoginUser(w http.ResponseWriter, req *http.Request) {
@@ -430,6 +432,5 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
   t, err := db.RetrieveUser(username)
   fmt.Println("retrieved pw:", t["password"])
   fmt.Println("equivalence", t["password"] == digest)
-  // fmt.Println("equivalence2", t["password"] == string(h.Sum(nil)))
   fmt.Println(t, err)
 }

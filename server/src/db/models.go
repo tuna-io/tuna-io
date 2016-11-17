@@ -176,7 +176,6 @@ func CreateUser(username string, email string, password string) ([]interface{}, 
   h := md5.New()
   io.WriteString(h, password)
   digest := fmt.Sprintf("%x", h.Sum(nil))
-  fmt.Println(digest)
 
   conn.Send("MULTI")
   conn.Send("HSETNX", "user:" + username, "username", username)
@@ -198,8 +197,6 @@ func RetrieveUser(username string) (map[string]string, error) {
   defer conn.Close()
 
   reply, err := redis.StringMap(conn.Do("HGETALL", "user:" + username))
-
-  // rep, _ := json.Marshal(reply)
 
   return reply, err
 }

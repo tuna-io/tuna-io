@@ -42,7 +42,7 @@ func main() {
    *------------------------------------*/
   u := api.PathPrefix("/users").Subrouter()
   u.Methods("POST").Path("/register").HandlerFunc(routes.RegisterUser)
-  u.Methods("GET").Path("/login").HandlerFunc(routes.LoginUser)
+  u.Methods("POST").Path("/login").HandlerFunc(routes.LoginUser)
   u.Methods("GET").Path("/logout").HandlerFunc(routes.LogoutUser)
   u.Methods("GET").Path("/{username}").HandlerFunc(routes.AuthenticateUser)
 
