@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router';
 
 export default class Home extends React.Component {
   constructor(props) {
@@ -19,7 +20,7 @@ export default class Home extends React.Component {
     var url = 'http://localhost:3000/api/videos/latest';
     var requestOptions = {
       'method': 'GET', 
-      'headers' : new Headers({ 'Content-Type': 'application/json' })
+      'headers': new Headers({ 'Content-Type': 'application/json' })
     };
     var request = new Request(url, requestOptions);
     var context = this;
@@ -53,7 +54,7 @@ export default class Home extends React.Component {
           { this.state.latestVideos.map(function(video) {
             return (
               <div className="video-preview" key={ video.creator + video.url }>
-                <div>{ video.title }</div>
+                <div><Link to={ '/videos/' + video.hash } >{ video.title }</Link></div>
                 <video width="400" controls>
                   <source src={ video.url } type="video/mp4" />
                 </video>

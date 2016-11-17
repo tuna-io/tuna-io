@@ -149,6 +149,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 *   redigo: nil return
 */
 func GetVideo(w http.ResponseWriter, req *http.Request) {
+  AllowAccess(w, req)
   hash := mux.Vars(req)["hash"]
 
   video, err := db.GetVideo(hash)
@@ -211,7 +212,6 @@ func GetLatestVideos(w http.ResponseWriter, req *http.Request) {
     fmt.Fprintln(w, err)
   } else {
     w.WriteHeader(http.StatusOK)
-    w.Header().Set("Access-Control-Allow-Origin", "*")
     fmt.Fprintln(w, videos)
   }
 }
