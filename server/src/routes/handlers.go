@@ -430,7 +430,24 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
 }
 
 func LoginUser(w http.ResponseWriter, req *http.Request) {
-  
+  username := req.FormValue("username") 
+  password := req.FormValue("password")
+
+  a, err := db.CheckUserCredentials(username, password)
+
+  w.Header().Set("Content-Type", "application/json")
+
+  if err != nil {
+    w.WriteHeader(http.StatusInternalServerError) // 500
+    fmt.Fprintln(w, err)
+  } else if !a {
+    w.WriteHeader(http.StatusUnauthorized) // 401
+    fmt.Fprintln(w, "Incorrect credentials provided!")
+  } else {
+    w.WriteHeader(http.StatusCreated) // 201
+    fmt.Fprintln(w, "User successfully logged in")
+    // TODO create session
+  }
 }
 
 func LogoutUser(w http.ResponseWriter, req *http.Request) {

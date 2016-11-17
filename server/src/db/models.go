@@ -191,11 +191,21 @@ func CreateUser(username string, email string, password string) ([]interface{}, 
   return reply, err
 }
 
-func CheckUserCredentials(username string, password string) {
+func CheckUserCredentials(username string, password string) (bool, error) {
   conn := Pool.Get()
   defer conn.Close()
 
-  
+  h := md5.New()
+  io.WriteString(h, password)
+  digest := fmt.Sprintf("%x", h.Sum(nil))
+
+  reply, err := redis.String(conn.Do("HGET", "user:" + username, "password"))
+
+  if reply == digest {
+    return true, err
+  } 
+
+  return false, err
 }
 
 // For testing purposes only
