@@ -450,6 +450,17 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
   }
 }
 
+/**
+* @api {get} /api/users/logout Clear a user's encrypted session cookies
+* @apiName LogoutUser
+* @apiGroup Users
+*
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   Cookies successfully cleared!
+*
+*/
 func LogoutUser(w http.ResponseWriter, req *http.Request) {
   cookie := &http.Cookie{
     Name: "session",
@@ -459,6 +470,9 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
   }
 
   http.SetCookie(w, cookie)
+  w.Header().Set("Content-Type", "application/json")
+  w.WriteHeader(http.StatusOK)
+  fmt.Fprintln("Cookies successfully cleared!")
 }
 
 /**
