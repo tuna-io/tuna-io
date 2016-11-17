@@ -389,14 +389,15 @@ func AllowAccess(rw http.ResponseWriter, req *http.Request) {
 
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
   username := req.FormValue("username")
+  email := req.FormValue("email")
   password := req.FormValue("password")
 
-  r, err := CreateUser(username, password)
+  r, err := db.CreateUser(username, email, password)
 
   fmt.Println(r, err)
 }
 
-func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
+func LoginUser(w http.ResponseWriter, req *http.Request) {
 
 }
 

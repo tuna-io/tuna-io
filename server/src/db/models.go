@@ -165,7 +165,7 @@ func GetLatestVideos() (string, error) {
 /*-------------------------------------
  *        USER DB CONTROLLERS
  *------------------------------------*/
-
+ 
 func CreateUser(username string, email string, password string) ([]interface{}, error) {
   conn := Pool.Get()
   defer conn.Close()
