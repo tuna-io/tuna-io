@@ -389,19 +389,23 @@ func AllowAccess(rw http.ResponseWriter, req *http.Request) {
  *       CLIENT AUTHENTICATION
  *------------------------------------*/
 
-var cookieHandler = securecookie.New(
-  securecookie.GenerateRandomKey(64),
-  securecookie.GenerateRandomKey(64)
-)
+var cookieHandler = securecookie.New(securecookie.GenerateRandomKey(64),securecookie.GenerateRandomKey(32))
 
 func SetSession(username string, w http.ResponseWriter) {
   value := map[string]string {
-    "username": username
+    "username": username,
   }
 
-  
-}
+  if encoded, err := cookieHandler.Encode("session", value); err == nil {
+    cookie := &http.Cookie{
+      Name: "session",
+      Value: encoded,
+      Path: "/",
+    }
 
+    http.SetCookie(w, cookie)
+  }
+}
 
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
   username := req.FormValue("username")
@@ -419,12 +423,9 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
     w.WriteHeader(http.StatusUnauthorized) // 401
     fmt.Fprintln(w, "Username already exists!")
   } else {
+    SetSession(username, w)
     w.WriteHeader(http.StatusCreated) // 201
     fmt.Fprintln(w, "User successfully registered!")
-    // TODO create session for user
-    session, _ := store.Get(req, "session")
-
-
   }
 }
 
