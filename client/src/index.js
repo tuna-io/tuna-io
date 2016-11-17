@@ -8,6 +8,7 @@ import Signin from './modules/Signin';
 import Dashboard from './modules/Dashboard';
 import Settings from './modules/Settings';
 import Upload from './modules/Upload';
+import VideoDetails from './modules/VideoDetails'
 
 ReactDOM.render((
   <Router history={hashHistory}>
@@ -19,6 +20,7 @@ ReactDOM.render((
         <Route path="/dashboard/settings" component={Settings} />
         <Route path="/dashboard/upload" component={Upload} />
       </Route>
+      <Route path="/videos/:videoId" component={VideoDetails} />
     </Route>
   </Router>
   ), document.getElementById('root'));
