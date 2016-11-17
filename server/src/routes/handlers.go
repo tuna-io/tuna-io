@@ -77,7 +77,7 @@ type Response struct {
 *
 * 
 * @apiErrorExample Error-Response:
-*   HTTP/1.1 404 Not Found
+*   HTTP/1.1 500 Internal Server Error
 *   Redigo failed to create and store the video
 */
 func CreateVideo(w http.ResponseWriter, req *http.Request) {
@@ -113,7 +113,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   j, err := json.Marshal(u)
 
   if err != nil {
-    w.WriteHeader(http.StatusNotFound)
+    w.WriteHeader(http.StatusInternalServerError)
     fmt.Fprintln(w, err)
   } else {
     w.WriteHeader(http.StatusOK)
@@ -169,6 +169,7 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 * @apiGroup Videos
 *
 * @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
 * [
 *   {
 *     "comments": "[]",
@@ -199,7 +200,7 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 * ]
 * 
 * @apiErrorExample Error-Response:
-*   HTTP/1.1 404 Not Found
+*   HTTP/1.1 500 Internal Server Error
 */
 func GetLatestVideos(w http.ResponseWriter, req *http.Request) {
   videos, err := db.GetLatestVideos()
@@ -207,11 +208,11 @@ func GetLatestVideos(w http.ResponseWriter, req *http.Request) {
 
 
   if (err != nil) {
-    w.WriteHeader(http.StatusNotFound)
+    w.WriteHeader(http.StatusInternalServerError)
     fmt.Fprintln(w, err)
   } else {
+    w.WriteHeader(http.StatusOK)
     w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.Header().Set("Content-Type", "application/json")
     fmt.Fprintln(w, videos)
   }
 }
@@ -468,10 +469,10 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "application/json")
 
   if err != nil {
-    w.WriteHeader(http.StatusInternalServerError) // 500
+    w.WriteHeader(http.StatusInternalServerError)
     fmt.Fprintln(w, err)
   } else if !a {
-    w.WriteHeader(http.StatusUnauthorized) // 401
+    w.WriteHeader(http.StatusUnauthorized)
     fmt.Fprintln(w, "Incorrect credentials provided!")
   } else {
     SetSession(username, w)
