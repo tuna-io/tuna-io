@@ -394,7 +394,19 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
 
   r, err := db.CreateUser(username, email, password)
 
-  fmt.Println(r, err)
+  w.Header().Set("Content-Type", "application/json")
+
+  if err != nil {
+    w.WriteHeader(http.StatusInternalServerError) // 500
+    fmt.Fprintln(w, err)
+  } else if r[0] == int64(0) {
+    w.WriteHeader(http.StatusUnauthorized) // 401
+    fmt.Fprintln(w, "Username already exists!")
+  } else {
+    w.WriteHeader(http.StatusCreated) // 201
+    fmt.Fprintln(w, "User successfully registered!")
+  }
+
 }
 
 func LoginUser(w http.ResponseWriter, req *http.Request) {

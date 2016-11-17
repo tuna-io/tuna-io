@@ -127,6 +127,7 @@ func AddTranscript(hash string, transcript *watson.Text) (string, error) {
 
   rep, _ := json.Marshal(reply)
 
+  // TODO: check if we want to stringify this --chris
   return string(rep), err
 }
 
