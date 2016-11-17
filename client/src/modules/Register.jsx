@@ -12,7 +12,23 @@ export default class Register extends React.Component {
 
   render() {
     return (
-      <div>This is the registration page</div>
+      <div>
+        <div>Register for an account in under a minute!</div>
+        <form>
+          <div>
+            Username:
+            <input type="text" value={this.state.username} />
+          </div>
+          <div>
+            Email:
+            <input type="email" value={this.state.email} />
+          </div>
+          <div>
+            Password:
+            <input type="password" value={this.state.password} />
+          </div>
+        </form>
+      </div>
     )
   }
 };
