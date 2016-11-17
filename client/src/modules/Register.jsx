@@ -17,15 +17,15 @@ export default class Register extends React.Component {
         <form>
           <div>
             Username:
-            <input type="text" value={this.state.username} />
+            <input type="text" value={this.state.username} onChange={() => this.setState("username")} />
           </div>
           <div>
             Email:
-            <input type="email" value={this.state.email} />
+            <input type="email" value={this.state.email} onChange={() => this.setState("email")} />
           </div>
           <div>
             Password:
-            <input type="password" value={this.state.password} />
+            <input type="password" value={this.state.password} onChange={() => this.setState("password")} />
           </div>
         </form>
       </div>
