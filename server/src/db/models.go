@@ -161,3 +161,42 @@ func GetLatestVideos() (string, error) {
   return string(results), err
 }
 
+
+/*-------------------------------------
+ *        USER DB CONTROLLERS
+ *------------------------------------*/
+
+func CreateUser(username string, email string, password string) ([]interface{}, error) {
+  conn := Pool.Get()
+  defer conn.Close()
+
+  h := md5.New()
+  io.WriteString(h, password)
+  digest := fmt.Sprintf("%x", h.Sum(nil))
+  fmt.Println(digest)
+
+  conn.Send("MULTI")
+  conn.Send("HSETNX", "user:" + username, "username", username)
+  conn.Send("HSETNX", "user:" + username, "email", email)
+  conn.Send("HSETNX", "user:" + username, "password", digest)
+  conn.Send("HSETNX", "user:" + username, "videos", []string{})
+  conn.Send("HSETNX", "user:" + username, "subscriptions", []string{})
+  conn.Send("HSETNX", "user:" + username, "liked_videos", []string{})
+  conn.Send("HSETNX", "user:" + username, "timestamp", time.Now())
+
+  reply, err := redis.Values(conn.Do("EXEC"))
+
+  return reply, err
+}
+
+// For testing purposes only
+func RetrieveUser(username string) (map[string]string, error) {
+  conn := Pool.Get()
+  defer conn.Close()
+
+  reply, err := redis.StringMap(conn.Do("HGETALL", "user:" + username))
+
+  // rep, _ := json.Marshal(reply)
+
+  return reply, err
+}
