@@ -461,6 +461,22 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
   http.SetCookie(w, cookie)
 }
 
+/**
+* @api {get} /api/users/authenticate Verify a user's credentials and retrieve
+*   their username from the encrypted session
+* @apiName AuthenticateUser
+* @apiGroup Users
+*
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   chris
+*
+* 
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 401 Unauthorized
+*   http: named cookie not present
+*/
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "application/json")
 
@@ -468,14 +484,14 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
     cookieValue := make(map[string]string)
 
     if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
-      w.WriteHeader(http.StatusOK) // 401
+      w.WriteHeader(http.StatusOK)
       fmt.Fprintln(w, cookieValue["username"])
     } else {
-      w.WriteHeader(http.StatusUnauthorized) // 401
+      w.WriteHeader(http.StatusUnauthorized)
       fmt.Fprintln(w, err)
     }
   } else {
-    w.WriteHeader(http.StatusUnauthorized) // 401
-    fmt.Fprintln(w, err) // http: named cookie not present
+    w.WriteHeader(http.StatusUnauthorized)
+    fmt.Fprintln(w, err)
   }
 }
