@@ -372,7 +372,8 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
 *       "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token,
 *        Authorization"
 *   }
-* 
+*
+*
 * @apiErrorExample Error-Response:
 *   HTTP/1.1 404 Not Found
 */
@@ -407,6 +408,7 @@ func SetSession(username string, w http.ResponseWriter) {
   }
 }
 
+
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
   username := req.FormValue("username")
   email := req.FormValue("email")
@@ -429,6 +431,21 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
   }
 }
 
+/**
+* @api {post} /users/login Attempt to login a user with the given credentials
+* @apiName LoginUser
+* @apiGroup Users
+*
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   User successfully logged in!
+*
+*
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 401 Unauthorized
+*   Incorrect credentials provided!
+*/
 func LoginUser(w http.ResponseWriter, req *http.Request) {
   username := req.FormValue("username") 
   password := req.FormValue("password")
@@ -445,7 +462,7 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
     fmt.Fprintln(w, "Incorrect credentials provided!")
   } else {
     SetSession(username, w)
-    w.WriteHeader(http.StatusCreated) // 201
+    w.WriteHeader(http.StatusOK)
     fmt.Fprintln(w, "User successfully logged in")
   }
 }
