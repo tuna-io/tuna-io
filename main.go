@@ -2,9 +2,9 @@ package main
 
 import (
   "log"
+  "routes"
   "net/http"
   "github.com/gorilla/mux"
-  "routes"
 )
 
 func main() {
@@ -44,7 +44,7 @@ func main() {
   u.Methods("POST").Path("/register").HandlerFunc(routes.RegisterUser)
   u.Methods("POST").Path("/login").HandlerFunc(routes.LoginUser)
   u.Methods("GET").Path("/logout").HandlerFunc(routes.LogoutUser)
-  u.Methods("GET").Path("/{username}").HandlerFunc(routes.AuthenticateUser)
+  u.Methods("GET").Path("/authenticate").HandlerFunc(routes.AuthenticateUser)
 
   /*-------------------------------------
    *      `/` STATIC FILE SERVER

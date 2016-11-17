@@ -1,13 +1,13 @@
 package db
 
 import (
-  "time"
-  "github.com/garyburd/redigo/redis"
-  "encoding/json"
-  "github.com/mediawen/watson-go-sdk"
-  "crypto/md5"
   "io"
   "fmt"
+  "time"
+  "crypto/md5"
+  "encoding/json"
+  "github.com/garyburd/redigo/redis"
+  "github.com/mediawen/watson-go-sdk"
 )
 
 /*-------------------------------------
@@ -41,6 +41,7 @@ type Transcript struct {
   Words []Word  `json:"words"`
 }
 
+
 /*-------------------------------------
  *      USER MODEL STRUCTURE
  *------------------------------------*/
@@ -56,6 +57,7 @@ type User struct {
 }
 
 type Users []User
+
 
 /*-------------------------------------
  *     REDIGO POOL INSTANTIATION
@@ -78,6 +80,7 @@ func HandleError(err error) {
     panic(err)
   }
 }
+
 
 /*-------------------------------------
  *        VIDEO DB CONTROLLERS
@@ -206,14 +209,4 @@ func CheckUserCredentials(username string, password string) (bool, error) {
   } 
 
   return false, err
-}
-
-// For testing purposes only
-func RetrieveUser(username string) (map[string]string, error) {
-  conn := Pool.Get()
-  defer conn.Close()
-
-  reply, err := redis.StringMap(conn.Do("HGETALL", "user:" + username))
-
-  return reply, err
 }

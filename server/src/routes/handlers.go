@@ -1,25 +1,24 @@
 package routes
 
 import (
-  "net/http"
-  "github.com/gorilla/mux"
+  "db"
+  "os"
   "fmt"
-  "db" 
-  "github.com/gorilla/schema"
+  "log"
+  "time"
   "strings"
   "os/exec"
-  "github.com/mediawen/watson-go-sdk"
-  "os"
-  "log"
-  "encoding/json"
-  "github.com/aws/aws-sdk-go/aws"
-  "github.com/aws/aws-sdk-go/aws/session"
-  "github.com/aws/aws-sdk-go/service/s3"
-  "time"
+  "net/http"
   "crypto/md5"
   "encoding/hex"
-  "io"
+  "encoding/json"
+  "github.com/gorilla/mux"
+  "github.com/gorilla/schema"
+  "github.com/aws/aws-sdk-go/aws"
   "github.com/gorilla/securecookie"
+  "github.com/mediawen/watson-go-sdk"
+  "github.com/aws/aws-sdk-go/service/s3"
+  "github.com/aws/aws-sdk-go/aws/session"
 )
 
 /**
@@ -239,6 +238,7 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
 
   return t, err
 }
+
 
 /*-------------------------------------
  *      AUDIO FILE TRANSCRIPTION
@@ -462,15 +462,20 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
 }
 
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
-  username := mux.Vars(req)["username"]
+  w.Header().Set("Content-Type", "application/json")
 
-  h := md5.New()
-  io.WriteString(h, "firstpassword")
-  digest := fmt.Sprintf("%x", h.Sum(nil))
+  if cookie, err := req.Cookie("session"); err == nil {
+    cookieValue := make(map[string]string)
 
-
-  t, err := db.RetrieveUser(username)
-  fmt.Println("retrieved pw:", t["password"])
-  fmt.Println("equivalence", t["password"] == digest)
-  fmt.Println(t, err)
+    if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
+      w.WriteHeader(http.StatusOK) // 401
+      fmt.Fprintln(w, cookieValue["username"])
+    } else {
+      w.WriteHeader(http.StatusUnauthorized) // 401
+      fmt.Fprintln(w, err)
+    }
+  } else {
+    w.WriteHeader(http.StatusUnauthorized) // 401
+    fmt.Fprintln(w, err) // http: named cookie not present
+  }
 }
