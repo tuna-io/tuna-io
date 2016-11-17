@@ -444,9 +444,9 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
     w.WriteHeader(http.StatusUnauthorized) // 401
     fmt.Fprintln(w, "Incorrect credentials provided!")
   } else {
+    SetSession(username, w)
     w.WriteHeader(http.StatusCreated) // 201
     fmt.Fprintln(w, "User successfully logged in")
-    // TODO create session
   }
 }
 
