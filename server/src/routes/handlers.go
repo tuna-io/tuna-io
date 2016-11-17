@@ -408,7 +408,20 @@ func SetSession(username string, w http.ResponseWriter) {
   }
 }
 
-
+/**
+* @api {post} /api/users/register Register a new user
+* @apiName RegisterUser
+* @apiGroup Users
+*
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 201 Created
+*
+*
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 401 Unauthorized
+*   Username already exists!
+*/
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
   username := req.FormValue("username")
   email := req.FormValue("email")
@@ -419,14 +432,14 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "application/json")
 
   if err != nil {
-    w.WriteHeader(http.StatusInternalServerError) // 500
+    w.WriteHeader(http.StatusInternalServerError)
     fmt.Fprintln(w, err)
   } else if r[0] == int64(0) {
-    w.WriteHeader(http.StatusUnauthorized) // 401
+    w.WriteHeader(http.StatusUnauthorized)
     fmt.Fprintln(w, "Username already exists!")
   } else {
     SetSession(username, w)
-    w.WriteHeader(http.StatusCreated) // 201
+    w.WriteHeader(http.StatusCreated)
     fmt.Fprintln(w, "User successfully registered!")
   }
 }
