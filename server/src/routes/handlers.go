@@ -389,7 +389,10 @@ func AllowAccess(rw http.ResponseWriter, req *http.Request) {
  *       CLIENT AUTHENTICATION
  *------------------------------------*/
 
-var store = sessions.NewCookieStore([]byte("b6UBmKpdmU"))
+var cookieHandler = securecookie.New(
+  securecookie.GenerateRandomKey(64),
+  securecookie.GenerateRandomKey(64)
+)
 
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
   username := req.FormValue("username")
@@ -410,6 +413,9 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
     w.WriteHeader(http.StatusCreated) // 201
     fmt.Fprintln(w, "User successfully registered!")
     // TODO create session for user
+    session, _ := store.Get(req, "session")
+
+
   }
 }
 
