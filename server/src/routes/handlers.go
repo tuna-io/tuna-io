@@ -1,23 +1,24 @@
 package routes
 
 import (
-  "net/http"
-  "github.com/gorilla/mux"
+  "db"
+  "os"
   "fmt"
-  "db" 
-  "github.com/gorilla/schema"
+  "log"
+  "time"
   "strings"
   "os/exec"
-  "github.com/mediawen/watson-go-sdk"
-  "os"
-  "log"
-  "encoding/json"
-  "github.com/aws/aws-sdk-go/aws"
-  "github.com/aws/aws-sdk-go/aws/session"
-  "github.com/aws/aws-sdk-go/service/s3"
-  "time"
+  "net/http"
   "crypto/md5"
   "encoding/hex"
+  "encoding/json"
+  "github.com/gorilla/mux"
+  "github.com/gorilla/schema"
+  "github.com/aws/aws-sdk-go/aws"
+  "github.com/gorilla/securecookie"
+  "github.com/mediawen/watson-go-sdk"
+  "github.com/aws/aws-sdk-go/service/s3"
+  "github.com/aws/aws-sdk-go/aws/session"
 )
 
 /**
@@ -76,7 +77,7 @@ type Response struct {
 *
 * 
 * @apiErrorExample Error-Response:
-*   HTTP/1.1 404 Not Found
+*   HTTP/1.1 500 Internal Server Error
 *   Redigo failed to create and store the video
 */
 func CreateVideo(w http.ResponseWriter, req *http.Request) {
@@ -112,7 +113,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   j, err := json.Marshal(u)
 
   if err != nil {
-    w.WriteHeader(http.StatusNotFound)
+    w.WriteHeader(http.StatusInternalServerError)
     fmt.Fprintln(w, err)
   } else {
     w.WriteHeader(http.StatusOK)
@@ -168,6 +169,7 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 * @apiGroup Videos
 *
 * @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
 * [
 *   {
 *     "comments": "[]",
@@ -198,7 +200,7 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 * ]
 * 
 * @apiErrorExample Error-Response:
-*   HTTP/1.1 404 Not Found
+*   HTTP/1.1 500 Internal Server Error
 */
 func GetLatestVideos(w http.ResponseWriter, req *http.Request) {
   videos, err := db.GetLatestVideos()
@@ -206,11 +208,11 @@ func GetLatestVideos(w http.ResponseWriter, req *http.Request) {
 
 
   if (err != nil) {
-    w.WriteHeader(http.StatusNotFound)
+    w.WriteHeader(http.StatusInternalServerError)
     fmt.Fprintln(w, err)
   } else {
+    w.WriteHeader(http.StatusOK)
     w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.Header().Set("Content-Type", "application/json")
     fmt.Fprintln(w, videos)
   }
 }
@@ -237,6 +239,7 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
 
   return t, err
 }
+
 
 /*-------------------------------------
  *      AUDIO FILE TRANSCRIPTION
@@ -370,7 +373,8 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
 *       "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token,
 *        Authorization"
 *   }
-* 
+*
+*
 * @apiErrorExample Error-Response:
 *   HTTP/1.1 404 Not Found
 */
@@ -380,4 +384,159 @@ func AllowAccess(rw http.ResponseWriter, req *http.Request) {
   rw.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
   
   return
+}
+
+
+/*-------------------------------------
+ *       CLIENT AUTHENTICATION
+ *------------------------------------*/
+
+var cookieHandler = securecookie.New(securecookie.GenerateRandomKey(64),securecookie.GenerateRandomKey(32))
+
+func SetSession(username string, w http.ResponseWriter) {
+  value := map[string]string {
+    "username": username,
+  }
+
+  if encoded, err := cookieHandler.Encode("session", value); err == nil {
+    cookie := &http.Cookie{
+      Name: "session",
+      Value: encoded,
+      Path: "/",
+    }
+
+    http.SetCookie(w, cookie)
+  }
+}
+
+/**
+* @api {post} /api/users/register Register a new user
+* @apiName RegisterUser
+* @apiGroup Users
+*
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 201 Created
+*
+*
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 401 Unauthorized
+*   Username already exists!
+*/
+func RegisterUser(w http.ResponseWriter, req *http.Request) {
+  username := req.FormValue("username")
+  email := req.FormValue("email")
+  password := req.FormValue("password")
+
+  r, err := db.CreateUser(username, email, password)
+
+  w.Header().Set("Content-Type", "application/json")
+
+  if err != nil {
+    w.WriteHeader(http.StatusInternalServerError)
+    fmt.Fprintln(w, err)
+  } else if r[0] == int64(0) {
+    w.WriteHeader(http.StatusUnauthorized)
+    fmt.Fprintln(w, "Username already exists!")
+  } else {
+    SetSession(username, w)
+    w.WriteHeader(http.StatusCreated)
+    fmt.Fprintln(w, "User successfully registered!")
+  }
+}
+
+/**
+* @api {post} /users/login Attempt to login a user with the given credentials
+* @apiName LoginUser
+* @apiGroup Users
+*
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   User successfully logged in!
+*
+*
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 401 Unauthorized
+*   Incorrect credentials provided!
+*/
+func LoginUser(w http.ResponseWriter, req *http.Request) {
+  username := req.FormValue("username") 
+  password := req.FormValue("password")
+
+  a, err := db.CheckUserCredentials(username, password)
+
+  w.Header().Set("Content-Type", "application/json")
+
+  if err != nil {
+    w.WriteHeader(http.StatusInternalServerError)
+    fmt.Fprintln(w, err)
+  } else if !a {
+    w.WriteHeader(http.StatusUnauthorized)
+    fmt.Fprintln(w, "Incorrect credentials provided!")
+  } else {
+    SetSession(username, w)
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintln(w, "User successfully logged in")
+  }
+}
+
+/**
+* @api {get} /api/users/logout Clear a user's encrypted session cookies
+* @apiName LogoutUser
+* @apiGroup Users
+*
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   Cookies successfully cleared!
+*
+*/
+func LogoutUser(w http.ResponseWriter, req *http.Request) {
+  cookie := &http.Cookie{
+    Name: "session",
+    Value: "",
+    Path: "/",
+    MaxAge: -1,
+  }
+
+  http.SetCookie(w, cookie)
+  w.Header().Set("Content-Type", "application/json")
+  w.WriteHeader(http.StatusOK)
+  fmt.Fprintln("Cookies successfully cleared!")
+}
+
+/**
+* @api {get} /api/users/authenticate Verify a user's credentials and retrieve
+*   their username from the encrypted session
+* @apiName AuthenticateUser
+* @apiGroup Users
+*
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   chris
+*
+* 
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 401 Unauthorized
+*   http: named cookie not present
+*/
+func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
+  w.Header().Set("Content-Type", "application/json")
+
+  if cookie, err := req.Cookie("session"); err == nil {
+    cookieValue := make(map[string]string)
+
+    if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
+      w.WriteHeader(http.StatusOK)
+      fmt.Fprintln(w, cookieValue["username"])
+    } else {
+      w.WriteHeader(http.StatusUnauthorized)
+      fmt.Fprintln(w, err)
+    }
+  } else {
+    w.WriteHeader(http.StatusUnauthorized)
+    fmt.Fprintln(w, err)
+  }
 }

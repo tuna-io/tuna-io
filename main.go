@@ -2,9 +2,9 @@ package main
 
 import (
   "log"
+  "routes"
   "net/http"
   "github.com/gorilla/mux"
-  "routes"
 )
 
 func main() {
@@ -36,6 +36,15 @@ func main() {
   s := api.PathPrefix("/s3").Subrouter()
   s.Methods("OPTIONS").HandlerFunc(routes.AllowAccess)
   s.Methods("POST").HandlerFunc(routes.SignVideo)
+
+  /*-------------------------------------
+   *      `/api/users` SUB-ROUTER
+   *------------------------------------*/
+  u := api.PathPrefix("/users").Subrouter()
+  u.Methods("POST").Path("/register").HandlerFunc(routes.RegisterUser)
+  u.Methods("POST").Path("/login").HandlerFunc(routes.LoginUser)
+  u.Methods("GET").Path("/logout").HandlerFunc(routes.LogoutUser)
+  u.Methods("GET").Path("/authenticate").HandlerFunc(routes.AuthenticateUser)
 
   /*-------------------------------------
    *      `/` STATIC FILE SERVER

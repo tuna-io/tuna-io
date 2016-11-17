@@ -1,11 +1,13 @@
 package db
 
 import (
-  "time"
-  "github.com/garyburd/redigo/redis"
-  "encoding/json"
-  "github.com/mediawen/watson-go-sdk"
+  "io"
   "fmt"
+  "time"
+  "crypto/md5"
+  "encoding/json"
+  "github.com/garyburd/redigo/redis"
+  "github.com/mediawen/watson-go-sdk"
 )
 
 /*-------------------------------------
@@ -39,6 +41,24 @@ type Transcript struct {
   Words []Word  `json:"words"`
 }
 
+
+/*-------------------------------------
+ *      USER MODEL STRUCTURE
+ *------------------------------------*/
+
+type User struct {
+  Username        string     `json:"username"`
+  Password        string     `json:"password"`
+  Email           string     `json:"email"`
+  Videos          []string   `json:"videos"`
+  Subscriptions   []string   `json:"subscriptions"`
+  LikedVideos     []string   `json:"liked_videos"`
+  Timestamp       time.Time  `json:"timestamp"`
+}
+
+type Users []User
+
+
 /*-------------------------------------
  *     REDIGO POOL INSTANTIATION
  *------------------------------------*/
@@ -60,6 +80,7 @@ func HandleError(err error) {
     panic(err)
   }
 }
+
 
 /*-------------------------------------
  *        VIDEO DB CONTROLLERS
@@ -111,6 +132,7 @@ func AddTranscript(hash string, transcript *watson.Text) (string, error) {
 
   rep, _ := json.Marshal(reply)
 
+  // TODO: check if we want to stringify this --chris
   return string(rep), err
 }
 
@@ -145,3 +167,46 @@ func GetLatestVideos() (string, error) {
   return string(results), err
 }
 
+
+/*-------------------------------------
+ *        USER DB CONTROLLERS
+ *------------------------------------*/
+ 
+func CreateUser(username string, email string, password string) ([]interface{}, error) {
+  conn := Pool.Get()
+  defer conn.Close()
+
+  h := md5.New()
+  io.WriteString(h, password)
+  digest := fmt.Sprintf("%x", h.Sum(nil))
+
+  conn.Send("MULTI")
+  conn.Send("HSETNX", "user:" + username, "username", username)
+  conn.Send("HSETNX", "user:" + username, "email", email)
+  conn.Send("HSETNX", "user:" + username, "password", digest)
+  conn.Send("HSETNX", "user:" + username, "videos", []string{})
+  conn.Send("HSETNX", "user:" + username, "subscriptions", []string{})
+  conn.Send("HSETNX", "user:" + username, "liked_videos", []string{})
+  conn.Send("HSETNX", "user:" + username, "timestamp", time.Now())
+
+  reply, err := redis.Values(conn.Do("EXEC"))
+
+  return reply, err
+}
+
+func CheckUserCredentials(username string, password string) (bool, error) {
+  conn := Pool.Get()
+  defer conn.Close()
+
+  h := md5.New()
+  io.WriteString(h, password)
+  digest := fmt.Sprintf("%x", h.Sum(nil))
+
+  reply, err := redis.String(conn.Do("HGET", "user:" + username, "password"))
+
+  if reply == digest {
+    return true, err
+  } 
+
+  return false, err
+}
