@@ -451,7 +451,14 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
 }
 
 func LogoutUser(w http.ResponseWriter, req *http.Request) {
+  cookie := &http.Cookie{
+    Name: "session",
+    Value: "",
+    Path: "/",
+    MaxAge: -1,
+  }
 
+  http.SetCookie(w, cookie)
 }
 
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
