@@ -8,7 +8,6 @@ import (
   "encoding/json"
   "github.com/garyburd/redigo/redis"
   "github.com/mediawen/watson-go-sdk"
-  "fmt"
 )
 
 /*-------------------------------------
@@ -87,9 +86,7 @@ func HandleError(err error) {
  *        VIDEO DB CONTROLLERS
  *------------------------------------*/
 
-func CreateVideo(v Video) (string, error) {
-  fmt.Println("working")
-  
+func CreateVideo(v Video) (string, error) {  
   conn := Pool.Get()
   defer conn.Close()
 
@@ -110,7 +107,7 @@ func CreateVideo(v Video) (string, error) {
   reply, err := redis.Values(conn.Do("EXEC"))
 
   rep, _ := json.Marshal(reply)
-
+  
   return string(rep), err
 }
 

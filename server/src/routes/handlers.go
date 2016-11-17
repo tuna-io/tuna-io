@@ -89,12 +89,12 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   // video := new(db.Video)
   // decoder := schema.NewDecoder()
   // err = decoder.Decode(video, req.Form)
-  
-  fmt.Println(video.Url, video.Title, video.Creator, video.Private)
-  
   if err != nil {
     panic(err)
   }
+  
+  fmt.Println(video.Url, video.Title, video.Creator, video.Private)
+  
 
   hasher := md5.New()
   hasher.Write([]byte(video.Url))
@@ -108,6 +108,9 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "application/json")
 
   t, err := ProcessVideo(video.Url, hash)
+  if err != nil {
+    panic(err)
+  }
 
   u := Response{
     Success: "Successfully uploaded and transcribed video file",
@@ -118,16 +121,14 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 
   j, err := json.Marshal(u)
 
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Header().Set("Content-Type", "application/json")
+
   if err != nil {
-<<<<<<< HEAD
     w.WriteHeader(http.StatusInternalServerError)
-=======
     fmt.Println("errored out", err)
-    w.WriteHeader(http.StatusNotFound)
->>>>>>> 38b4ffd... Post createdvideo from client
     fmt.Fprintln(w, err)
   } else {
-    fmt.Println("successful", j)
     w.WriteHeader(http.StatusOK)
     fmt.Fprintln(w, string(j))
   }
@@ -229,12 +230,16 @@ func GetLatestVideos(w http.ResponseWriter, req *http.Request) {
 }
 
 func ProcessVideo(url string, hash string) (*watson.Text, error) {
+
   applicationName := "ffmpeg"
   arg0 := "-i"
   destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
-
   cmd := exec.Command(applicationName, arg0, url, destination)
   out, err := cmd.Output()
+
+  if err != nil {
+    panic(err)
+  }
 
   t := TranscribeAudio(destination)
   db.AddTranscript(hash, t)
@@ -346,6 +351,7 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
   req, _ := svc.PutObjectRequest(&s3.PutObjectInput{
     Bucket: aws.String("invalidmemories"),
     Key:    aws.String(v.Filename),
+    ACL:    aws.String("public-read"),
   })
 
   // allow upload with url for 5min
@@ -353,12 +359,12 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
   if err != nil {
     fmt.Println("Failed to sign r", err)
   }
-  
+
   j, err := json.Marshal(urlStr)
   if err != nil {
     fmt.Println("failed to convert to json", err)
   }
-
+  
   w.Header().Set("Access-Control-Allow-Origin", "*")
   w.Header().Set("Content-Type", "application/json")
   w.Write(j)
