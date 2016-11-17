@@ -163,6 +163,44 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
   }
 }
 
+/**
+* @api {get} /api/videos/latest Get the 10 latest videos
+* @apiName GetLatestVideos
+* @apiGroup Videos
+*
+* @apiSuccessExample Success-Response:
+* [
+*   {
+*     "comments": "[]",
+*     "creator": "Bobby1",
+*     "dislikes": "[]",
+*     "hash": "b12c8a16bbe30b9d79cbaab81a82151d",
+*     "likes": "[]",
+*     "private": "0",
+*     "timestamp": "2016-11-16 09:49:02.236181764 -0800 PST",
+*     "title": "bill_11s.mp4",
+*     "transcript": "null",
+*     "url": "https://s3-us-west-1.amazonaws.com/invalidmemories/bill_10s.mp4",
+*     "views": "0"
+*   },
+*   {
+*     "comments": "[]",
+*     "creator": "Bobby1",
+*     "dislikes": "[]",
+*     "hash": "083517446ac7100ef679c8f5004e810a",
+*     "likes": "[]",
+*     "private": "0",
+*     "timestamp": "2016-11-16 11:56:26.509119987 -0800 PST",
+*     "title": "test.mp4",
+*     "transcript": "null",
+*     "url": "https://s3-us-west-1.amazonaws.com/invalidmemories/test.mp4",
+*     "views": "0"
+*   }
+* ]
+* 
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 404 Not Found
+*/
 func GetLatestVideos(w http.ResponseWriter, req *http.Request) {
   videos, err := videos.GetLatestVideos()
   w.Header().Set("Content-Type", "application/json")
@@ -172,7 +210,8 @@ func GetLatestVideos(w http.ResponseWriter, req *http.Request) {
     w.WriteHeader(http.StatusNotFound)
     fmt.Fprintln(w, err)
   } else {
-    w.WriteHeader(http.StatusOK)
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+    w.Header().Set("Content-Type", "application/json")
     fmt.Fprintln(w, videos)
   }
 }
