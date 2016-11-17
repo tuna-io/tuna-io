@@ -4,8 +4,7 @@ import (
   "net/http"
   "github.com/gorilla/mux"
   "fmt"
-  "dbModel" 
-  "videosModel"
+  "db" 
   "github.com/gorilla/schema"
   "strings"
   "os/exec"
@@ -202,7 +201,7 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 *   HTTP/1.1 404 Not Found
 */
 func GetLatestVideos(w http.ResponseWriter, req *http.Request) {
-  videos, err := videos.GetLatestVideos()
+  videos, err := db.GetLatestVideos()
   w.Header().Set("Content-Type", "application/json")
 
 
