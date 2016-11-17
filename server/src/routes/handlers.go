@@ -19,7 +19,7 @@ import (
   "crypto/md5"
   "encoding/hex"
   "io"
-  "github.com/gorilla/sessions"
+  "github.com/gorilla/securecookie"
 )
 
 /**
@@ -393,6 +393,15 @@ var cookieHandler = securecookie.New(
   securecookie.GenerateRandomKey(64),
   securecookie.GenerateRandomKey(64)
 )
+
+func SetSession(username string, w http.ResponseWriter) {
+  value := map[string]string {
+    "username": username
+  }
+
+  
+}
+
 
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
   username := req.FormValue("username")
