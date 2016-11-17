@@ -191,6 +191,13 @@ func CreateUser(username string, email string, password string) ([]interface{}, 
   return reply, err
 }
 
+func CheckUserCredentials(username string, password string) {
+  conn := Pool.Get()
+  defer conn.Close()
+
+  
+}
+
 // For testing purposes only
 func RetrieveUser(username string) (map[string]string, error) {
   conn := Pool.Get()
