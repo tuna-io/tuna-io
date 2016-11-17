@@ -4,19 +4,22 @@ class VideoDetails extends Component {
   constructor(props) {
     super(props);
 
+    // Initialize state in constructor
     this.state = {
       currentVideoId: props.params.videoId,
       currentVideoDetails: null,
     };
 
-    // make API call
+    // Fetch initial video data. This is only called once
     this.fetchVideoFromAPI(props.params.videoId);
   }
 
+  // Upon going to a different video details page, fetch video data
   componentWillReceiveProps(nextProps) {
     this.fetchVideoFromAPI(nextProps.params.videoId);
   }
 
+  // Helper function to fetch video data
   fetchVideoFromAPI(videoId) {
     const url = 'http://localhost:3000/api/videos/' + videoId;
     const options = {
@@ -36,8 +39,6 @@ class VideoDetails extends Component {
   }
 
   render() {
-    console.log('rendering. state:', this.state);
-
     if (this.state.currentVideoDetails) {
       return (
         <div>
@@ -51,6 +52,7 @@ class VideoDetails extends Component {
       );
     }
 
+    // Need to return valid JSX before the initial API call has returned
     return (<div />);
   }
 }
