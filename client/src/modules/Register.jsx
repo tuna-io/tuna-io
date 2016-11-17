@@ -23,6 +23,27 @@ export default class Register extends React.Component {
     event.preventDefault();
   }
 
+  authenticateUser() {
+    var url = 'http://localhost:3000/api/users/authenticate';
+    var requestOptions = {
+      'method': 'GET',
+      'headers': new Headers({
+        'Content-Type': 'application/json'
+      })
+    };
+    var request = new Request(url, requestOptions);
+
+    fetch(request)
+    .then(function(response) {
+      console.log(response.json());
+    })
+  }
+
+  componentDidMount() {
+    console.log('component mount');
+    this.authenticateUser()
+  }
+
   render() {
     return (
       <div>
