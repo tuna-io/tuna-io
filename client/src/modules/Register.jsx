@@ -5,9 +5,9 @@ export default class Register extends React.Component {
     super(props);
 
     this.state = {
-      'username': '',
-      'email': '',
-      'password': ''
+      username: '',
+      email: '',
+      password: '',
     };
 
     this.handleChange = this.handleChange.bind(this);
