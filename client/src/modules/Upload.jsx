@@ -9,7 +9,15 @@ export default class Upload extends React.Component {
       file: null,
       videoReturned: false,
       signedUrl: null,
+      title: "",
+      description: "",
+      private: false,
     };
+  }
+
+  handleChange(event) {
+    const value = event.target.name === "private" ? event.target.checked : event.target.value;
+    this.setState({ [event.target.name]: value });
   }
 
   submitVideo(event) {
@@ -32,13 +40,15 @@ export default class Upload extends React.Component {
         console.log('video returned from S3. data is:', data);
 
         // POST video metadata to the server
+        console.log(this.state.title, this.state.description, this.state.private);
         return fetch('http://localhost:3000/api/videos', {
           method: 'POST',
           body: JSON.stringify({
-            title: 'test',
+            title: this.state.title,
+            description: this.state.description,
             url: `https://s3-us-west-1.amazonaws.com/invalidmemories/${this.state.file.name}`,
             creator: 'bill',
-            private: false,
+            private: this.state.private,
           }),
           headers: {
             'Content-Type': 'application/json',
@@ -127,12 +137,24 @@ export default class Upload extends React.Component {
         {
           this.state.signedUrl ?
           (
-            <form onSubmit={this.submitVideo.bind(this)}>
-              <input name="submit" type="submit" value="Upload into cloud" />
-            </form>
+            <div>
+              <h3>Upload options</h3>
+              <form onSubmit={this.submitVideo.bind(this)}>
+                <input name="title" type="text" onChange={this.handleChange.bind(this)} placeholder={this.state.file.name} defaultValue={this.state.file.name} />
+                <input name="description" type="text" onChange={this.handleChange.bind(this)} placeholder="description" />
+                <input name="private" type="checkbox" onChange={this.handleChange.bind(this)}  />
+                <input name="submit" type="submit" value="Upload into cloud" />
+              </form>
+            </div>
           ) : null
         }
-        {this.state.videoReturned ? (<div><video src={`https://d2bezlfyzapny1.cloudfront.net/${this.state.file.name}`} width="400" controls /></div>) : null }
+        {
+          this.state.videoReturned ?
+          (
+            <div>
+              <video src={`https://d2bezlfyzapny1.cloudfront.net/${this.state.file.name}`} width="400" controls />
+            </div>) : null
+          }
         {
           this.renderTranscript()
         }
