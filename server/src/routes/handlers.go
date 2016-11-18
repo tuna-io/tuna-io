@@ -442,6 +442,8 @@ func SetSession(username string, w http.ResponseWriter) {
 *   Username already exists!
 */
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
+  AllowAccess(w, req)
+
   username := req.FormValue("username")
   email := req.FormValue("email")
   password := req.FormValue("password")
@@ -479,6 +481,8 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
 *   Incorrect credentials provided!
 */
 func LoginUser(w http.ResponseWriter, req *http.Request) {
+  AllowAccess(w, req)
+
   username := req.FormValue("username") 
   password := req.FormValue("password")
 
@@ -511,6 +515,8 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
 *
 */
 func LogoutUser(w http.ResponseWriter, req *http.Request) {
+  AllowAccess(w, req)
+
   cookie := &http.Cookie{
     Name: "session",
     Value: "",
@@ -542,6 +548,7 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
 */
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
   AllowAccess(w, req)
+  
   w.Header().Set("Content-Type", "application/json")
 
   if cookie, err := req.Cookie("session"); err == nil {
