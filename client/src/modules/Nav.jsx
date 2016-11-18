@@ -13,6 +13,7 @@ export default React.createClass({
     return (
       <div>This is the nav bar. Links should show up
         <ul>
+          <li><Link to="/">Home</Link></li>
           <li><Link to="/about">About</Link></li>
           <li><Link to="/signin">Sign in</Link></li>
           <li><Link to="/register">Register</Link></li>

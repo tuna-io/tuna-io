@@ -6,7 +6,7 @@ export default class Home extends React.Component {
     super(props);
 
     this.state = {
-      'latestVideos' : []
+      latestVideos: [],
     };
   }
 
@@ -48,21 +48,24 @@ export default class Home extends React.Component {
 
   render() {
     return (
-      <div id="latest-videos">
-        <div>Latest videos</div>
-        <div>
-          { this.state.latestVideos.map(function(video) {
-            return (
-              <div className="video-preview" key={ video.creator + video.url }>
-                <div><Link to={ '/videos/' + video.hash } >{ video.title }</Link></div>
-                <video width="400" controls>
-                  <source src={ video.url } type="video/mp4" />
-                </video>
-              </div>
-            )
-          }) }
+      <div>
+        <h1>TunaVid.IO - the 6th fastest fish in the sea</h1>
+        <div id="latest-videos">
+          <div>Latest videos</div>
+          <div>
+            { this.state.latestVideos.map(function(video) {
+              return (
+                <div className="video-preview" key={ video.creator + video.url }>
+                  <div><Link to={ '/videos/' + video.hash } >{ video.title }</Link></div>
+                  <video width="400" controls>
+                    <source src={ video.url } type="video/mp4" />
+                  </video>
+                </div>
+              );
+            }) }
+          </div>
         </div>
       </div>
-    )
+    );
   }
-};
+}
