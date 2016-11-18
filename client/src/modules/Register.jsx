@@ -19,29 +19,49 @@ export default class Register extends React.Component {
   }
 
   handleSubmit(event) {
-    alert(this.state.username);
+    fetch('http://localhost:3000/api/users/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        'username': this.state.username,
+        'email': this.state.email,
+        'password': this.state.password
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(function(response) {
+      console.log(response);
+    })
+    .catch(function(err) {
+      console.log(err);
+    })
+
+    // alert(this.state.username);
     event.preventDefault();
   }
 
   authenticateUser() {
-    var url = 'http://localhost:3000/api/users/authenticate';
-    var requestOptions = {
-      'method': 'GET',
-      'headers': new Headers({
+    fetch('http://localhost:3000/api/users/authenticate', {
+      method: 'GET',
+      headers: {
         'Content-Type': 'application/json'
-      })
-    };
-    var request = new Request(url, requestOptions);
-
-    fetch(request)
-    .then(function(response) {
-      console.log(response.json());
+      }
     })
+    .then(function(response) {
+      return response.text()
+    })
+    .then(function(textResponse) {
+      console.log(textResponse);
+    })
+    .catch(function(err) {
+      console.log(err);
+    });
   }
 
   componentDidMount() {
     console.log('component mount');
-    this.authenticateUser()
+    this.authenticateUser();
   }
 
   render() {
@@ -55,11 +75,11 @@ export default class Register extends React.Component {
           </div>
           <div>
             Email:
-            <input type="email" value={this.state.email} onChange={this.handleChange} />
+            <input type="email" name="email" value={this.state.email} onChange={this.handleChange} />
           </div>
           <div>
             Password:
-            <input type="password" value={this.state.password} onChange={this.handleChange} />
+            <input type="password" name="password" value={this.state.password} onChange={this.handleChange} />
           </div>
           <div>
             <input type="submit" value="Submit" />
