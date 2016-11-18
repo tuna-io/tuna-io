@@ -9,18 +9,17 @@ export default React.createClass({
     });
   },
 
+export default class Nav extends React.Component {
   render() {
     return (
-      <div>This is the nav bar. Links should show up
-        <ul>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/about">About</Link></li>
-          <li><Link to="/signin">Sign in</Link></li>
-          <li><Link to="/register">Register</Link></li>
-          <li><Link to="/dashboard">Dashboard</Link></li>
-          <li onClick={this.logout}>Logout</li>
-        </ul>
+      <div className="nav-bar">
+        <div><Link to="/">Home</Link></div>
+        <div><Link to="/about">About</Link></div>
+        <div><Link to="/signin">Sign in</Link></div>
+        <div><Link to="/register">Register</Link></div>
+        <div><Link to="/dashboard">Dashboard</Link></div>
+        <div onClick={this.logout}>Logout</div>
       </div>
-      )
+    );
   }
-});
+}
