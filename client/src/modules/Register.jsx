@@ -1,11 +1,12 @@
 import React from 'react';
 
-export default class Signin extends React.Component {
+export default class Register extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       username: '',
+      email: '',
       password: '',
     };
 
@@ -18,10 +19,11 @@ export default class Signin extends React.Component {
   }
 
   handleSubmit(event) {
-    fetch('http://127.0.0.1:3000/api/users/login', {
+    fetch('http://127.0.0.1:3000/api/users/register', {
       method: 'POST',
       body: JSON.stringify({
         username: this.state.username,
+        email: this.state.email,
         password: this.state.password
       }),
       credentials: 'same-origin',
@@ -68,11 +70,15 @@ export default class Signin extends React.Component {
   render() {
     return (
       <div>
-        <div>Sign in to your existing account!</div>
+        <div>Register for an account in under a minute!</div>
         <form onSubmit={this.handleSubmit}>
           <div>
             Username:
             <input type="text" name="username" value={this.state.username} onChange={this.handleChange} />
+          </div>
+          <div>
+            Email:
+            <input type="email" name="email" value={this.state.email} onChange={this.handleChange} />
           </div>
           <div>
             Password:

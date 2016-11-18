@@ -13,13 +13,18 @@ import (
   "encoding/hex"
   "encoding/json"
   "github.com/gorilla/mux"
-  "github.com/gorilla/schema"
+  "github.com/gorilla/sessions"
   "github.com/aws/aws-sdk-go/aws"
-  "github.com/gorilla/securecookie"
   "github.com/mediawen/watson-go-sdk"
   "github.com/aws/aws-sdk-go/service/s3"
   "github.com/aws/aws-sdk-go/aws/session"
 )
+
+func HandleError(err error) {
+  if err != nil {
+    panic(err)
+  }
+}
 
 /**
  * @api {get} /api/isalive Check if server is running
@@ -84,18 +89,12 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   decoder := json.NewDecoder(req.Body)
   video := new(db.Video)
   err := decoder.Decode(&video)
-
-  // err := req.ParseForm()
-  // video := new(db.Video)
-  // decoder := schema.NewDecoder()
-  // err = decoder.Decode(video, req.Form)
   if err != nil {
     panic(err)
   }
   
   fmt.Println(video.Url, video.Title, video.Creator, video.Private)
   
-
   hasher := md5.New()
   hasher.Write([]byte(video.Url))
   hash := hex.EncodeToString(hasher.Sum(nil))
@@ -337,7 +336,6 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
 */
 func SignVideo(w http.ResponseWriter, r *http.Request) {
 
-  // create new video object from given request json
   decoder := json.NewDecoder(r.Body)
 
   v := new(Vidfile)
@@ -397,9 +395,10 @@ type Vidfile struct {
 *   HTTP/1.1 404 Not Found
 */
 func AllowAccess(rw http.ResponseWriter, req *http.Request) {
-  rw.Header().Set("Access-Control-Allow-Origin", "*")
+  rw.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1")
   rw.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
   rw.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+  rw.Header().Set("Access-Control-Allow-Credentials", "true")
   
   return
 }
@@ -409,22 +408,18 @@ func AllowAccess(rw http.ResponseWriter, req *http.Request) {
  *       CLIENT AUTHENTICATION
  *------------------------------------*/
 
-var cookieHandler = securecookie.New(securecookie.GenerateRandomKey(64),securecookie.GenerateRandomKey(32))
+var store = sessions.NewCookieStore([]byte("something-very-secret"))
 
-func SetSession(username string, w http.ResponseWriter) {
-  value := map[string]string {
-    "username": username,
+func init() {
+  store.Options = &sessions.Options{
+    MaxAge: 3600 * 24 * 30,
   }
+}
 
-  if encoded, err := cookieHandler.Encode("session", value); err == nil {
-    cookie := &http.Cookie{
-      Name: "session",
-      Value: encoded,
-      Path: "/",
-    }
-
-    http.SetCookie(w, cookie)
-  }
+func SetSession(username string, w http.ResponseWriter, req *http.Request) {
+  session, _ := store.Get(req, "session-id")
+  session.Values["username"] = username
+  sessions.Save(req, w)
 }
 
 /**
@@ -435,6 +430,7 @@ func SetSession(username string, w http.ResponseWriter) {
 *
 * @apiSuccessExample Success-Response:
 *   HTTP/1.1 201 Created
+*   User successfully created!
 *
 *
 * @apiErrorExample Error-Response:
@@ -442,13 +438,23 @@ func SetSession(username string, w http.ResponseWriter) {
 *   Username already exists!
 */
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
-  username := req.FormValue("username")
-  email := req.FormValue("email")
-  password := req.FormValue("password")
 
-  r, err := db.CreateUser(username, email, password)
+  type Registration struct {
+    Username  string  `json:"username"`
+    Email     string  `json:"email"`
+    Password  string  `json:"password"`
+  }
 
-  w.Header().Set("Content-Type", "application/json")
+  decoder := json.NewDecoder(req.Body)
+  u := new(Registration)
+  err := decoder.Decode(&u)
+  if err != nil {
+    fmt.Println(err)
+  }
+
+  r, err := db.CreateUser(u.Username, u.Email, u.Password)
+
+  w.Header().Set("Content-Type", "text/plain")
 
   if err != nil {
     w.WriteHeader(http.StatusInternalServerError)
@@ -457,7 +463,7 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
     w.WriteHeader(http.StatusUnauthorized)
     fmt.Fprintln(w, "Username already exists!")
   } else {
-    SetSession(username, w)
+    SetSession(u.Username, w, req)
     w.WriteHeader(http.StatusCreated)
     fmt.Fprintln(w, "User successfully registered!")
   }
@@ -479,12 +485,22 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
 *   Incorrect credentials provided!
 */
 func LoginUser(w http.ResponseWriter, req *http.Request) {
-  username := req.FormValue("username") 
-  password := req.FormValue("password")
 
-  a, err := db.CheckUserCredentials(username, password)
+  type Login struct {
+    Username  string  `json:"username"`
+    Password  string  `json:"password"`
+  }
 
-  w.Header().Set("Content-Type", "application/json")
+  decoder := json.NewDecoder(req.Body)
+  u := new(Login)
+  err := decoder.Decode(&u)
+  if err != nil {
+    fmt.Println(err)
+  }
+
+  a, err := db.CheckUserCredentials(u.Username, u.Password)
+
+  w.Header().Set("Content-Type", "text/plain")
 
   if err != nil {
     w.WriteHeader(http.StatusInternalServerError)
@@ -493,7 +509,7 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
     w.WriteHeader(http.StatusUnauthorized)
     fmt.Fprintln(w, "Incorrect credentials provided!")
   } else {
-    SetSession(username, w)
+    SetSession(u.Username, w, req)
     w.WriteHeader(http.StatusOK)
     fmt.Fprintln(w, "User successfully logged in")
   }
@@ -511,17 +527,10 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
 *
 */
 func LogoutUser(w http.ResponseWriter, req *http.Request) {
-  cookie := &http.Cookie{
-    Name: "session",
-    Value: "",
-    Path: "/",
-    MaxAge: -1,
-  }
-
-  http.SetCookie(w, cookie)
-  w.Header().Set("Content-Type", "application/json")
-  w.WriteHeader(http.StatusOK)
-  fmt.Fprintln(w, "Cookies successfully cleared!")
+  session, _ := store.Get(req, "session-id")
+  delete(session.Values, "username")
+  sessions.Save(req, w)
+  fmt.Fprintln(w, "Successfully logged out!")
 }
 
 /**
@@ -541,20 +550,7 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
 *   http: named cookie not present
 */
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
-  w.Header().Set("Content-Type", "application/json")
-
-  if cookie, err := req.Cookie("session"); err == nil {
-    cookieValue := make(map[string]string)
-
-    if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
-      w.WriteHeader(http.StatusOK)
-      fmt.Fprintln(w, cookieValue["username"])
-    } else {
-      w.WriteHeader(http.StatusUnauthorized)
-      fmt.Fprintln(w, err)
-    }
-  } else {
-    w.WriteHeader(http.StatusUnauthorized)
-    fmt.Fprintln(w, err)
-  }
+  w.Header().Set("Content-Type", "text/plain")
+  session, err := store.Get(req, "session-id")
+  fmt.Fprintln(w, session.Values["username"], err)
 }

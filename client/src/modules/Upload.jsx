@@ -113,6 +113,6 @@ export default class Upload extends React.Component {
         </div>
         {this.state.videoReturned ? (<video autoPlay src={"https://d2bezlfyzapny1.cloudfront.net/" + this.state.filename} style={videoStyle}/>) : null }
       </div>
-      );
+    )
   }
 }

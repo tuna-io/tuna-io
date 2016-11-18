@@ -41,6 +41,7 @@ func main() {
    *      `/api/users` SUB-ROUTER
    *------------------------------------*/
   u := api.PathPrefix("/users").Subrouter()
+  u.Methods("OPTIONS").HandlerFunc(routes.AllowAccess)
   u.Methods("POST").Path("/register").HandlerFunc(routes.RegisterUser)
   u.Methods("POST").Path("/login").HandlerFunc(routes.LoginUser)
   u.Methods("GET").Path("/logout").HandlerFunc(routes.LogoutUser)
@@ -49,7 +50,8 @@ func main() {
   /*-------------------------------------
    *      `/` STATIC FILE SERVER
    *------------------------------------*/
-  r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./doc/"))))
+  r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./client/build"))))
+  r.PathPrefix("/dashboard/upload").Handler(http.FileServer(http.Dir("./client/build/dashboard/upload")))
 
   // Start up server and error log
   log.Println("Listening at port 3000")

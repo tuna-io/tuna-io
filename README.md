@@ -164,6 +164,12 @@ npm install
 npm install -g mocha
 ```
 
+Build the client
+```
+cd client
+npm run build
+```
+
 Install all Go dependencies and start up the server!
 ```
 go get
