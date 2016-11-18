@@ -15,11 +15,6 @@ import Home from './modules/Home';
 ReactDOM.render((
   <Router history={browserHistory}>
     <Route path="/" component={App} >
-      <Route path="/about" component={About} />
-      <Route path="/signin" component={Signin} />
-      <Route path="/dashboard" component={Dashboard} >
-        <Route path="/dashboard/settings" component={Settings} />
-        <Route path="/dashboard/upload" component={Upload} />
       <IndexRoute component={Home} />
       <Route path="about" component={About} />
       <Route path="repos" component={Repos} />

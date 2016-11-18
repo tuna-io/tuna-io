@@ -13,7 +13,6 @@ import (
   "encoding/hex"
   "encoding/json"
   "github.com/gorilla/mux"
-  "github.com/gorilla/schema"
   "github.com/gorilla/sessions"
   "github.com/aws/aws-sdk-go/aws"
   "github.com/mediawen/watson-go-sdk"
@@ -90,18 +89,12 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   decoder := json.NewDecoder(req.Body)
   video := new(db.Video)
   err := decoder.Decode(&video)
-
-  // err := req.ParseForm()
-  // video := new(db.Video)
-  // decoder := schema.NewDecoder()
-  // err = decoder.Decode(video, req.Form)
   if err != nil {
     panic(err)
   }
   
   fmt.Println(video.Url, video.Title, video.Creator, video.Private)
   
-
   hasher := md5.New()
   hasher.Write([]byte(video.Url))
   hash := hex.EncodeToString(hasher.Sum(nil))
