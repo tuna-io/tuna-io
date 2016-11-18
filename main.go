@@ -51,6 +51,7 @@ func main() {
    *      `/` STATIC FILE SERVER
    *------------------------------------*/
   r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./client/build"))))
+  r.PathPrefix("/dashboard/upload").Handler(http.FileServer(http.Dir("./client/build/dashboard/upload")))
 
   // Start up server and error log
   log.Println("Listening at port 3000")

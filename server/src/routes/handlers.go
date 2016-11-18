@@ -555,14 +555,15 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
 func LogoutUser(w http.ResponseWriter, req *http.Request) {
 
   session, _ := store.Get(req, "session-id")
+  delete(session.Values, "username")
 
 
-  session.Options = &sessions.Options{
+  // session.Options = &sessions.Options{
   //   Path: "/",
   //   // Domain: "localhost:3001",
-    MaxAge: -1,
+    // MaxAge: -1,
   //   HttpOnly: true,
-  }
+  // }
 
   // session.Values["username"] = ""
   fmt.Println(session)

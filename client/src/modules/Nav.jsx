@@ -3,11 +3,9 @@ import { Link } from 'react-router';
 
 export default React.createClass({
   logout() {
-    fetch('http://localhost:3000/api/users/logout', {
+    fetch('http://127.0.0.1:3000/api/users/logout', {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      credentials: 'same-origin',
     });
   },
 
