@@ -9,7 +9,7 @@ import Signin from './modules/Signin';
 import Dashboard from './modules/Dashboard';
 import Settings from './modules/Settings';
 import Upload from './modules/Upload';
-import VideoDetails from './modules/VideoDetails'
+import VideoDetails from './modules/VideoDetails';
 import Home from './modules/Home';
 
 ReactDOM.render((
@@ -21,8 +21,8 @@ ReactDOM.render((
       <Route path="register" component={Register} />
       <Route path="signin" component={Signin} />
       <Route path="dashboard" component={Dashboard} >
-        <Route path="dashboard/settings" component={Settings} />
-        <Route path="dashboard/upload" component={Upload} />
+        <Route path="settings" component={Settings} />
+        <Route path="upload" component={Upload} />
       </Route>
       <Route path="/videos/:videoId" component={VideoDetails} />
     </Route>
