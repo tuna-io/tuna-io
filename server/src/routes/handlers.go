@@ -21,6 +21,12 @@ import (
   "github.com/aws/aws-sdk-go/aws/session"
 )
 
+func HandleError(err error) {
+  if err != nil {
+    panic(err)
+  }
+}
+
 /**
  * @api {get} /api/isalive Check if server is running
  * @apiName IsAlivea
@@ -38,15 +44,6 @@ func IsAlive(w http.ResponseWriter, req *http.Request) {
   w.Write([]byte("I'm Alive"))
 }
 
-func init() {
-  store.Options = &sessions.Options{
-    // Path: "/",
-    // Domain: "127.0.0.1",
-    MaxAge: 3600 * 24 * 30,
-    // HttpOnly: false,
-    // Secure: true,
-  }
-}
 
 /*-------------------------------------
  *          VIDEO HANDLERS
@@ -418,25 +415,19 @@ func AllowAccess(rw http.ResponseWriter, req *http.Request) {
  *       CLIENT AUTHENTICATION
  *------------------------------------*/
 
-func SetSession(username string, w http.ResponseWriter) {
-  // value := map[string]string {
-  //   "username": username,
-  // }
-
-  // // if encoded, err := cookieHandler.Encode("session", value); err == nil {
-  //   // cookie := &http.Cookie{
-  //     Name: "session",
-  //     Value: encoded,
-  //     Path: "/",
-  //   }
-
-  //   http.SetCookie(w, cookie)
-  // }
-}
-
 var store = sessions.NewCookieStore([]byte("something-very-secret"))
 
+func init() {
+  store.Options = &sessions.Options{
+    MaxAge: 3600 * 24 * 30,
+  }
+}
 
+func SetSession(username string, w http.ResponseWriter, req *http.Request) {
+  session, _ := store.Get(req, "session-id")
+  session.Values["username"] = username
+  sessions.Save(req, w)
+}
 
 /**
 * @api {post} /api/users/register Register a new user
@@ -453,21 +444,18 @@ var store = sessions.NewCookieStore([]byte("something-very-secret"))
 *   Username already exists!
 */
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
-  // AllowAccess(w, req)
 
-
-
-  type User struct {
+  type Registration struct {
     Username  string  `json:"username"`
     Email     string  `json:"email"`
     Password  string  `json:"password"`
   }
 
   decoder := json.NewDecoder(req.Body)
-  u := new(User)
+  u := new(Registration)
   err := decoder.Decode(&u)
   if err != nil {
-    panic(err)
+    fmt.Println(err)
   }
 
   r, err := db.CreateUser(u.Username, u.Email, u.Password)
@@ -481,20 +469,8 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
     w.WriteHeader(http.StatusUnauthorized)
     fmt.Fprintln(w, "Username already exists!")
   } else {
-    SetSession(u.Username, w)
-    session, _ := store.Get(req, "session-id")
+    SetSession(u.Username, w, req)
 
-
-    // session.Options = &sessions.Options{
-    //   Path: "/",
-    //   // Domain: "localhost:3001",
-    //   MaxAge: 3600 * 24 * 15,
-    //   HttpOnly: true,
-    // }
-
-    session.Values["username"] = u.Username
-    fmt.Println(session)
-    sessions.Save(req, w)
     // http.SetCookie(w, session)
     // fmt.Println(s)
 
@@ -600,8 +576,6 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
 *   http: named cookie not present
 */
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
-  // AllowAccess(w, req)
-
   fmt.Println("Called authenticateuser")
 
   w.Header().Set("Content-Type", "application/json")

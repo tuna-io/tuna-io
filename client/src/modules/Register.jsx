@@ -36,9 +36,9 @@ export default class Register extends React.Component {
     fetch('http://127.0.0.1:3000/api/users/register', {
       method: 'POST',
       body: JSON.stringify({
-        'username': this.state.username,
-        'email': this.state.email,
-        'password': this.state.password
+        username: this.state.username,
+        email: this.state.email,
+        password: this.state.password
       }),
       credentials: 'same-origin',
       headers: {
