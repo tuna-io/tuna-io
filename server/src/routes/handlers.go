@@ -16,7 +16,6 @@ import (
   "github.com/gorilla/schema"
   "github.com/gorilla/sessions"
   "github.com/aws/aws-sdk-go/aws"
-  "github.com/gorilla/securecookie"
   "github.com/mediawen/watson-go-sdk"
   "github.com/aws/aws-sdk-go/service/s3"
   "github.com/aws/aws-sdk-go/aws/session"
@@ -347,7 +346,6 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
 */
 func SignVideo(w http.ResponseWriter, r *http.Request) {
 
-  // create new video object from given request json
   decoder := json.NewDecoder(r.Body)
 
   v := new(Vidfile)
@@ -420,22 +418,20 @@ func AllowAccess(rw http.ResponseWriter, req *http.Request) {
  *       CLIENT AUTHENTICATION
  *------------------------------------*/
 
-var cookieHandler = securecookie.New(securecookie.GenerateRandomKey(64),securecookie.GenerateRandomKey(32))
-
 func SetSession(username string, w http.ResponseWriter) {
-  value := map[string]string {
-    "username": username,
-  }
+  // value := map[string]string {
+  //   "username": username,
+  // }
 
-  if encoded, err := cookieHandler.Encode("session", value); err == nil {
-    cookie := &http.Cookie{
-      Name: "session",
-      Value: encoded,
-      Path: "/",
-    }
+  // // if encoded, err := cookieHandler.Encode("session", value); err == nil {
+  //   // cookie := &http.Cookie{
+  //     Name: "session",
+  //     Value: encoded,
+  //     Path: "/",
+  //   }
 
-    http.SetCookie(w, cookie)
-  }
+  //   http.SetCookie(w, cookie)
+  // }
 }
 
 var store = sessions.NewCookieStore([]byte("something-very-secret"))
@@ -486,12 +482,7 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
     fmt.Fprintln(w, "Username already exists!")
   } else {
     SetSession(u.Username, w)
-    session, err := store.Get(req, "session-id")
-    if (err != nil) {
-      http.Error(w, err.Error(), http.StatusInternalServerError)
-      return
-    }
-
+    session, _ := store.Get(req, "session-id")
 
 
     // session.Options = &sessions.Options{
@@ -562,6 +553,20 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
 *
 */
 func LogoutUser(w http.ResponseWriter, req *http.Request) {
+
+  session, _ := store.Get(req, "session-id")
+
+
+  session.Options = &sessions.Options{
+  //   Path: "/",
+  //   // Domain: "localhost:3001",
+    MaxAge: -1,
+  //   HttpOnly: true,
+  }
+
+  // session.Values["username"] = ""
+  fmt.Println(session)
+  sessions.Save(req, w)
 //   AllowAccess(w, req)
 
 //   cookie := &http.Cookie{
