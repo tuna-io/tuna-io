@@ -1,5 +1,4 @@
 import React from 'react';
-import $ from 'jquery';
 
 export default class Register extends React.Component {
   constructor(props) {
@@ -20,19 +19,6 @@ export default class Register extends React.Component {
   }
 
   handleSubmit(event) {
-    // $.ajax({
-    //   url: 'http://127.0.0.1:3000/api/users/register',
-    //   method: 'POST',
-    //   data: JSON.stringify({
-    //     'username': this.state.username,
-    //     'email': this.state.email,
-    //     'password': this.state.password
-    //   }),
-    //   success: function(data) {
-    //     console.log(data)
-    //   },
-    // });
-    // // })
     fetch('http://127.0.0.1:3000/api/users/register', {
       method: 'POST',
       body: JSON.stringify({
@@ -61,10 +47,10 @@ export default class Register extends React.Component {
   authenticateUser() {
     fetch('http://127.0.0.1:3000/api/users/authenticate', {
       method: 'GET',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json'
       },
-      'credentials': 'include',
     })
     .then(function(response) {
       return response.text()

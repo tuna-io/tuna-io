@@ -437,6 +437,7 @@ func SetSession(username string, w http.ResponseWriter, req *http.Request) {
 *
 * @apiSuccessExample Success-Response:
 *   HTTP/1.1 201 Created
+*   User successfully created!
 *
 *
 * @apiErrorExample Error-Response:
@@ -525,34 +526,10 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
 *
 */
 func LogoutUser(w http.ResponseWriter, req *http.Request) {
-
   session, _ := store.Get(req, "session-id")
   delete(session.Values, "username")
-
-
-  // session.Options = &sessions.Options{
-  //   Path: "/",
-  //   // Domain: "localhost:3001",
-    // MaxAge: -1,
-  //   HttpOnly: true,
-  // }
-
-  // session.Values["username"] = ""
-  fmt.Println(session)
   sessions.Save(req, w)
-//   AllowAccess(w, req)
-
-//   cookie := &http.Cookie{
-//     Name: "session",
-//     Value: "",
-//     Path: "/",
-//     MaxAge: -1,
-//   }
-
-//   http.SetCookie(w, cookie)
-//   w.Header().Set("Content-Type", "application/json")
-//   w.WriteHeader(http.StatusOK)
-//   fmt.Fprintln(w, "Cookies successfully cleared!")
+  fmt.Fprintln(w, "Successfully logged out!")
 }
 
 /**
@@ -572,27 +549,7 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
 *   http: named cookie not present
 */
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
-  fmt.Println("Called authenticateuser")
-
   w.Header().Set("Content-Type", "text/plain")
-
   session, err := store.Get(req, "session-id")
-
-  fmt.Println(session)
   fmt.Fprintln(w, session.Values["username"], err)
-
-  // if cookie, err := req.Cookie("session"); err == nil {
-  //   cookieValue := make(map[string]string)
-
-  //   if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
-  //     w.WriteHeader(http.StatusOK)
-  //     fmt.Fprintln(w, cookieValue["username"])
-  //   } else {
-  //     w.WriteHeader(http.StatusUnauthorized)
-  //     fmt.Fprintln(w, err)
-  //   }
-  // } else {
-  //   w.WriteHeader(http.StatusUnauthorized)
-  //   fmt.Fprintln(w, err)
-  // }
 }
