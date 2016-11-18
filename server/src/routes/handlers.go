@@ -14,6 +14,7 @@ import (
   "encoding/json"
   "github.com/gorilla/mux"
   "github.com/gorilla/schema"
+  "github.com/gorilla/sessions"
   "github.com/aws/aws-sdk-go/aws"
   "github.com/gorilla/securecookie"
   "github.com/mediawen/watson-go-sdk"
@@ -38,6 +39,15 @@ func IsAlive(w http.ResponseWriter, req *http.Request) {
   w.Write([]byte("I'm Alive"))
 }
 
+func init() {
+  store.Options = &sessions.Options{
+    Path: "/",
+    // Domain: "127.0.0.1",
+    MaxAge: 3600 * 24 * 30,
+    HttpOnly: false,
+    // Secure: true,
+  }
+}
 
 /*-------------------------------------
  *          VIDEO HANDLERS
@@ -397,9 +407,10 @@ type Vidfile struct {
 *   HTTP/1.1 404 Not Found
 */
 func AllowAccess(rw http.ResponseWriter, req *http.Request) {
-  rw.Header().Set("Access-Control-Allow-Origin", "*")
+  rw.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1")
   rw.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
   rw.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+  rw.Header().Set("Access-Control-Allow-Credentials", "true")
   
   return
 }
@@ -427,6 +438,10 @@ func SetSession(username string, w http.ResponseWriter) {
   }
 }
 
+var store = sessions.NewCookieStore([]byte("something-very-secret"))
+
+
+
 /**
 * @api {post} /api/users/register Register a new user
 * @apiName RegisterUser
@@ -442,7 +457,9 @@ func SetSession(username string, w http.ResponseWriter) {
 *   Username already exists!
 */
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
-  AllowAccess(w, req)
+  // AllowAccess(w, req)
+
+
 
   type User struct {
     Username  string  `json:"username"`
@@ -459,7 +476,7 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
 
   r, err := db.CreateUser(u.Username, u.Email, u.Password)
 
-  w.Header().Set("Content-Type", "application/json")
+  // w.Header().Set("Content-Type", "application/json")
 
   if err != nil {
     w.WriteHeader(http.StatusInternalServerError)
@@ -469,6 +486,27 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
     fmt.Fprintln(w, "Username already exists!")
   } else {
     SetSession(u.Username, w)
+    session, err := store.Get(req, "session-id")
+    if (err != nil) {
+      http.Error(w, err.Error(), http.StatusInternalServerError)
+      return
+    }
+
+
+
+    // session.Options = &sessions.Options{
+    //   Path: "/",
+    //   // Domain: "localhost:3001",
+    //   MaxAge: 3600 * 24 * 15,
+    //   HttpOnly: true,
+    // }
+
+    session.Values["username"] = u.Username
+    fmt.Println(session)
+    sessions.Save(req, w)
+    // http.SetCookie(w, session)
+    // fmt.Println(s)
+
     w.WriteHeader(http.StatusCreated)
     fmt.Fprintln(w, "User successfully registered!")
   }
@@ -490,26 +528,26 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
 *   Incorrect credentials provided!
 */
 func LoginUser(w http.ResponseWriter, req *http.Request) {
-  AllowAccess(w, req)
+//   AllowAccess(w, req)
 
-  username := req.FormValue("username") 
-  password := req.FormValue("password")
+//   username := req.FormValue("username") 
+//   password := req.FormValue("password")
 
-  a, err := db.CheckUserCredentials(username, password)
+//   a, err := db.CheckUserCredentials(username, password)
 
-  w.Header().Set("Content-Type", "application/json")
+//   w.Header().Set("Content-Type", "application/json")
 
-  if err != nil {
-    w.WriteHeader(http.StatusInternalServerError)
-    fmt.Fprintln(w, err)
-  } else if !a {
-    w.WriteHeader(http.StatusUnauthorized)
-    fmt.Fprintln(w, "Incorrect credentials provided!")
-  } else {
-    SetSession(username, w)
-    w.WriteHeader(http.StatusOK)
-    fmt.Fprintln(w, "User successfully logged in")
-  }
+//   if err != nil {
+//     w.WriteHeader(http.StatusInternalServerError)
+//     fmt.Fprintln(w, err)
+//   } else if !a {
+//     w.WriteHeader(http.StatusUnauthorized)
+//     fmt.Fprintln(w, "Incorrect credentials provided!")
+//   } else {
+//     SetSession(username, w)
+//     w.WriteHeader(http.StatusOK)
+//     fmt.Fprintln(w, "User successfully logged in")
+//   }
 }
 
 /**
@@ -524,19 +562,19 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
 *
 */
 func LogoutUser(w http.ResponseWriter, req *http.Request) {
-  AllowAccess(w, req)
+//   AllowAccess(w, req)
 
-  cookie := &http.Cookie{
-    Name: "session",
-    Value: "",
-    Path: "/",
-    MaxAge: -1,
-  }
+//   cookie := &http.Cookie{
+//     Name: "session",
+//     Value: "",
+//     Path: "/",
+//     MaxAge: -1,
+//   }
 
-  http.SetCookie(w, cookie)
-  w.Header().Set("Content-Type", "application/json")
-  w.WriteHeader(http.StatusOK)
-  fmt.Fprintln(w, "Cookies successfully cleared!")
+//   http.SetCookie(w, cookie)
+//   w.Header().Set("Content-Type", "application/json")
+//   w.WriteHeader(http.StatusOK)
+//   fmt.Fprintln(w, "Cookies successfully cleared!")
 }
 
 /**
@@ -556,22 +594,29 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
 *   http: named cookie not present
 */
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
-  AllowAccess(w, req)
+  // AllowAccess(w, req)
+
+  fmt.Println("Called authenticateuser")
 
   w.Header().Set("Content-Type", "application/json")
 
-  if cookie, err := req.Cookie("session"); err == nil {
-    cookieValue := make(map[string]string)
+  session, err := store.Get(req, "session-id")
 
-    if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
-      w.WriteHeader(http.StatusOK)
-      fmt.Fprintln(w, cookieValue["username"])
-    } else {
-      w.WriteHeader(http.StatusUnauthorized)
-      fmt.Fprintln(w, err)
-    }
-  } else {
-    w.WriteHeader(http.StatusUnauthorized)
-    fmt.Fprintln(w, err)
-  }
+  fmt.Println(session)
+  fmt.Println(session.Values["username"], err)
+
+  // if cookie, err := req.Cookie("session"); err == nil {
+  //   cookieValue := make(map[string]string)
+
+  //   if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
+  //     w.WriteHeader(http.StatusOK)
+  //     fmt.Fprintln(w, cookieValue["username"])
+  //   } else {
+  //     w.WriteHeader(http.StatusUnauthorized)
+  //     fmt.Fprintln(w, err)
+  //   }
+  // } else {
+  //   w.WriteHeader(http.StatusUnauthorized)
+  //   fmt.Fprintln(w, err)
+  // }
 }

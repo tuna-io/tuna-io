@@ -1,4 +1,5 @@
 import React from 'react';
+import $ from 'jquery';
 
 export default class Register extends React.Component {
   constructor(props) {
@@ -19,34 +20,50 @@ export default class Register extends React.Component {
   }
 
   handleSubmit(event) {
-    fetch('http://localhost:3000/api/users/register', {
+    $.ajax({
+      url: 'http://127.0.0.1:3000/api/users/register',
       method: 'POST',
-      body: JSON.stringify({
+      data: JSON.stringify({
         'username': this.state.username,
         'email': this.state.email,
         'password': this.state.password
       }),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(function(response) {
-      console.log(response);
-    })
-    .catch(function(err) {
-      console.log(err);
-    })
+      success: function(data) {
+        console.log(data)
+      },
+    });
+    // })
+    // fetch('http://localhost:3000/api/users/register', {
+    //   method: 'POST',
+    //   body: JSON.stringify({
+    //     'username': this.state.username,
+    //     'email': this.state.email,
+    //     'password': this.state.password
+    //   }),
+    //   credentials: 'same-origin',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    // })
+    // .then(function(response) {
+    //   console.log(response);
+    // })
+    // .catch(function(err) {
+    //   console.log(err);
+    // })
 
     // alert(this.state.username);
     event.preventDefault();
   }
 
   authenticateUser() {
-    fetch('http://localhost:3000/api/users/authenticate', {
+    console.log('authenticating')
+    fetch('http://127.0.0.1:3000/api/users/authenticate', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      'credentials': 'include',
     })
     .then(function(response) {
       return response.text()
@@ -60,6 +77,12 @@ export default class Register extends React.Component {
   }
 
   componentDidMount() {
+    // $.ajaxSetup({
+    //   xhrFields: {
+    //     withCredentials: true
+    //   }
+    // });
+
     console.log('component mount');
     this.authenticateUser();
   }

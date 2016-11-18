@@ -50,7 +50,7 @@ func main() {
   /*-------------------------------------
    *      `/` STATIC FILE SERVER
    *------------------------------------*/
-  r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./doc/"))))
+  r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./client/build"))))
 
   // Start up server and error log
   log.Println("Listening at port 3000")
