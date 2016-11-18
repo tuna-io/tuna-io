@@ -44,7 +44,7 @@ func init() {
     Path: "/",
     // Domain: "127.0.0.1",
     MaxAge: 3600 * 24 * 30,
-    HttpOnly: false,
+    // HttpOnly: false,
     // Secure: true,
   }
 }
