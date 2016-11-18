@@ -460,7 +460,7 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
 
   r, err := db.CreateUser(u.Username, u.Email, u.Password)
 
-  // w.Header().Set("Content-Type", "application/json")
+  w.Header().Set("Content-Type", "text/plain")
 
   if err != nil {
     w.WriteHeader(http.StatusInternalServerError)
@@ -470,10 +470,6 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
     fmt.Fprintln(w, "Username already exists!")
   } else {
     SetSession(u.Username, w, req)
-
-    // http.SetCookie(w, session)
-    // fmt.Println(s)
-
     w.WriteHeader(http.StatusCreated)
     fmt.Fprintln(w, "User successfully registered!")
   }
@@ -578,12 +574,12 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
   fmt.Println("Called authenticateuser")
 
-  w.Header().Set("Content-Type", "application/json")
+  w.Header().Set("Content-Type", "text/plain")
 
   session, err := store.Get(req, "session-id")
 
   fmt.Println(session)
-  fmt.Println(session.Values["username"], err)
+  fmt.Fprintln(w, session.Values["username"], err)
 
   // if cookie, err := req.Cookie("session"); err == nil {
   //   cookieValue := make(map[string]string)

@@ -46,7 +46,10 @@ export default class Register extends React.Component {
       },
     })
     .then(function(response) {
-      console.log(response);
+      return response.text();
+    })
+    .then(function(textResponse) {
+      console.log(textResponse);
     })
     .catch(function(err) {
       console.log(err);
