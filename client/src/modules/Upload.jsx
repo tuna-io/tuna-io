@@ -35,7 +35,6 @@ export default class Upload extends React.Component {
       title: file.name,
     });
 
-    // Fetch signed URL
     fetch('http://127.0.0.1:3000/api/s3', {
       method: 'POST',
       body: JSON.stringify({
@@ -158,6 +157,50 @@ export default class Upload extends React.Component {
     }
 
     return null;
+    })
+    .then((data) => {
+      // console.log('we got data', data, 'and', data.body);
+      // console.log('filename', file.name);
+      this.setState({
+        videoReturned: true
+      });
+
+      return fetch('http://127.0.0.1:3000/api/videos', {
+        method: 'POST',
+        body: JSON.stringify({
+          'title': 'test',
+          'url': 'https://s3-us-west-1.amazonaws.com/invalidmemories/' + file.name,
+          'creator': 'bill',
+          'private': false
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    })
+    .then((rawResp)=> {
+      // console.log('raw resp returned');
+      return rawResp.json();
+    })
+    .then((resp)=> {
+      console.log('fetch returned', resp);
+      var newTranscript = [];
+      // console.log("fetch transcript", resp.transcript);
+      resp.transcript.Words.forEach((word)=> {
+        newTranscript.push({"word": word.Token, "time": word.End});
+      });
+
+      this.setState({
+        transcript: newTranscript
+      });
+      console.log("new transcript is", this.state.transcript, this);
+      this.render();
+      // console.log('should have rendered');
+    
+    })
+    .catch((err) => {
+      console.log('error uploading', err);
+    });
   }
 
   render() {
