@@ -40,7 +40,6 @@ export default class Register extends React.Component {
         'email': this.state.email,
         'password': this.state.password
       }),
-      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json'
       },
