@@ -444,11 +444,20 @@ func SetSession(username string, w http.ResponseWriter) {
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
   AllowAccess(w, req)
 
-  username := req.FormValue("username")
-  email := req.FormValue("email")
-  password := req.FormValue("password")
+  type User struct {
+    Username  string  `json:"username"`
+    Email     string  `json:"email"`
+    Password  string  `json:"password"`
+  }
 
-  r, err := db.CreateUser(username, email, password)
+  decoder := json.NewDecoder(req.Body)
+  u := new(User)
+  err := decoder.Decode(&u)
+  if err != nil {
+    panic(err)
+  }
+
+  r, err := db.CreateUser(u.Username, u.Email, u.Password)
 
   w.Header().Set("Content-Type", "application/json")
 
@@ -459,7 +468,7 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
     w.WriteHeader(http.StatusUnauthorized)
     fmt.Fprintln(w, "Username already exists!")
   } else {
-    SetSession(username, w)
+    SetSession(u.Username, w)
     w.WriteHeader(http.StatusCreated)
     fmt.Fprintln(w, "User successfully registered!")
   }
@@ -548,7 +557,7 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
 */
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
   AllowAccess(w, req)
-  
+
   w.Header().Set("Content-Type", "application/json")
 
   if cookie, err := req.Cookie("session"); err == nil {
