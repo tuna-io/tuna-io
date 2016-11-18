@@ -41,7 +41,7 @@ func IsAlive(w http.ResponseWriter, req *http.Request) {
 
 func init() {
   store.Options = &sessions.Options{
-    Path: "/",
+    // Path: "/",
     // Domain: "127.0.0.1",
     MaxAge: 3600 * 24 * 30,
     // HttpOnly: false,
