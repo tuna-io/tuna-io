@@ -5,7 +5,7 @@ export default class Upload extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      transcript: [{ word: "holdya", time: 1 }, { word: "breath", time: 2 }],
+      transcript: "",
       file: null,
       videoReturned: false,
       signedUrl: null,
@@ -90,6 +90,26 @@ export default class Upload extends React.Component {
     });
   }
 
+  renderTranscript() {
+    if (this.state.videoReturned) {
+      if (this.state.transcript) {
+        return (
+          <h2>Transcript
+            <div>
+              {this.state.transcript.map(pair => pair.word).reduce((firstword, secondword) => `${firstword} ${secondword}`)}
+            </div>
+          </h2>
+        );
+      }
+
+      return (
+        <h2>Creating transcript</h2>
+      );
+    }
+
+    return null;
+  }
+
   render() {
     console.log('rendering now');
     return (
@@ -103,11 +123,10 @@ export default class Upload extends React.Component {
           </div>
         </Dropzone>
         <button onClick={this.submitVideo.bind(this)}>Upload into the cloud</button>
-        <div>Transcript</div>
-        <div>
-          {this.state.transcript.map(pair => pair.word).reduce((firstword, secondword) => `${firstword} ${secondword}`)}
-        </div>
-        {this.state.videoReturned ? (<video src={`https://d2bezlfyzapny1.cloudfront.net/${this.state.file.name}`} width="400" controls />) : null }
+        {this.state.videoReturned ? (<div><video src={`https://d2bezlfyzapny1.cloudfront.net/${this.state.file.name}`} width="400" controls /></div>) : null }
+        {
+          this.renderTranscript()
+        }
       </div>
     );
   }
