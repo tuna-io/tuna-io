@@ -12,7 +12,9 @@ export default class Upload extends React.Component {
     };
   }
 
-  submitVideo() {
+  submitVideo(event) {
+    event.preventDefault();
+
     if (this.state.signedUrl) {
       console.log('about to upload to S3');
       fetch(this.state.signedUrl, {
@@ -122,7 +124,14 @@ export default class Upload extends React.Component {
             Drop some files here!
           </div>
         </Dropzone>
-        <button onClick={this.submitVideo.bind(this)}>Upload into the cloud</button>
+        {
+          this.state.signedUrl ?
+          (
+            <form onSubmit={this.submitVideo.bind(this)}>
+              <input name="submit" type="submit" value="Upload into cloud" />
+            </form>
+          ) : null
+        }
         {this.state.videoReturned ? (<div><video src={`https://d2bezlfyzapny1.cloudfront.net/${this.state.file.name}`} width="400" controls /></div>) : null }
         {
           this.renderTranscript()
