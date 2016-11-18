@@ -492,26 +492,34 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
 *   Incorrect credentials provided!
 */
 func LoginUser(w http.ResponseWriter, req *http.Request) {
-//   AllowAccess(w, req)
 
-//   username := req.FormValue("username") 
-//   password := req.FormValue("password")
+  type Login struct {
+    Username  string  `json:"username"`
+    Password  string  `json:"password"`
+  }
 
-//   a, err := db.CheckUserCredentials(username, password)
+  decoder := json.NewDecoder(req.Body)
+  u := new(Login)
+  err := decoder.Decode(&u)
+  if err != nil {
+    fmt.Println(err)
+  }
 
-//   w.Header().Set("Content-Type", "application/json")
+  a, err := db.CheckUserCredentials(u.Username, u.Password)
 
-//   if err != nil {
-//     w.WriteHeader(http.StatusInternalServerError)
-//     fmt.Fprintln(w, err)
-//   } else if !a {
-//     w.WriteHeader(http.StatusUnauthorized)
-//     fmt.Fprintln(w, "Incorrect credentials provided!")
-//   } else {
-//     SetSession(username, w)
-//     w.WriteHeader(http.StatusOK)
-//     fmt.Fprintln(w, "User successfully logged in")
-//   }
+  w.Header().Set("Content-Type", "text/plain")
+
+  if err != nil {
+    w.WriteHeader(http.StatusInternalServerError)
+    fmt.Fprintln(w, err)
+  } else if !a {
+    w.WriteHeader(http.StatusUnauthorized)
+    fmt.Fprintln(w, "Incorrect credentials provided!")
+  } else {
+    SetSession(u.Username, w, req)
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintln(w, "User successfully logged in")
+  }
 }
 
 /**
