@@ -19,6 +19,8 @@ type Video struct {
   Url         string      `json:"url"`
   Hash        string      `json:"hash"`
   Creator     string      `json:"creator"`
+  Extension   string      `json:"extension"`
+  Description string      `json:"description"`
   Timestamp   time.Time   `json:"timestamp"`
   Private     bool        `json:"private"`
   Views       int         `json:"views"`
@@ -99,6 +101,8 @@ func CreateVideo(v Video) (string, error) {
   conn.Send("HSET", "video:" + v.Hash, "creator", v.Creator)
   conn.Send("HSET", "video:" + v.Hash, "timestamp", v.Timestamp)
   conn.Send("HSET", "video:" + v.Hash, "private", v.Private)
+  conn.Send("HSET", "video:" + v.Hash, "description", v.Description)
+  conn.Send("HSET", "video:" + v.Hash, "extension", v.Extension)
   conn.Send("HSET", "video:" + v.Hash, "views", 0)
   conn.Send("HSET", "video:" + v.Hash, "likes", []string{})
   conn.Send("HSET", "video:" + v.Hash, "dislikes", []string{})

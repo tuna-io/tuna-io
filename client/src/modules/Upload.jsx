@@ -22,9 +22,9 @@ export default class Upload extends React.Component {
       videoReturned: false,
       query: "",
       searchResults: [],
-      searchReturned: false
+      searchReturned: false,
     };
-    
+
     // Bind helper functions in constructor
     this.handleChange = this.handleChange.bind(this);
     this.submitVideoToCDN = this.submitVideoToCDN.bind(this);
@@ -94,10 +94,11 @@ export default class Upload extends React.Component {
           method: 'POST',
           body: JSON.stringify({
             title: this.state.title,
+            creator: this.props.loggedIn,
             description: this.state.description,
-            url: `https://s3-us-west-1.amazonaws.com/invalidmemories/${this.state.file.name}`,
-            creator: 'bill', // TODO REMOVE USER HARDCODING WHEN USER AUTHENTICATION IS DONE
+            extension: this.state.file.type,
             private: this.state.private,
+            url: `https://s3-us-west-1.amazonaws.com/invalidmemories/${this.state.file.name}`,
           }),
           headers: {
             'Content-Type': 'application/json',
@@ -128,17 +129,14 @@ export default class Upload extends React.Component {
       method: "GET",
       credentials: 'same-origin',
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     })
-    .then((resp)=> {
-      return resp.json();
-    })
+    .then(resp => resp.json())
     .then((searchResults)=>{
-      console.log("search results are", searchResults);
       this.setState({
         searchResults: searchResults,
-        searchReturned: true
+        searchReturned: true,
       });
       // this.render();
     })
@@ -177,7 +175,7 @@ export default class Upload extends React.Component {
   // Transcript is rendered after server-side transcription
   renderTranscript() {
     if (this.state.videoReturned) {
-      if (this.state.transcript) {
+      if (this.state.transcript.length > 0) {
         return (
           <div>
             <h3>Transcript</h3>
@@ -202,7 +200,7 @@ export default class Upload extends React.Component {
       return (
         <form onSubmit={this.search}>
           Search:
-          <input type="text" name="query" onChange={this.handleChange}/>
+          <input type="text" name="query" onChange={this.handleChange} />
           <input type="submit" value="Submit" />
         </form>
       );
@@ -217,7 +215,6 @@ export default class Upload extends React.Component {
           <div> Search results: </div>
           <div>
             {this.state.searchReturned ? (this.state.searchResults.map((i)=> {
-                console.log("word is", this.state.transcript[i].word);
                 return (<div>{"Word: " + this.state.transcript[i].word + ", Time: " + this.state.transcript[i].time}</div>)
                 })
               ) : null 
@@ -232,7 +229,7 @@ export default class Upload extends React.Component {
     return (
       <div>
         <h1>
-          Upload a video! {this.props.loggedIn}
+          Upload a video!
         </h1>
         <Dropzone onDrop={this.attachUsingDropzone} size={150}>
           <div>
