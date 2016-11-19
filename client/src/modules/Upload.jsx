@@ -95,7 +95,7 @@ export default class Upload extends React.Component {
             title: this.state.title,
             description: this.state.description,
             url: `https://s3-us-west-1.amazonaws.com/invalidmemories/${this.state.file.name}`,
-            creator: 'bill', // TODO REMOVE USER HARDCODING WHEN USER AUTHENTICATION IS DONE
+            creator: this.props.loggedIn,
             private: this.state.private,
           }),
           headers: {
@@ -230,7 +230,7 @@ export default class Upload extends React.Component {
     return (
       <div>
         <h1>
-          Upload a video! {this.props.loggedIn}
+          Upload a video!
         </h1>
         <Dropzone onDrop={this.attachUsingDropzone} size={150}>
           <div>
