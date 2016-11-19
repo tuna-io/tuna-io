@@ -30,20 +30,6 @@ export default class Home extends React.Component {
     // Return JSON-parsed object as a promise
     .then(response => response.json())
     .then((jsonResponse) => {
-    var context = this;
-
-    fetch('http://127.0.0.1:3000/api/videos/latest', {
-      method: 'GET',
-      credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(function(response) {
-      // Return JSON-parsed object as a promise
-      return response.json();
-    })
-    .then(function(jsonResponse) {
       // jsonResponse should contain an array of objects
       console.log('Latest videos:', jsonResponse);
 
