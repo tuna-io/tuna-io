@@ -90,14 +90,10 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   err := decoder.Decode(&video)
   HandleError(err)
   
-  fmt.Println(video.Url, video.Title, video.Creator, video.Private)
-  
   hasher := md5.New()
   hasher.Write([]byte(video.Url))
   hash := hex.EncodeToString(hasher.Sum(nil))
   video.Hash = hash
-
-  fmt.Println("Generating hash for video:", hash)
 
   db.CreateVideo(*video)
 
@@ -238,6 +234,8 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
   cmd = exec.Command("rm", destination)
   _, err = cmd.Output()
 
+  HandleError(err)
+
   return t, err
 }
 
@@ -269,6 +267,11 @@ func GetKeys() (string, string) {
   err := decoder.Decode(&cfg)
   HandleError(err)
 
+  if (err != nil) {
+    fmt.Println("err:", err)
+  }
+
+  fmt.Println(cfg.User, cfg.Pass)
   return cfg.User, cfg.Pass
 }
 
@@ -634,3 +637,38 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
     w.Write(j)
   }
 }
+
+func SearchVideo(w http.ResponseWriter, req *http.Request) {
+  AllowAccess(w, req)
+  hash := mux.Vars(req)["hash"]
+  query := mux.Vars(req)["query"]
+
+  transcript, err := db.GetVideoTranscript(hash)
+
+  HandleError(err)
+
+  var words = transcript.Words
+  var foundWords []int
+  for i := 0; i < len(words); i++ {
+    if words[i].Token == query {
+      foundWords = append(foundWords, i)
+    }
+  }
+
+  fmt.Println("foundWords", foundWords)
+
+  w.Header().Set("Content-Type", "application/json")
+
+  j, err := json.Marshal(foundWords)
+
+  if err != nil {
+    fmt.Println("error marshalling foundowrds", err)
+    w.WriteHeader(http.StatusNotFound)
+    w.Write([]byte("sad"))
+  } else {
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte(j))
+  }
+}
+
+

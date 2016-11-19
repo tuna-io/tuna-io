@@ -14,7 +14,8 @@ func main() {
    *         `/api` ROUTER
    *------------------------------------*/
   api := r.PathPrefix("/api").Subrouter()
-
+  // allow access for all preflighted requests
+  r.Methods("OPTIONS").HandlerFunc(routes.AllowAccess)
   /*-------------------------------------
    *     `/api/isalive` TEST ROUTE
    *------------------------------------*/
@@ -25,24 +26,21 @@ func main() {
    *      `/api/videos` SUB-ROUTER
    *------------------------------------*/
   v := api.PathPrefix("/videos").Subrouter()
-  v.Methods("OPTIONS").Path("/latest").HandlerFunc(routes.AllowAccess)
   v.Methods("GET").Path("/latest").HandlerFunc(routes.GetLatestVideos)
   v.Methods("POST").HandlerFunc(routes.CreateVideo)
-  v.Methods("OPTIONS").Path("/{hash}").HandlerFunc(routes.GetVideo)
+  v.Methods("GET").Path("/search/{hash}/{query}").HandlerFunc(routes.SearchVideo)
   v.Methods("GET").Path("/{hash}").HandlerFunc(routes.GetVideo)
 
   /*-------------------------------------
    *      `/api/s3` SUB-ROUTER
    *------------------------------------*/
   s := api.PathPrefix("/s3").Subrouter()
-  s.Methods("OPTIONS").HandlerFunc(routes.AllowAccess)
   s.Methods("POST").HandlerFunc(routes.SignVideo)
 
   /*-------------------------------------
    *      `/api/users` SUB-ROUTER
    *------------------------------------*/
   u := api.PathPrefix("/users").Subrouter()
-  u.Methods("OPTIONS").HandlerFunc(routes.AllowAccess)
   u.Methods("POST").Path("/register").HandlerFunc(routes.RegisterUser)
   u.Methods("POST").Path("/login").HandlerFunc(routes.LoginUser)
   u.Methods("GET").Path("/logout").HandlerFunc(routes.LogoutUser)
