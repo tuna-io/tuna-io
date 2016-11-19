@@ -13,6 +13,11 @@ export default class Upload extends React.Component {
       description: "",
       private: false,
     };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.submitVideo = this.submitVideo.bind(this);
+    this.uploadUsingDropzone = this.uploadUsingDropzone.bind(this);
+    this.renderTranscript = this.renderTranscript.bind(this);
   }
 
   handleChange(event) {
@@ -142,11 +147,11 @@ export default class Upload extends React.Component {
           (
             <div>
               <h3>Upload options</h3>
-              <form onSubmit={this.submitVideo.bind(this)}>
-                <input name="title" type="text" onChange={this.handleChange.bind(this)} placeholder={this.state.file.name} defaultValue={this.state.file.name} />
-                <input name="description" type="text" onChange={this.handleChange.bind(this)} placeholder="description" />
-                <span>Private:</span><input name="private" type="checkbox" onChange={this.handleChange.bind(this)}  />
-                <input name="submit" type="submit" value="Upload into cloud" />
+              <form onSubmit={this.submitVideo}>
+                <div><input name="title" type="text" onChange={this.handleChange} placeholder={this.state.file.name} defaultValue={this.state.file.name} /></div>
+                <div><input name="description" type="text" onChange={this.handleChange} placeholder="description" /></div>
+                <div><span>Private:</span><input name="private" type="checkbox" onChange={this.handleChange} /></div>
+                <div><input name="submit" type="submit" value="Upload into cloud" /></div>
               </form>
             </div>
           ) : null
