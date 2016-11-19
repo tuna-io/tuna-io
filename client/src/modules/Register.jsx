@@ -1,4 +1,5 @@
 import React from 'react';
+import { browserHistory } from 'react-router';
 
 export default class Register extends React.Component {
   constructor(props) {
@@ -19,6 +20,8 @@ export default class Register extends React.Component {
   }
 
   handleSubmit(event) {
+    var context = this;
+
     fetch('http://127.0.0.1:3000/api/users/register', {
       method: 'POST',
       body: JSON.stringify({
@@ -32,40 +35,20 @@ export default class Register extends React.Component {
       },
     })
     .then(function(response) {
-      console.log(response)
       return response.json();
     })
     .then(function(jsonResponse) {
-      console.log(jsonResponse);
+      console.log('Registration response:', jsonResponse);
+      if (jsonResponse.username) {
+        context.props.auth();
+        browserHistory.push('/');
+      }
     })
     .catch(function(err) {
       console.log(err);
     });
 
     event.preventDefault();
-  }
-
-  authenticateUser() {
-    fetch('http://127.0.0.1:3000/api/users/authenticate', {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(function(response) {
-      return response.json()
-    })
-    .then(function(jsonResponse) {
-      console.log(jsonResponse);
-    })
-    .catch(function(err) {
-      console.log(err);
-    });
-  }
-
-  componentDidMount() {
-    this.authenticateUser();
   }
 
   render() {

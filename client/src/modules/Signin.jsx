@@ -36,12 +36,11 @@ export default class Signin extends React.Component {
       return response.json();
     })
     .then(function(jsonResponse) {
-      console.log("Signin Response:", jsonResponse);
+      console.log('Signin Response:', jsonResponse);
       if (jsonResponse.username) {
         context.props.auth();
         browserHistory.push('/');
       }
-      // jsonResponse.username ? context.props.auth() : null;
     })
     .catch(function(err) {
       console.log(err);
