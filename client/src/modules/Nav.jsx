@@ -25,10 +25,18 @@ export default React.createClass({
       <div className="nav-bar">
         <div><Link to="/">Home</Link></div>
         <div><Link to="/about">About</Link></div>
-        <div><Link to="/signin">Sign in</Link></div>
-        <div><Link to="/register">Register</Link></div>
-        <div><Link to="/dashboard">Dashboard (Logged in as {this.props.loggedIn})</Link></div>
-        <div onClick={this.logout.bind(this)}>Logout</div>
+        {!this.props.loggedIn &&
+          <div>
+            <div><Link to="/signin">Sign in</Link></div>
+            <div><Link to="/register">Register</Link></div>
+          </div>
+        }
+        {this.props.loggedIn &&
+          <div>
+            <div><Link to="/dashboard">Dashboard (Logged in as {this.props.loggedIn})</Link></div>
+            <div onClick={this.logout.bind(this)}>Logout</div>
+          </div>
+        }
       </div>
     );
   },
