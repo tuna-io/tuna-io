@@ -14,8 +14,15 @@ export default class Upload extends React.Component {
       title: '',
       description: '',
       private: false,
-    };
 
+      transcript: [{"word": "coming soon...", "time": 1}],
+      filename: "",
+      videoReturned: false,
+      query: "",
+      searchResults: [],
+      searchReturned: false
+    };
+    
     // Bind helper functions in constructor
     this.handleChange = this.handleChange.bind(this);
     this.submitVideoToCDN = this.submitVideoToCDN.bind(this);
@@ -23,6 +30,7 @@ export default class Upload extends React.Component {
     this.renderVideoOptionsForm = this.renderVideoOptionsForm.bind(this);
     this.renderVideoModule = this.renderVideoModule.bind(this);
     this.renderTranscript = this.renderTranscript.bind(this);
+    this.search = this.search.bind(this);
   }
 
   // Triggered when user drops file into Dropzone
@@ -105,10 +113,35 @@ export default class Upload extends React.Component {
         this.setState({
           transcript: newTranscript,
         });
-        this.render();
       })
       .catch(err => console.log('Error uploading video to CDN:', err));
     }
+  }
+
+  search(e){
+    e.preventDefault();
+
+    fetch("http://127.0.0.1:3000/api/videos/search/de5af6e0b1a73ca5ea8d97ef1d7802c2/" + this.state.query, {
+      method: "GET",
+      credentials: 'same-origin',
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then((resp)=> {
+      return resp.json();
+    })
+    .then((searchResults)=>{
+      console.log("search results are", searchResults);
+      this.setState({
+        searchResults: searchResults,
+        searchReturned: true
+      });
+      // this.render();
+    })
+    .catch((err)=> {
+      console.log('error', err);
+    });
   }
 
   // Video options form is rendered when the user has attached a file using Dropzone
@@ -160,6 +193,41 @@ export default class Upload extends React.Component {
     return null;
   }
 
+  renderSearchForm() {
+    if (this.state.transcript.length > 1) {
+      return (
+        <form onSubmit={this.search}>
+          Search:
+          <input type="text" name="query" onChange={this.handleChange}/>
+          <input type="submit" value="Submit" />
+        </form>
+      );
+    }
+  }
+
+  renderSearchResults(){
+    if (this.state.transcript.length > 1) {
+      return (
+        <div>
+          <div> Search results: </div>
+          <div>
+            {this.state.searchReturned ? (this.state.searchResults.map((i)=> {
+                console.log("word is", this.state.transcript[i].word);
+                return (<div>{"Word: " + this.state.transcript[i].word + ", Time: " + this.state.transcript[i].time}</div>)
+                })
+              ) : null 
+            }
+          </div>
+        </div>
+      );
+    }
+  }
+  // updateValue(e){
+  //   this.setState({
+  //     query: e.target.value
+  //   });
+  // }
+
   render() {
     return (
       <div>
@@ -179,6 +247,12 @@ export default class Upload extends React.Component {
         }
         {
           this.renderTranscript()
+        }
+        {
+          this.renderSearchForm()
+        }
+        {
+          this.renderSearchResults()
         }
       </div>
     );

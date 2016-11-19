@@ -91,13 +91,10 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   HandleError(err)
   
   // fmt.Println(video.Url, video.Title, video.Creator, video.Private)
-  
   hasher := md5.New()
   hasher.Write([]byte(video.Url))
   hash := hex.EncodeToString(hasher.Sum(nil))
   video.Hash = hash
-
-  // fmt.Println("Generating hash for video:", hash)
 
   db.CreateVideo(*video)
 
@@ -236,17 +233,11 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
   db.AddTranscript(hash, t)
 
   cmd = exec.Command("rm", destination)
-// <<<<<<< HEAD
   _, err = cmd.Output()
-// =======
-//   out, err = cmd.Output()
 
   if err != nil {
     fmt.Println("error deleting file", err)
-  } else {
-    // fmt.Println("successfully deleted file", out)
-  }
-// >>>>>>> 4eecded... Iterate through transcript to get search terms
+  } 
 
   return t, err
 }
@@ -355,7 +346,7 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
   j, err := json.Marshal(urlStr)
   HandleError(err)
 
-  w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Header().Set("Access-Control-Allow-Origin", "127.0.0.1")
   w.Header().Set("Content-Type", "application/json")
   w.Write(j)
 }
@@ -650,28 +641,44 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
   }
 }
 
-
 func SearchVideo(w http.ResponseWriter, req *http.Request) {
   AllowAccess(w, req)
   hash := mux.Vars(req)["hash"]
+  query := mux.Vars(req)["query"]
+  fmt.Println("query is", query)
+  fmt.Println("hash is", hash)
 
-  video, err := db.GetVideo(hash)
-  words := video.Transcript.Words
-  var foundWords []string
-  for i := 0; i < words.length; i++ {
-    foundWords.append(foundWords, i)
+  transcript, err := db.GetVideoTranscript(hash)
+
+  HandleError(err)
+
+  var words = transcript.Words
+  var foundWords []int
+  for i := 0; i < len(words); i++ {
+    // fmt.Println(words[i].Token, words[i].End)
+    if words[i].Token == query {
+      foundWords = append(foundWords, i)
+    }
   }
 
-
+  fmt.Println("foundWords", foundWords)
 
   w.Header().Set("Content-Type", "application/json")
 
-  if (err != nil) {
+  // if (err != nil) {
+  //   w.WriteHeader(http.StatusNotFound)
+  //   // w.Write([]byte(err))
+  // } else {
+  j, err := json.Marshal(foundWords)
+
+  if err != nil {
+    fmt.Println("error marshalling foundowrds", err)
     w.WriteHeader(http.StatusNotFound)
-    fmt.Fprintln(w, err)
+    w.Write([]byte("sad"))
   } else {
     w.WriteHeader(http.StatusOK)
-    fmt.Fprintln(w, video)
+    w.Write([]byte(j))
   }
 }
+
 
