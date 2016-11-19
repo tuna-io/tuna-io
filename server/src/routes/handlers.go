@@ -4,7 +4,6 @@ import (
   "db"
   "os"
   "fmt"
-  "log"
   "time"
   "strings"
   "os/exec"
@@ -230,14 +229,14 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
   arg0 := "-i"
   destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
   cmd := exec.Command(applicationName, arg0, url, destination)
-  out, err := cmd.Output()
+  _, err := cmd.Output()
   HandleError(err)
 
   t := TranscribeAudio(destination)
   db.AddTranscript(hash, t)
 
   cmd = exec.Command("rm", destination)
-  out, err = cmd.Output()
+  _, err = cmd.Output()
 
   return t, err
 }
@@ -382,15 +381,16 @@ func AllowAccess(rw http.ResponseWriter, req *http.Request) {
 
 type AuthResponse struct {
   Success     bool        `json:"success"`
-  Error       bool        `json:"hash"`
-  Username    string      `json:"url"`
+  Error       error       `json:"error"`
+  Message     string      `json:"message"`
+  Username    string      `json:"username"`
 }
 
 var store = sessions.NewCookieStore([]byte("something-very-secret"))
 
 func init() {
   store.Options = &sessions.Options{
-    MaxAge: 3600 * 24 * 30,
+    MaxAge: 3600 * 24 * 30, // 30 days
   }
 }
 
@@ -413,7 +413,7 @@ func SetSession(username string, w http.ResponseWriter, req *http.Request) {
 *
 *
 * @apiErrorExample Error-Response:
-*   HTTP/1.1 401 Unauthorized
+*   HTTP/1.1 200 OK
 *   Username already exists!
 */
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
@@ -431,18 +431,48 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
 
   r, err := db.CreateUser(u.Username, u.Email, u.Password)
 
-  w.Header().Set("Content-Type", "text/plain")
+  w.Header().Set("Content-Type", "application/json")
 
   if err != nil {
+    ar := AuthResponse{
+      Success: false,
+      Error: err,
+      Message: "Internal server error, please see error log",
+      Username: "",
+    }
+
+    j, err := json.Marshal(ar)
+    HandleError(err)
+
     w.WriteHeader(http.StatusInternalServerError)
-    fmt.Fprintln(w, err)
+    w.Write(j)
   } else if r[0] == int64(0) {
-    w.WriteHeader(http.StatusUnauthorized)
-    fmt.Fprintln(w, "Username already exists!")
+    ar := AuthResponse{
+      Success: false,
+      Error: nil,
+      Message: "Username already exists!",
+      Username: "",
+    }
+
+    j, err := json.Marshal(ar)
+    HandleError(err)
+
+    w.WriteHeader(http.StatusOK)
+    w.Write(j)
   } else {
+    ar := AuthResponse{
+      Success: false,
+      Error: nil,
+      Message: "User successfully created!",
+      Username: u.Username,
+    }
+
+    j, err := json.Marshal(ar)
+    HandleError(err)
+
     SetSession(u.Username, w, req)
     w.WriteHeader(http.StatusCreated)
-    fmt.Fprintln(w, "User successfully registered!")
+    w.Write(j)
   }
 }
 

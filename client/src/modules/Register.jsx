@@ -32,10 +32,11 @@ export default class Register extends React.Component {
       },
     })
     .then(function(response) {
-      return response.text();
+      console.log(response)
+      return response.json();
     })
-    .then(function(textResponse) {
-      console.log(textResponse);
+    .then(function(jsonResponse) {
+      console.log(jsonResponse);
     })
     .catch(function(err) {
       console.log(err);
