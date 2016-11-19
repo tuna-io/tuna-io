@@ -166,7 +166,7 @@ export default class Upload extends React.Component {
         <h1>
           Upload a video!
         </h1>
-        <Dropzone onDrop={this.attachUsingDropzone.bind(this)} size={150}>
+        <Dropzone onDrop={this.attachUsingDropzone} size={150}>
           <div>
             Drop some files here!
           </div>
