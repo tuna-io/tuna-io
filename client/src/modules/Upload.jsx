@@ -9,21 +9,19 @@ export default class Upload extends React.Component {
       file: null,
       signedUrl: null,
       videoReturned: false,
-      transcript: '',
 
       // Upload options
       title: '',
       description: '',
       private: false,
 
-      transcript: [{"word": "coming soon...", "time": 1}],
-      filename: "",
-      videoReturned: false,
+      // Transcript format: [{"word": "coming", "time": 1}, {"word": "soon", "time": 2}]
+      transcript: [],
       query: "",
       searchResults: [],
-      searchReturned: false
+      searchReturned: false,
     };
-    
+
     // Bind helper functions in constructor
     this.handleChange = this.handleChange.bind(this);
     this.submitVideoToCDN = this.submitVideoToCDN.bind(this);
@@ -123,21 +121,18 @@ export default class Upload extends React.Component {
   search(e){
     e.preventDefault();
 
-    fetch("http://127.0.0.1:3000/api/videos/search/de5af6e0b1a73ca5ea8d97ef1d7802c2/" + this.state.query, {
+    fetch('http://127.0.0.1:3000/api/videos/search/de5af6e0b1a73ca5ea8d97ef1d7802c2/' + this.state.query, {
       method: "GET",
       credentials: 'same-origin',
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     })
-    .then((resp)=> {
-      return resp.json();
-    })
+    .then(resp => resp.json())
     .then((searchResults)=>{
-      console.log("search results are", searchResults);
       this.setState({
         searchResults: searchResults,
-        searchReturned: true
+        searchReturned: true,
       });
       // this.render();
     })
@@ -176,7 +171,7 @@ export default class Upload extends React.Component {
   // Transcript is rendered after server-side transcription
   renderTranscript() {
     if (this.state.videoReturned) {
-      if (this.state.transcript) {
+      if (this.state.transcript.length > 0) {
         return (
           <div>
             <h3>Transcript</h3>
@@ -197,11 +192,11 @@ export default class Upload extends React.Component {
 
   // search form to find words in query
   renderSearchForm() {
-    if (this.state.transcript.length > 1) {
+    if (this.state.transcript.length > 0) {
       return (
         <form onSubmit={this.search}>
           Search:
-          <input type="text" name="query" onChange={this.handleChange}/>
+          <input type="text" name="query" onChange={this.handleChange} />
           <input type="submit" value="Submit" />
         </form>
       );
@@ -210,13 +205,12 @@ export default class Upload extends React.Component {
 
   // render results as word and time
   renderSearchResults(){
-    if (this.state.transcript.length > 1) {
+    if (this.state.transcript.length > 0) {
       return (
         <div>
           <div> Search results: </div>
           <div>
             {this.state.searchReturned ? (this.state.searchResults.map((i)=> {
-                console.log("word is", this.state.transcript[i].word);
                 return (<div>{"Word: " + this.state.transcript[i].word + ", Time: " + this.state.transcript[i].time}</div>)
                 })
               ) : null 

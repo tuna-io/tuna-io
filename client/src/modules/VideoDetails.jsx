@@ -136,6 +136,8 @@ class VideoDetails extends Component {
 
   render() {
     if (this.state.currentVideoDetails) {
+      console.log(this.state.currentVideoDetails);
+
       return (
         <div>
           <h1>{this.state.currentVideoDetails.title}</h1>
@@ -144,6 +146,12 @@ class VideoDetails extends Component {
           </div>
           <div>Creator: {this.state.currentVideoDetails.creator}</div>
           <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
+          <div>Description: {this.state.currentVideoDetails.description}</div>
+          <div>Extension: {this.state.currentVideoDetails.extension}</div>
+          <div>Views: {this.state.currentVideoDetails.views}</div>
+          <div>Likes: {this.state.currentVideoDetails.likes}</div>
+          <div>Dislikes: {this.state.currentVideoDetails.dislikes}</div>
+          <div>Private: {this.state.currentVideoDetails.private}</div>
           {
             this.renderTranscript()
           }
