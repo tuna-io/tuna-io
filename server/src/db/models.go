@@ -122,7 +122,6 @@ func GetVideo(hash string) (string, error) {
   return string(rep), err
 }
 
-// change me back!!!!!!!!!!
 func GetVideoTranscript(hash string) (watson.Text, error) {
   conn := Pool.Get()
   defer conn.Close()

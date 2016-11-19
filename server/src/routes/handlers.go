@@ -90,7 +90,6 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   err := decoder.Decode(&video)
   HandleError(err)
   
-  // fmt.Println(video.Url, video.Title, video.Creator, video.Private)
   hasher := md5.New()
   hasher.Write([]byte(video.Url))
   hash := hex.EncodeToString(hasher.Sum(nil))
@@ -346,7 +345,7 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
   j, err := json.Marshal(urlStr)
   HandleError(err)
 
-  w.Header().Set("Access-Control-Allow-Origin", "127.0.0.1")
+  w.Header().Set("Access-Control-Allow-Origin", "*")
   w.Header().Set("Content-Type", "application/json")
   w.Write(j)
 }
@@ -655,7 +654,6 @@ func SearchVideo(w http.ResponseWriter, req *http.Request) {
   var words = transcript.Words
   var foundWords []int
   for i := 0; i < len(words); i++ {
-    // fmt.Println(words[i].Token, words[i].End)
     if words[i].Token == query {
       foundWords = append(foundWords, i)
     }
@@ -665,10 +663,6 @@ func SearchVideo(w http.ResponseWriter, req *http.Request) {
 
   w.Header().Set("Content-Type", "application/json")
 
-  // if (err != nil) {
-  //   w.WriteHeader(http.StatusNotFound)
-  //   // w.Write([]byte(err))
-  // } else {
   j, err := json.Marshal(foundWords)
 
   if err != nil {
