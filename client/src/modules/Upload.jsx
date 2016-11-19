@@ -1,6 +1,7 @@
 import React from 'react';
 import Dropzone from 'react-dropzone';
 
+// TODO: render video details page instead of duplicating functionality
 export default class Upload extends React.Component {
   constructor(props) {
     super(props);
@@ -193,6 +194,7 @@ export default class Upload extends React.Component {
     return null;
   }
 
+  // search form to find words in query
   renderSearchForm() {
     if (this.state.transcript.length > 1) {
       return (
@@ -205,6 +207,7 @@ export default class Upload extends React.Component {
     }
   }
 
+  // render results as word and time
   renderSearchResults(){
     if (this.state.transcript.length > 1) {
       return (
@@ -222,11 +225,6 @@ export default class Upload extends React.Component {
       );
     }
   }
-  // updateValue(e){
-  //   this.setState({
-  //     query: e.target.value
-  //   });
-  // }
 
   render() {
     return (
