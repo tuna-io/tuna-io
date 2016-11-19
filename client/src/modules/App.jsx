@@ -28,9 +28,7 @@ export default class App extends React.Component {
       return response.json()
     })
     .then(function(jsonResponse) {
-      console.log(jsonResponse);
-      console.log(jsonResponse.username);
-      jsonResponse.username !== '' ? context.setState({loggedIn: jsonResponse.username}) : null;
+      context.setState({loggedIn: jsonResponse.username});
     })
     .catch(function(err) {
       console.log(err);
@@ -46,7 +44,7 @@ export default class App extends React.Component {
   render() {
     return (
       <div>
-        <Nav loggedIn={this.state.loggedIn} />
+        <Nav loggedIn={this.state.loggedIn} auth={this.authenticateUser} />
         {
           React.cloneElement(
             this.props.children, {
