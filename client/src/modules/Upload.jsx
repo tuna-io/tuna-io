@@ -86,7 +86,7 @@ export default class Upload extends React.Component {
             title: this.state.title,
             description: this.state.description,
             url: `https://s3-us-west-1.amazonaws.com/invalidmemories/${this.state.file.name}`,
-            creator: 'bill',
+            creator: 'bill', // TODO REMOVE USER HARDCODING WHEN USER AUTHENTICATION IS DONE
             private: this.state.private,
           }),
           headers: {
