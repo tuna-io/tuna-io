@@ -53,7 +53,7 @@ class VideoDetails extends Component {
   saveTranscript(transcript){
     const newTranscript = [];
     transcript.Words.forEach(word =>
-      newTranscript.push({ word: word.Token, time: word.End })
+      newTranscript.push({ word: word.Token, time: Math.floor(word.End) })
     );
     this.setState({
       transcript: newTranscript,
@@ -123,7 +123,17 @@ class VideoDetails extends Component {
           <div>
             {this.state.searchReturned ? (this.state.searchResults.map((i)=> {
                 console.log("word is", this.state.transcript[i].word);
-                return (<div>{"Word: " + this.state.transcript[i].word + ", Time: " + this.state.transcript[i].time}</div>)
+                return (
+                  <div>
+                  {
+                    this.state.transcript[i].time + ': ' + 
+                    this.state.transcript.slice(Math.max(i - 8, 0), Math.min(i + 8, this.state.transcript.length))
+                    .map(pair => pair.word)
+                    .reduce((fword, sword) => {
+                      return `${fword} ${sword}`
+                    })
+                  }
+                  </div>)
                 })
               ) : null 
             }
