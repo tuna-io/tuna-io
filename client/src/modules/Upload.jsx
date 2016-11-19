@@ -18,6 +18,7 @@ export default class Upload extends React.Component {
   handleChange(event) {
     const value = event.target.name === "private" ? event.target.checked : event.target.value;
     this.setState({ [event.target.name]: value });
+    console.log(this.state.title);
   }
 
   submitVideo(event) {
@@ -76,11 +77,12 @@ export default class Upload extends React.Component {
 
   // upload params: file dragged into dropzone
   // sends filename to server to get signed url, then uploads the file to AWS
-  upload(files) {
+  uploadUsingDropzone(files) {
     const file = files[0];
     this.setState({
       videoReturned: false,
       file: file,
+      title: file.name,
     });
 
     // Get the signed URL
@@ -106,16 +108,17 @@ export default class Upload extends React.Component {
     if (this.state.videoReturned) {
       if (this.state.transcript) {
         return (
-          <h2>Transcript
+          <div>
+            <h3>Transcript</h3>
             <div>
               {this.state.transcript.map(pair => pair.word).reduce((firstword, secondword) => `${firstword} ${secondword}`)}
             </div>
-          </h2>
+          </div>
         );
       }
 
       return (
-        <h2>Creating transcript</h2>
+        <h3>Creating transcript</h3>
       );
     }
 
@@ -129,7 +132,7 @@ export default class Upload extends React.Component {
         <div>
           This is the upload subpage
         </div>
-        <Dropzone onDrop={this.upload.bind(this)} size={150}>
+        <Dropzone onDrop={this.uploadUsingDropzone.bind(this)} size={150}>
           <div>
             Drop some files here!
           </div>
@@ -142,7 +145,7 @@ export default class Upload extends React.Component {
               <form onSubmit={this.submitVideo.bind(this)}>
                 <input name="title" type="text" onChange={this.handleChange.bind(this)} placeholder={this.state.file.name} defaultValue={this.state.file.name} />
                 <input name="description" type="text" onChange={this.handleChange.bind(this)} placeholder="description" />
-                <input name="private" type="checkbox" onChange={this.handleChange.bind(this)}  />
+                <span>Private:</span><input name="private" type="checkbox" onChange={this.handleChange.bind(this)}  />
                 <input name="submit" type="submit" value="Upload into cloud" />
               </form>
             </div>
@@ -152,6 +155,7 @@ export default class Upload extends React.Component {
           this.state.videoReturned ?
           (
             <div>
+              <h3>Your video</h3>
               <video src={`https://d2bezlfyzapny1.cloudfront.net/${this.state.file.name}`} width="400" controls />
             </div>) : null
           }
