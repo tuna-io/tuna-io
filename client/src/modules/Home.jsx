@@ -48,6 +48,9 @@ export default class Home extends React.Component {
       <div>
         <h1>TunaVid.IO - the 6th fastest fish in the sea</h1>
         <div id="latest-videos">
+          {this.props.loggedIn &&
+            <div>Welcome back, {this.props.loggedIn}</div>
+          }
           <div>Latest videos</div>
           <div>
             { this.state.latestVideos.map(video =>

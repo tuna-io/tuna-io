@@ -7,7 +7,7 @@ export default class App extends React.Component {
     super(props);
 
     this.state = {
-      loggedIn: 'HEYO',
+      loggedIn: '',
     };
 
     this.authenticateUser = this.authenticateUser.bind(this);
@@ -15,6 +15,7 @@ export default class App extends React.Component {
 
   authenticateUser() {
     var context = this;
+    console.log('Calling authenticateUser()');
 
     fetch('http://127.0.0.1:3000/api/users/authenticate', {
       method: 'GET',
@@ -37,7 +38,9 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    this.state.loggedIn ? this.authenticateUser() : null;
+    console.log('this.state.loggedIn:', this.state.loggedIn);
+    console.log('true?', !!this.state.loggedIn);
+    !this.state.loggedIn ? this.authenticateUser() : null;
   }
 
   render() {

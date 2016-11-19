@@ -68,7 +68,7 @@ export default class Signin extends React.Component {
   render() {
     return (
       <div>
-        <div>Sign in to your existing account! {this.props.loggedIn}</div>
+        <div>Sign in to your existing account!</div>
         <form onSubmit={this.handleSubmit}>
           <div>
             Username:
