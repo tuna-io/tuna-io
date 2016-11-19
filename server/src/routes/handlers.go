@@ -380,6 +380,12 @@ func AllowAccess(rw http.ResponseWriter, req *http.Request) {
  *       CLIENT AUTHENTICATION
  *------------------------------------*/
 
+type AuthResponse struct {
+  Success     bool        `json:"success"`
+  Error       bool        `json:"hash"`
+  Username    string      `json:"url"`
+}
+
 var store = sessions.NewCookieStore([]byte("something-very-secret"))
 
 func init() {
