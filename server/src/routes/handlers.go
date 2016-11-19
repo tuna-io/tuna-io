@@ -90,14 +90,14 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   err := decoder.Decode(&video)
   HandleError(err)
   
-  fmt.Println(video.Url, video.Title, video.Creator, video.Private)
+  // fmt.Println(video.Url, video.Title, video.Creator, video.Private)
   
   hasher := md5.New()
   hasher.Write([]byte(video.Url))
   hash := hex.EncodeToString(hasher.Sum(nil))
   video.Hash = hash
 
-  fmt.Println("Generating hash for video:", hash)
+  // fmt.Println("Generating hash for video:", hash)
 
   db.CreateVideo(*video)
 
@@ -236,7 +236,17 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
   db.AddTranscript(hash, t)
 
   cmd = exec.Command("rm", destination)
+// <<<<<<< HEAD
   _, err = cmd.Output()
+// =======
+//   out, err = cmd.Output()
+
+  if err != nil {
+    fmt.Println("error deleting file", err)
+  } else {
+    // fmt.Println("successfully deleted file", out)
+  }
+// >>>>>>> 4eecded... Iterate through transcript to get search terms
 
   return t, err
 }
@@ -269,6 +279,11 @@ func GetKeys() (string, string) {
   err := decoder.Decode(&cfg)
   HandleError(err)
 
+  if (err != nil) {
+    fmt.Println("err:", err)
+  }
+
+  fmt.Println(cfg.User, cfg.Pass)
   return cfg.User, cfg.Pass
 }
 
@@ -634,3 +649,29 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
     w.Write(j)
   }
 }
+
+
+func SearchVideo(w http.ResponseWriter, req *http.Request) {
+  AllowAccess(w, req)
+  hash := mux.Vars(req)["hash"]
+
+  video, err := db.GetVideo(hash)
+  words := video.Transcript.Words
+  var foundWords []string
+  for i := 0; i < words.length; i++ {
+    foundWords.append(foundWords, i)
+  }
+
+
+
+  w.Header().Set("Content-Type", "application/json")
+
+  if (err != nil) {
+    w.WriteHeader(http.StatusNotFound)
+    fmt.Fprintln(w, err)
+  } else {
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintln(w, video)
+  }
+}
+
