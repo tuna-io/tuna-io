@@ -624,7 +624,7 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
       Success: true,
       Error: nil,
       Message: "Session-ID successfully resolved!",
-      Username: session.Values["username"],
+      Username: session.Values["username"].(string),
     }
 
     j, err := json.Marshal(ar)
