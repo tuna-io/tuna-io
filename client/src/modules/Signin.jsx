@@ -1,4 +1,5 @@
 import React from 'react';
+import { browserHistory } from 'react-router';
 
 export default class Signin extends React.Component {
   constructor(props) {
@@ -18,6 +19,8 @@ export default class Signin extends React.Component {
   }
 
   handleSubmit(event) {
+    var context = this;
+
     fetch('http://127.0.0.1:3000/api/users/login', {
       method: 'POST',
       body: JSON.stringify({
@@ -30,39 +33,20 @@ export default class Signin extends React.Component {
       },
     })
     .then(function(response) {
-      return response.text();
+      return response.json();
     })
-    .then(function(textResponse) {
-      console.log(textResponse);
+    .then(function(jsonResponse) {
+      console.log('Signin Response:', jsonResponse);
+      if (jsonResponse.username) {
+        context.props.auth();
+        browserHistory.push('/');
+      }
     })
     .catch(function(err) {
       console.log(err);
     });
 
     event.preventDefault();
-  }
-
-  authenticateUser() {
-    fetch('http://127.0.0.1:3000/api/users/authenticate', {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(function(response) {
-      return response.text()
-    })
-    .then(function(textResponse) {
-      console.log(textResponse);
-    })
-    .catch(function(err) {
-      console.log(err);
-    });
-  }
-
-  componentDidMount() {
-    this.authenticateUser();
   }
 
   render() {

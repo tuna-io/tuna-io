@@ -10,13 +10,19 @@ export default class Home extends React.Component {
     };
   }
 
+  componentDidMount() {
+    !this.props.loggedIn ? this.props.auth() : null;
+  }
+
   componentWillMount() {
-    // Get latest videos in componentWillMount to get the latest videos for every homepage visit
+    // Get latest videos in componentWillMount to get the latest videos for
+    // every homepage visit
     this.getLatestVideos();
   }
 
   getLatestVideos() {
-    // Create and configure AJAX request using fetch(): https://davidwalsh.name/fetch
+    // Create and configure AJAX request using fetch()
+    // https://davidwalsh.name/fetch
     const url = 'http://127.0.0.1:3000/api/videos/latest';
     const requestOptions = {
       method: 'GET',
@@ -34,7 +40,7 @@ export default class Home extends React.Component {
       console.log('Latest videos:', jsonResponse);
 
       // Cursorily clean data
-      const validVideos = jsonResponse.filter(video => (video.url && video.url !== ""));
+      const validVideos = jsonResponse.filter(video => (video.url && video.url !== ''));
 
       context.setState({ latestVideos: validVideos });
     })
@@ -46,8 +52,11 @@ export default class Home extends React.Component {
   render() {
     return (
       <div>
-        <h1>TunaVid.IO - the 6th fastest fish in the sea</h1>
+        <h1>TunaVid.io - the 6th fastest fish in the sea</h1>
         <div id="latest-videos">
+          {this.props.loggedIn &&
+            <div>Welcome back, {this.props.loggedIn}, here are your personal recommendations</div>
+          }
           <div>Latest videos</div>
           <div>
             { this.state.latestVideos.map(video =>

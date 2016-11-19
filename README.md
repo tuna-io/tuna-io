@@ -148,14 +148,24 @@ Update IBM Watson API Keys
 - Update `keys.json` with your API keys
 
 Save AWS Key to Config file
+- Sign up for your an AWS S3 account, click on **Security** and copy the access key ID and secret access key
+- Create a configuration file in your root directory (not the project's root directory)
 ```
--Create a config file in your personal user directory (not the project directory) at ~/.aws/credentials 
--Sign up for an AWS S3 account, go to security and copy over a new key
--With the new info, save the credentials file in this format (aws sdk will do the rest!)
+cd
+mkdir .aws
+vim ~/.aws/credentials
+```
+
+Enter the following information into the file
+```
 [default]
 aws_access_key_id = SUPER_SECRET
 aws_secret_access_key = EVEN_MORE_SECRET
+```
 
+Save and close the file
+```
+:x
 ```
 
 Install all NPM dependencies
