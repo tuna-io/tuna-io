@@ -534,10 +534,6 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
     w.WriteHeader(http.StatusUnauthorized)
     w.Write(j)
   } else {
-    SetSession(u.Username, w, req)
-    w.WriteHeader(http.StatusOK)
-    fmt.Fprintln(w, "User successfully logged in")
-
     ar := AuthResponse{
       Success: true,
       Error: nil,
@@ -549,7 +545,7 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
     HandleError(err)
 
     SetSession(u.Username, w, req)
-    w.WriteHeader(http.StatusCreated)
+    w.WriteHeader(http.StatusOK)
     w.Write(j)
   }
 }

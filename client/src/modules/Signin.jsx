@@ -30,10 +30,10 @@ export default class Signin extends React.Component {
       },
     })
     .then(function(response) {
-      return response.text();
+      return response.json();
     })
-    .then(function(textResponse) {
-      console.log(textResponse);
+    .then(function(jsonResponse) {
+      console.log(jsonResponse);
     })
     .catch(function(err) {
       console.log(err);
@@ -51,10 +51,10 @@ export default class Signin extends React.Component {
       },
     })
     .then(function(response) {
-      return response.text()
+      return response.json()
     })
-    .then(function(textResponse) {
-      console.log(textResponse);
+    .then(function(jsonResponse) {
+      console.log(jsonResponse);
     })
     .catch(function(err) {
       console.log(err);
