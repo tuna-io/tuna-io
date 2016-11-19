@@ -49,7 +49,10 @@ export default class App extends React.Component {
         <Nav loggedIn={this.state.loggedIn} />
         {
           React.cloneElement(
-            this.props.children, {loggedIn: this.state.loggedIn}
+            this.props.children, {
+              loggedIn: this.state.loggedIn,
+              auth: this.authenticateUser,
+            }
           ) || 
           <Home loggedIn={this.state.loggedIn} />
         }

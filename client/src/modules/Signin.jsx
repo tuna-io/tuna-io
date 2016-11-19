@@ -18,6 +18,8 @@ export default class Signin extends React.Component {
   }
 
   handleSubmit(event) {
+    var context = this;
+
     fetch('http://127.0.0.1:3000/api/users/login', {
       method: 'POST',
       body: JSON.stringify({
@@ -34,35 +36,13 @@ export default class Signin extends React.Component {
     })
     .then(function(jsonResponse) {
       console.log(jsonResponse);
+      jsonResponse.username ? context.props.auth() : null;        
     })
     .catch(function(err) {
       console.log(err);
     });
 
     event.preventDefault();
-  }
-
-  authenticateUser() {
-    fetch('http://127.0.0.1:3000/api/users/authenticate', {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(function(response) {
-      return response.json()
-    })
-    .then(function(jsonResponse) {
-      console.log(jsonResponse);
-    })
-    .catch(function(err) {
-      console.log(err);
-    });
-  }
-
-  componentDidMount() {
-    this.authenticateUser();
   }
 
   render() {
