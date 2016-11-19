@@ -579,7 +579,7 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
   j, err := json.Marshal(ar)
   HandleError(err)
 
-  w.WriteHeader(http.StatusInternalServerError)
+  w.WriteHeader(http.StatusOK)
   w.Write(j)
 }
 
@@ -603,5 +603,34 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "text/plain")
   session, err := store.Get(req, "session-id")
   HandleError(err)
-  fmt.Fprintln(w, session.Values["username"], err)
+
+  w.Header().Set("Content-Type", "application/json")
+
+  if session.Values["username"] == nil {
+    ar := AuthResponse{
+      Success: false,
+      Error: nil,
+      Message: "Session-ID not valid!",
+      Username: "",
+    }
+
+    j, err := json.Marshal(ar)
+    HandleError(err)
+
+    w.WriteHeader(http.StatusOK)
+    w.Write(j)
+  } else {
+    ar := AuthResponse{
+      Success: true,
+      Error: nil,
+      Message: "Session-ID successfully resolved!",
+      Username: session.Values["username"],
+    }
+
+    j, err := json.Marshal(ar)
+    HandleError(err)
+
+    w.WriteHeader(http.StatusOK)
+    w.Write(j)
+  }
 }
