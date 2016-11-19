@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router';
+import { browserHistory, Link } from 'react-router';
 
 export default React.createClass({
   logout() {
@@ -13,6 +13,7 @@ export default React.createClass({
     .then(jsonResponse => {
       console.log(jsonResponse);
       jsonResponse.success ? this.props.auth() : null;
+      browserHistory.push('/')
     })
     .catch(err => {
       console.log(err);
