@@ -54,7 +54,7 @@ export default class App extends React.Component {
               auth: this.authenticateUser,
             }
           ) || 
-          <Home loggedIn={this.state.loggedIn} />
+          <Home loggedIn={this.state.loggedIn} auth={this.authenticateUser} />
         }
       </div>
     )
