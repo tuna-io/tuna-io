@@ -20,6 +20,8 @@ export default class Upload extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.submitVideoToCDN = this.submitVideoToCDN.bind(this);
     this.attachUsingDropzone = this.attachUsingDropzone.bind(this);
+    this.renderVideoOptionsForm = this.renderVideoOptionsForm.bind(this);
+    this.renderVideoModule = this.renderVideoModule.bind(this);
     this.renderTranscript = this.renderTranscript.bind(this);
   }
 
@@ -109,6 +111,34 @@ export default class Upload extends React.Component {
     }
   }
 
+  // Video options form is rendered when the user has attached a file using Dropzone
+  renderVideoOptionsForm() {
+    return this.state.signedUrl ?
+    (
+      <div>
+        <h3>Upload options</h3>
+        <form onSubmit={this.submitVideoToCDN}>
+          <div><input name="title" type="text" onChange={this.handleChange} placeholder={this.state.file.name} defaultValue={this.state.file.name} /></div>
+          <div><input name="description" type="text" onChange={this.handleChange} placeholder="description" /></div>
+          <div><span>Private:</span><input name="private" type="checkbox" onChange={this.handleChange} /></div>
+          <div><input name="submit" type="submit" value="Upload into cloud" /></div>
+        </form>
+      </div>
+    ) : null;
+  }
+
+  // Video is rendered after a successful upload to the CDN
+  renderVideoModule() {
+    return this.state.videoReturned ?
+    (
+      <div>
+        <h3>Your video</h3>
+        <video src={`https://d2bezlfyzapny1.cloudfront.net/${this.state.file.name}`} width="400" controls />
+      </div>
+    ) : null;
+  }
+
+  // Transcript is rendered after server-side transcription
   renderTranscript() {
     if (this.state.videoReturned) {
       if (this.state.transcript) {
@@ -142,27 +172,11 @@ export default class Upload extends React.Component {
           </div>
         </Dropzone>
         {
-          this.state.signedUrl ?
-          (
-            <div>
-              <h3>Upload options</h3>
-              <form onSubmit={this.submitVideoToCDN}>
-                <div><input name="title" type="text" onChange={this.handleChange} placeholder={this.state.file.name} defaultValue={this.state.file.name} /></div>
-                <div><input name="description" type="text" onChange={this.handleChange} placeholder="description" /></div>
-                <div><span>Private:</span><input name="private" type="checkbox" onChange={this.handleChange} /></div>
-                <div><input name="submit" type="submit" value="Upload into cloud" /></div>
-              </form>
-            </div>
-          ) : null
+          this.renderVideoOptionsForm()
         }
         {
-          this.state.videoReturned ?
-          (
-            <div>
-              <h3>Your video</h3>
-              <video src={`https://d2bezlfyzapny1.cloudfront.net/${this.state.file.name}`} width="400" controls />
-            </div>) : null
-          }
+          this.renderVideoModule()
+        }
         {
           this.renderTranscript()
         }
