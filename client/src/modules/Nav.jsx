@@ -25,21 +25,29 @@ export default React.createClass({
     return (
       <Grid>
         <Row className="nav-bar">
-          <Col xs={3} sm={3} md={3} lg={3}>
-            <div><Link to="/">Home</Link></div>
+          <Col xs>
+            <Link to="/">Home</Link>
           </Col>
-          <Col xs={3} sm={3} md={3} lg={3}>
-            <div><Link to="/about">About</Link></div>
+          <Col xs>
+            <Link to="/about">About</Link>
           </Col>
           {!this.props.loggedIn &&
-            <Col xs={3} sm={3} md={3} lg={3}>
-              <div><Link to="/signin">Sign in</Link></div>
-              <div><Link to="/register">Register</Link></div>
+            <Col xs>
+              <Link to="/signin">Sign in</Link>
+            </Col>
+          }
+          {!this.props.loggedIn &&
+            <Col xs>
+              <Link to="/register">Register</Link>
             </Col>
           }
           {this.props.loggedIn &&
-            <Col xs={3} sm={3} md={3} lg={3}>
-              <div><Link to="/dashboard">Dashboard (Logged in as {this.props.loggedIn})</Link></div>
+            <Col xs>
+              <Link to="/dashboard">Dashboard (Logged in as {this.props.loggedIn})</Link>
+            </Col>
+          }
+          {this.props.loggedIn &&
+            <Col xs>
               <div onClick={this.logout.bind(this)}>Logout</div>
             </Col>
           }
