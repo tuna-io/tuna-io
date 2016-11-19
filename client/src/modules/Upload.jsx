@@ -93,10 +93,11 @@ export default class Upload extends React.Component {
           method: 'POST',
           body: JSON.stringify({
             title: this.state.title,
-            description: this.state.description,
-            url: `https://s3-us-west-1.amazonaws.com/invalidmemories/${this.state.file.name}`,
             creator: this.props.loggedIn,
+            description: this.state.description,
+            extension: this.state.file.type,
             private: this.state.private,
+            url: `https://s3-us-west-1.amazonaws.com/invalidmemories/${this.state.file.name}`,
           }),
           headers: {
             'Content-Type': 'application/json',
