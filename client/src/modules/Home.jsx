@@ -52,7 +52,7 @@ export default class Home extends React.Component {
   render() {
     return (
       <div>
-        <h1>TunaVid.IO - the 6th fastest fish in the sea</h1>
+        <h1>TunaVid.io - the 6th fastest fish in the sea</h1>
         <div id="latest-videos">
           {this.props.loggedIn &&
             <div>Welcome back, {this.props.loggedIn}, here are your personal recommendations</div>

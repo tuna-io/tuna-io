@@ -11,9 +11,9 @@ export default React.createClass({
       return response.json();
     })
     .then(jsonResponse => {
-      console.log(jsonResponse);
+      console.log("Signout Response:", jsonResponse);
       jsonResponse.success ? this.props.auth() : null;
-      browserHistory.push('/')
+      browserHistory.push('/');
     })
     .catch(err => {
       console.log(err);

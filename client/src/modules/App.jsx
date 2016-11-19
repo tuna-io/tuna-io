@@ -15,7 +15,6 @@ export default class App extends React.Component {
 
   authenticateUser() {
     var context = this;
-    console.log('Calling authenticateUser()');
 
     fetch('http://127.0.0.1:3000/api/users/authenticate', {
       method: 'GET',

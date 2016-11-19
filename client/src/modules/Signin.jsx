@@ -1,4 +1,5 @@
 import React from 'react';
+import { browserHistory } from 'react-router';
 
 export default class Signin extends React.Component {
   constructor(props) {
@@ -35,8 +36,12 @@ export default class Signin extends React.Component {
       return response.json();
     })
     .then(function(jsonResponse) {
-      console.log(jsonResponse);
-      jsonResponse.username ? context.props.auth() : null;        
+      console.log("Signin Response:", jsonResponse);
+      if (jsonResponse.username) {
+        context.props.auth();
+        browserHistory.push('/');
+      }
+      // jsonResponse.username ? context.props.auth() : null;
     })
     .catch(function(err) {
       console.log(err);
