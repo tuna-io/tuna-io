@@ -35,8 +35,6 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    console.log('this.state.loggedIn:', this.state.loggedIn);
-    console.log('true?', !!this.state.loggedIn);
     !this.state.loggedIn ? this.authenticateUser() : null;
   }
 

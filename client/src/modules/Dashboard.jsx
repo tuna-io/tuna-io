@@ -5,7 +5,7 @@ import { Link } from 'react-router';
 export default React.createClass({
   render() {
     return (
-      <div>This is the dashboard page component
+      <div>This is the dashboard page component {this.props.loggedIn}
         <div>These are links items on the settings page</div>
         <ul>
           <li><Link to="/dashboard/settings">Settings</Link></li>

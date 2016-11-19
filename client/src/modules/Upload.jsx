@@ -8,11 +8,11 @@ export default class Upload extends React.Component {
       file: null,
       signedUrl: null,
       videoReturned: false,
-      transcript: "",
+      transcript: '',
 
       // Upload options
-      title: "",
-      description: "",
+      title: '',
+      description: '',
       private: false,
     };
 
@@ -164,7 +164,7 @@ export default class Upload extends React.Component {
     return (
       <div>
         <h1>
-          Upload a video!
+          Upload a video! {this.props.loggedIn}
         </h1>
         <Dropzone onDrop={this.attachUsingDropzone} size={150}>
           <div>
