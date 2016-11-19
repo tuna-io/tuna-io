@@ -2,7 +2,11 @@ import React from 'react';
 import Nav from './Nav';
 import Home from './Home';
 
-export default React.createClass({
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
   render() {
     return (
       <div>
@@ -11,4 +15,4 @@ export default React.createClass({
       </div>
     )
   }
-});
+};
