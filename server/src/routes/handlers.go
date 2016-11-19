@@ -234,9 +234,7 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
   cmd = exec.Command("rm", destination)
   _, err = cmd.Output()
 
-  if err != nil {
-    fmt.Println("error deleting file", err)
-  } 
+  HandleError(err)
 
   return t, err
 }
@@ -644,8 +642,6 @@ func SearchVideo(w http.ResponseWriter, req *http.Request) {
   AllowAccess(w, req)
   hash := mux.Vars(req)["hash"]
   query := mux.Vars(req)["query"]
-  fmt.Println("query is", query)
-  fmt.Println("hash is", hash)
 
   transcript, err := db.GetVideoTranscript(hash)
 
