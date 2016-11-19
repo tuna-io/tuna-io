@@ -89,9 +89,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   decoder := json.NewDecoder(req.Body)
   video := new(db.Video)
   err := decoder.Decode(&video)
-  if err != nil {
-    panic(err)
-  }
+  HandleError(err)
   
   fmt.Println(video.Url, video.Title, video.Creator, video.Private)
   
@@ -107,9 +105,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "application/json")
 
   t, err := ProcessVideo(video.Url, hash)
-  if err != nil {
-    panic(err)
-  }
+  HandleError(err)
 
   u := Response{
     Success: "Successfully uploaded and transcribed video file",
@@ -119,13 +115,13 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
   }
 
   j, err := json.Marshal(u)
+  HandleError(err)
 
   w.Header().Set("Access-Control-Allow-Origin", "*")
   w.Header().Set("Content-Type", "application/json")
 
   if err != nil {
     w.WriteHeader(http.StatusInternalServerError)
-    fmt.Println("errored out", err)
     fmt.Fprintln(w, err)
   } else {
     w.WriteHeader(http.StatusOK)
@@ -235,22 +231,13 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
   destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
   cmd := exec.Command(applicationName, arg0, url, destination)
   out, err := cmd.Output()
-
-  if err != nil {
-    panic(err)
-  }
+  HandleError(err)
 
   t := TranscribeAudio(destination)
   db.AddTranscript(hash, t)
 
   cmd = exec.Command("rm", destination)
   out, err = cmd.Output()
-
-  if err != nil {
-    fmt.Println("error deleting file", err)
-  } else {
-    fmt.Println("successfully deleted file", out)
-  }
 
   return t, err
 }
@@ -281,12 +268,8 @@ func GetKeys() (string, string) {
   decoder := json.NewDecoder(file)
   cfg := Configuration{}
   err := decoder.Decode(&cfg)
+  HandleError(err)
 
-  if (err != nil) {
-    fmt.Println("err:", err)
-  }
-
-  fmt.Println(cfg.User, cfg.Pass)
   return cfg.User, cfg.Pass
 }
 
@@ -295,15 +278,11 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
   w := watson.New(user, pass)
 
   is, err := os.Open(audioPath)
-  if err != nil {
-    log.Fatal(err)
-  }
+  HandleError(err)
   defer is.Close()
 
   tt, err := w.Recognize(is, "en-US_BroadbandModel", "wav")
-  if err != nil {
-    fmt.Println("err:", err)
-  }
+  HandleError(err)
 
   return tt
 }
@@ -312,6 +291,11 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
 /*-------------------------------------
  *         S3 VIDEO UPLOADING
  *------------------------------------*/
+
+type Vidfile struct {
+  Filename string `json:"filename"`
+  Filetype string `json:"filetype"`
+}
 
 /**
 * @api {post} /api/s3 Generate a signed url for uploading to s3
@@ -340,9 +324,7 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
 
   v := new(Vidfile)
   err := decoder.Decode(&v)
-  if err != nil {
-    panic(err)
-  }
+  HandleError(err)
 
   // get presigned url to allow upload on client side
   svc := s3.New(session.New(&aws.Config{Region: aws.String("us-west-1")}))
@@ -354,25 +336,15 @@ func SignVideo(w http.ResponseWriter, r *http.Request) {
 
   // allow upload with url for 5min
   urlStr, err := req.Presign(5 * time.Minute)
-  if err != nil {
-    fmt.Println("Failed to sign r", err)
-  }
+  HandleError(err)
 
   j, err := json.Marshal(urlStr)
-  if err != nil {
-    fmt.Println("failed to convert to json", err)
-  }
-  
+  HandleError(err)
+
   w.Header().Set("Access-Control-Allow-Origin", "*")
   w.Header().Set("Content-Type", "application/json")
   w.Write(j)
 }
-
-type Vidfile struct {
-  Filename string `json:"filename"`
-  Filetype string `json:"filetype"`
-}
-
 
 /**
 * @api {options} /api/s3 Allow cross-origin requests
@@ -417,7 +389,8 @@ func init() {
 }
 
 func SetSession(username string, w http.ResponseWriter, req *http.Request) {
-  session, _ := store.Get(req, "session-id")
+  session, err := store.Get(req, "session-id")
+  HandleError(err)
   session.Values["username"] = username
   sessions.Save(req, w)
 }
@@ -448,9 +421,7 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
   decoder := json.NewDecoder(req.Body)
   u := new(Registration)
   err := decoder.Decode(&u)
-  if err != nil {
-    fmt.Println(err)
-  }
+  HandleError(err)
 
   r, err := db.CreateUser(u.Username, u.Email, u.Password)
 
@@ -494,9 +465,7 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
   decoder := json.NewDecoder(req.Body)
   u := new(Login)
   err := decoder.Decode(&u)
-  if err != nil {
-    fmt.Println(err)
-  }
+  HandleError(err)
 
   a, err := db.CheckUserCredentials(u.Username, u.Password)
 
@@ -527,7 +496,8 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
 *
 */
 func LogoutUser(w http.ResponseWriter, req *http.Request) {
-  session, _ := store.Get(req, "session-id")
+  session, err := store.Get(req, "session-id")
+  HandleError(err)
   delete(session.Values, "username")
   sessions.Save(req, w)
   fmt.Fprintln(w, "Successfully logged out!")
@@ -552,5 +522,6 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
   w.Header().Set("Content-Type", "text/plain")
   session, err := store.Get(req, "session-id")
+  HandleError(err)
   fmt.Fprintln(w, session.Values["username"], err)
 }
