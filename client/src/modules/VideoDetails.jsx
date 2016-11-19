@@ -21,7 +21,7 @@ class VideoDetails extends Component {
 
   // Helper function to fetch video data
   fetchVideoFromAPI(videoId) {
-    const url = 'http://localhost:3000/api/videos/' + videoId;
+    const url = `http://127.0.0.1:3000/api/videos/${videoId}`;
     const options = {
       method: 'GET',
       headers: new Headers({ 'Content-Type': 'application/json' }),

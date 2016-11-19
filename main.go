@@ -25,9 +25,10 @@ func main() {
    *      `/api/videos` SUB-ROUTER
    *------------------------------------*/
   v := api.PathPrefix("/videos").Subrouter()
-  v.Methods("OPTIONS").HandlerFunc(routes.AllowAccess)
-  v.Methods("POST").HandlerFunc(routes.CreateVideo)
+  v.Methods("OPTIONS").Path("/latest").HandlerFunc(routes.AllowAccess)
   v.Methods("GET").Path("/latest").HandlerFunc(routes.GetLatestVideos)
+  v.Methods("POST").HandlerFunc(routes.CreateVideo)
+  v.Methods("OPTIONS").Path("/{hash}").HandlerFunc(routes.GetVideo)
   v.Methods("GET").Path("/{hash}").HandlerFunc(routes.GetVideo)
 
   /*-------------------------------------
@@ -51,7 +52,6 @@ func main() {
    *      `/` STATIC FILE SERVER
    *------------------------------------*/
   r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./client/build"))))
-  r.PathPrefix("/dashboard/upload").Handler(http.FileServer(http.Dir("./client/build/dashboard/upload")))
 
   // Start up server and error log
   log.Println("Listening at port 3000")
