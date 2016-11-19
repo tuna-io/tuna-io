@@ -505,18 +505,52 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
 
   a, err := db.CheckUserCredentials(u.Username, u.Password)
 
-  w.Header().Set("Content-Type", "text/plain")
+  w.Header().Set("Content-Type", "application/json")
 
   if err != nil {
+    ar := AuthResponse{
+      Success: false,
+      Error: err,
+      Message: "Internal server error, please see error log",
+      Username: "",
+    }
+
+    j, err := json.Marshal(ar)
+    HandleError(err)
+
     w.WriteHeader(http.StatusInternalServerError)
-    fmt.Fprintln(w, err)
+    w.Write(j)
   } else if !a {
+    ar := AuthResponse{
+      Success: false,
+      Error: nil,
+      Message: "Incorrect credentials provided!",
+      Username: "",
+    }
+
+    j, err := json.Marshal(ar)
+    HandleError(err)
+
     w.WriteHeader(http.StatusUnauthorized)
-    fmt.Fprintln(w, "Incorrect credentials provided!")
+    w.Write(j)
   } else {
     SetSession(u.Username, w, req)
     w.WriteHeader(http.StatusOK)
     fmt.Fprintln(w, "User successfully logged in")
+
+    ar := AuthResponse{
+      Success: true,
+      Error: nil,
+      Message: "User successfully logged in!",
+      Username: u.Username,
+    }
+
+    j, err := json.Marshal(ar)
+    HandleError(err)
+
+    SetSession(u.Username, w, req)
+    w.WriteHeader(http.StatusCreated)
+    w.Write(j)
   }
 }
 
