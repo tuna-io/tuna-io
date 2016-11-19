@@ -34,11 +34,21 @@
   - Watson Go SDK
 - Redis 3.2.5
 - AWS S3
-- React
 - FFmpeg 3.2
 - IBM Watson
 
-Dev Dependencies
+#### Client
+- React
+  - React-DOM 15.3.2
+  - React-Dropzone 3.7.3
+  - [React-Flexbox-Grid](https://github.com/roylee0704/react-flexbox-grid) 0.10.2
+    - classnames 2.2.5
+    - css-loader 0.26.0
+    - flexboxgrid 6.3.1
+    - style-loader 0.13.1
+  - React-Router 3.0.0
+
+#### Dev Dependencies
 - [APIDoc](https://github.com/apidoc/apidoc) 0.16.1
 - [Redis Commander](https://github.com/joeferner/redis-commander)
 
@@ -172,6 +182,27 @@ Install all NPM dependencies
 ```
 npm install
 npm install -g mocha
+```
+
+Configure `webpack` to load `flexboxgrid` with CSS modules
+```
+cd client/node_modules/react-scripts/config
+vim webpack.config.prod.js
+```
+
+Replace the `css` loaders with:
+```
+{
+  test: /\.css$/,
+  loader: 'style!css?modules',
+  include: /flexboxgrid/,
+},
+{
+  test: /\.css$/,
+  loader: 'style!css!postcss',
+  include: path.join(__dirname, 'node_modules'), // oops, this also includes flexboxgrid
+  exclude: /flexboxgrid/, // so we have to exclude it
+},
 ```
 
 Build the client

@@ -1,5 +1,6 @@
 import React from 'react';
 import { browserHistory, Link } from 'react-router';
+import { Grid, Row, Col } from 'react-flexbox-grid/lib/index'
 
 export default React.createClass({
   logout() {
@@ -22,22 +23,36 @@ export default React.createClass({
 
   render() {
     return (
-      <div className="nav-bar">
-        <div><Link to="/">Home</Link></div>
-        <div><Link to="/about">About</Link></div>
-        {!this.props.loggedIn &&
-          <div>
-            <div><Link to="/signin">Sign in</Link></div>
-            <div><Link to="/register">Register</Link></div>
-          </div>
-        }
-        {this.props.loggedIn &&
-          <div>
-            <div><Link to="/dashboard">Dashboard (Logged in as {this.props.loggedIn})</Link></div>
-            <div onClick={this.logout.bind(this)}>Logout</div>
-          </div>
-        }
-      </div>
+      <Grid>
+        <Row className="nav-bar">
+          <Col xs>
+            <Link to="/">Home</Link>
+          </Col>
+          <Col xs>
+            <Link to="/about">About</Link>
+          </Col>
+          {!this.props.loggedIn &&
+            <Col xs>
+              <Link to="/signin">Sign in</Link>
+            </Col>
+          }
+          {!this.props.loggedIn &&
+            <Col xs>
+              <Link to="/register">Register</Link>
+            </Col>
+          }
+          {this.props.loggedIn &&
+            <Col xs>
+              <Link to="/dashboard">Dashboard (Logged in as {this.props.loggedIn})</Link>
+            </Col>
+          }
+          {this.props.loggedIn &&
+            <Col xs>
+              <div onClick={this.logout.bind(this)}>Logout</div>
+            </Col>
+          }
+        </Row>
+      </Grid>
     );
   },
 });
