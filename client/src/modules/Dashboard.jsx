@@ -1,6 +1,6 @@
 import React from 'react';
-import Overview from './Overview';
 import { Link } from 'react-router';
+import Overview from './Overview';
 
 export default React.createClass({
   render() {
@@ -10,11 +10,16 @@ export default React.createClass({
         <ul>
           <li><Link to="/dashboard/settings">Settings</Link></li>
           <li><Link to="/dashboard/upload">Upload</Link></li>
-
-          { this.props.children || <Overview />}
-
+          {
+            React.cloneElement(
+              this.props.children, {
+                loggedIn: this.props.loggedIn,
+                auth: this.authenticateUser,
+              },
+            ) || <Overview loggedIn={this.state.loggedIn} auth={this.authenticateUser} />
+          }
         </ul>
       </div>
-    )
-  }
+    );
+  },
 });
