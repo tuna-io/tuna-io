@@ -16,7 +16,7 @@ export default React.createClass({
         <div><Link to="/about">About</Link></div>
         <div><Link to="/signin">Sign in</Link></div>
         <div><Link to="/register">Register</Link></div>
-        <div><Link to="/dashboard">Dashboard</Link></div>
+        <div><Link to="/dashboard">Dashboard (Logged in as {this.props.loggedIn})</Link></div>
         <div onClick={this.logout}>Logout</div>
       </div>
     );

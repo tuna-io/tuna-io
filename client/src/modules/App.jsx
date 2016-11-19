@@ -7,11 +7,15 @@ export default class App extends React.Component {
     super(props);
 
     this.state = {
-      'loggedIn': '',
+      loggedIn: 'HEYO',
     };
+
+    this.authenticateUser = this.authenticateUser.bind(this);
   }
 
   authenticateUser() {
+    var context = this;
+
     fetch('http://127.0.0.1:3000/api/users/authenticate', {
       method: 'GET',
       credentials: 'include',
@@ -24,6 +28,8 @@ export default class App extends React.Component {
     })
     .then(function(jsonResponse) {
       console.log(jsonResponse);
+      console.log(jsonResponse.username);
+      jsonResponse.username !== '' ? context.setState({loggedIn: jsonResponse.username}) : null;
     })
     .catch(function(err) {
       console.log(err);
@@ -37,14 +43,12 @@ export default class App extends React.Component {
   render() {
     return (
       <div>
-        <Nav />
+        <Nav loggedIn={this.state.loggedIn} />
         {
           React.cloneElement(
             this.props.children, {loggedIn: this.state.loggedIn}
           ) || 
-          React.cloneElement(
-            <Home />, {loggedIn: this.state.loggedIn}
-          )
+          <Home loggedIn={this.state.loggedIn} />
         }
       </div>
     )
