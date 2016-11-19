@@ -566,7 +566,21 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
   HandleError(err)
   delete(session.Values, "username")
   sessions.Save(req, w)
-  fmt.Fprintln(w, "Successfully logged out!")
+
+  w.Header().Set("Content-Type", "application/json")
+
+  ar := AuthResponse{
+    Success: true,
+    Error: nil,
+    Message: "User successfully logged out!",
+    Username: "",
+  }
+
+  j, err := json.Marshal(ar)
+  HandleError(err)
+
+  w.WriteHeader(http.StatusInternalServerError)
+  w.Write(j)
 }
 
 /**
