@@ -38,7 +38,14 @@ export default class App extends React.Component {
     return (
       <div>
         <Nav />
-        {this.props.children || <Home />}
+        {
+          React.cloneElement(
+            this.props.children, {loggedIn: this.state.loggedIn}
+          ) || 
+          React.cloneElement(
+            <Home />, {loggedIn: this.state.loggedIn}
+          )
+        }
       </div>
     )
   }
