@@ -5,32 +5,66 @@ export default class Upload extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      transcript: "",
       file: null,
-      videoReturned: false,
       signedUrl: null,
+      videoReturned: false,
+      transcript: "",
+
+      // Upload options
       title: "",
       description: "",
       private: false,
     };
 
+    // Bind helper functions in constructor
     this.handleChange = this.handleChange.bind(this);
-    this.submitVideo = this.submitVideo.bind(this);
-    this.uploadUsingDropzone = this.uploadUsingDropzone.bind(this);
+    this.submitVideoToCDN = this.submitVideoToCDN.bind(this);
+    this.attachUsingDropzone = this.attachUsingDropzone.bind(this);
     this.renderTranscript = this.renderTranscript.bind(this);
   }
 
-  handleChange(event) {
-    const value = event.target.name === "private" ? event.target.checked : event.target.value;
-    this.setState({ [event.target.name]: value });
-    console.log(this.state.title);
+  // Triggered when user drops file into Dropzone
+  // Use file information to retrieve signed URL
+  attachUsingDropzone(files) {
+    const file = files[0];
+    this.setState({
+      videoReturned: false,
+      file: file,
+      title: file.name,
+    });
+
+    // Fetch signed URL
+    fetch('http://localhost:3000/api/s3', {
+      method: 'POST',
+      body: JSON.stringify({
+        filename: file.name,
+        filetype: file.type,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(data => data.json())
+    .then((signedUrl) => {
+      this.setState({ signedUrl: signedUrl });
+    })
+    .catch(err => console.log('Error retrieving signed URL:', err));
   }
 
-  submitVideo(event) {
+  // Handle video options form change
+  handleChange(event) {
+    // Retrieve checkbox data using event.target.checked
+    const value = event.target.name === "private" ? event.target.checked : event.target.value;
+    this.setState({ [event.target.name]: value });
+  }
+
+  // Triggered on video options form submission
+  submitVideoToCDN(event) {
+    // Prevent page refresh
     event.preventDefault();
 
     if (this.state.signedUrl) {
-      console.log('about to upload to S3');
+      // Upload video into CDN
       fetch(this.state.signedUrl, {
         method: 'PUT',
         body: this.state.file,
@@ -43,10 +77,7 @@ export default class Upload extends React.Component {
           videoReturned: true,
         });
 
-        console.log('video returned from S3. data is:', data);
-
-        // POST video metadata to the server
-        console.log(this.state.title, this.state.description, this.state.private);
+        // Post video metadata to the server
         return fetch('http://localhost:3000/api/videos', {
           method: 'POST',
           body: JSON.stringify({
@@ -59,7 +90,8 @@ export default class Upload extends React.Component {
           headers: {
             'Content-Type': 'application/json',
           },
-        });
+        })
+        .catch(err => console.log('Error posting video to /api/videos:', err));
       })
       .then(rawResp => rawResp.json())
       .then((resp) => {
@@ -71,42 +103,10 @@ export default class Upload extends React.Component {
         this.setState({
           transcript: newTranscript,
         });
-        console.log("new transcript is", this.state.transcript, this);
         this.render();
       })
-      .catch((err) => {
-        console.log('error uploading', err);
-      });
+      .catch(err => console.log('Error uploading video to CDN:', err));
     }
-  }
-
-  // upload params: file dragged into dropzone
-  // sends filename to server to get signed url, then uploads the file to AWS
-  uploadUsingDropzone(files) {
-    const file = files[0];
-    this.setState({
-      videoReturned: false,
-      file: file,
-      title: file.name,
-    });
-
-    // Get the signed URL
-    fetch('http://localhost:3000/api/s3', {
-      method: 'POST',
-      body: JSON.stringify({
-        filename: file.name,
-        filetype: file.type,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then(data => data.json())
-    // Upload the video to the CDN
-    .then((signedUrl) => {
-      this.setState({ signedUrl: signedUrl });
-      console.log('returned signed URL:', this.state.signedUrl);
-    });
   }
 
   renderTranscript() {
@@ -131,13 +131,12 @@ export default class Upload extends React.Component {
   }
 
   render() {
-    console.log('rendering now');
     return (
       <div>
-        <div>
-          This is the upload subpage
-        </div>
-        <Dropzone onDrop={this.uploadUsingDropzone.bind(this)} size={150}>
+        <h1>
+          Upload a video!
+        </h1>
+        <Dropzone onDrop={this.attachUsingDropzone.bind(this)} size={150}>
           <div>
             Drop some files here!
           </div>
@@ -147,7 +146,7 @@ export default class Upload extends React.Component {
           (
             <div>
               <h3>Upload options</h3>
-              <form onSubmit={this.submitVideo}>
+              <form onSubmit={this.submitVideoToCDN}>
                 <div><input name="title" type="text" onChange={this.handleChange} placeholder={this.state.file.name} defaultValue={this.state.file.name} /></div>
                 <div><input name="description" type="text" onChange={this.handleChange} placeholder="description" /></div>
                 <div><span>Private:</span><input name="private" type="checkbox" onChange={this.handleChange} /></div>
