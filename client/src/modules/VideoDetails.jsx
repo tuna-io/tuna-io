@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { default as Video, Controls, Play, Mute, Seek, Fullscreen, Time, Overlay } from 'react-html5video';
 
 // TODO: prevent errors if there is no transcript
 // TODO: remove duplicate code in upload
@@ -12,7 +11,7 @@ class VideoDetails extends Component {
       currentVideoId: props.params.videoId,
       currentVideoDetails: null,
 
-      // transcript looks like [{word: "example", time: 2}]
+      // Transcript format: [{"word": "coming", "time": 1}, {"word": "soon", "time": 2}]      
       transcript: [],
       query: "",
       searchResults: [],
