@@ -10,14 +10,19 @@ class VideoDetails extends Component {
     this.state = {
       currentVideoId: props.params.videoId,
       currentVideoDetails: null,
-      transcript: [{"word": "coming soon...", "time": 1}],
+
+      // Transcript format: [{"word": "coming", "time": 1}, {"word": "soon", "time": 2}]      
+      transcript: [],
       query: "",
       searchResults: [],
-      searchReturned: false,
+      currentTime: 24
     };
+
+    this.myVideo;
 
     this.search = this.search.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.findTime = this.findTime.bind(this);
     // Fetch initial video data. This is only called once
     this.fetchVideoFromAPI(props.params.videoId);
   }
@@ -40,9 +45,11 @@ class VideoDetails extends Component {
     .then(response => response.json())
     .then((jsonResponse) => {
       this.setState({ currentVideoDetails: jsonResponse });
-      console.log("hash is", jsonResponse.hash);
+      // console.log("hash is", jsonResponse.hash);
       var transcript = JSON.parse(jsonResponse.transcript);
       this.saveTranscript(transcript);
+
+      this.myVideo = this.refs.myVideo;
     })
     .catch((err) => {
       console.log('Error fetching video with ID', videoId, err);
@@ -53,7 +60,7 @@ class VideoDetails extends Component {
   saveTranscript(transcript){
     const newTranscript = [];
     transcript.Words.forEach(word =>
-      newTranscript.push({ word: word.Token, time: word.End })
+      newTranscript.push({ word: word.Token, time: Math.floor(word.End) })
     );
     this.setState({
       transcript: newTranscript,
@@ -68,7 +75,7 @@ class VideoDetails extends Component {
 
   search(e){
     e.preventDefault();
-    console.log("search hash", this.state.currentVideoDetails.hash);
+    // console.log("search hash", this.state.currentVideoDetails.hash);
     fetch("http://127.0.0.1:3000/api/videos/search/" + this.state.currentVideoDetails.hash + "/" + this.state.query, {
       method: "GET",
       credentials: 'same-origin',
@@ -79,11 +86,9 @@ class VideoDetails extends Component {
     .then((resp)=> {
       return resp.json();
     })
-    .then((searchResults)=>{
-      console.log("search results are", searchResults);
+    .then((newSearchResults)=>{
       this.setState({
-        searchResults: searchResults,
-        searchReturned: true
+        searchResults: newSearchResults
       });
     })
     .catch((err)=> {
@@ -91,20 +96,31 @@ class VideoDetails extends Component {
     });
   }
 
+  findTime(time, event){
+    console.log("here");
+    console.log("time is", time);
+    this.myVideo.currentTime = time;
+    // this.setState({
+    //   currentTime: time
+    // });
+  }
   // Transcript is rendered after server-side transcription
   renderTranscript() {
     return (
       <div>
-        <h3>Transcript</h3>
-        <div>
-          {this.state.transcript.map(pair => pair.word).reduce((firstword, secondword) => `${firstword} ${secondword}`)}
-        </div>
+        <h3>Transcript: </h3>
+        {this.state.transcript.length ? (
+          <div>
+            {this.state.transcript.map(pair => pair.word).reduce((firstword, secondword) => `${firstword} ${secondword}`)}
+          </div>
+          ) : null
+        }
       </div>
     );
   }
 
   renderSearchForm() {
-    if (this.state.transcript.length > 1) {
+    if (this.state.transcript.length) {
       return (
         <form onSubmit={this.search}>
           Search:
@@ -116,14 +132,24 @@ class VideoDetails extends Component {
   }
 
   renderSearchResults(){
-    if (this.state.transcript.length > 1) {
+    if (this.state.transcript.length) {
       return (
         <div>
           <div> Search results: </div>
-          <div>
-            {this.state.searchReturned ? (this.state.searchResults.map((i)=> {
-                console.log("word is", this.state.transcript[i].word);
-                return (<div>{"Word: " + this.state.transcript[i].word + ", Time: " + this.state.transcript[i].time}</div>)
+          <div> 
+            {this.state.searchResults ? (this.state.searchResults.map((i)=> {
+                return (
+                  <button onClick={this.findTime.bind(this, this.state.transcript[i].time)}>
+                    {
+                      Math.floor(this.state.transcript[i].time / 60) + ":" + this.state.transcript[i].time % 60 + '--' + 
+                      this.state.transcript.slice(Math.max(i - 4, 0), Math.min(i + 5, this.state.transcript.length))
+                      .map(pair => pair.word)
+                      .reduce((fword, sword) => {
+                        return `${fword} ${sword}`
+                      })
+                    }
+                  </button>
+                  )
                 })
               ) : null 
             }
@@ -142,7 +168,10 @@ class VideoDetails extends Component {
         <div>
           <h1>{this.state.currentVideoDetails.title}</h1>
           <div>
-            <video width="400" src={this.state.currentVideoDetails.url} controls />
+            <video ref="myVideo" controls width="400" >
+              <source src={this.state.currentVideoDetails.url} type="video/mp4"/>
+            </video>
+
           </div>
           <div>Creator: {this.state.currentVideoDetails.creator}</div>
           <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>

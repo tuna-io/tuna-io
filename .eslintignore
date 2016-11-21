@@ -1,5 +1,6 @@
 .eslint*
 **/node_modules
+node_modules/*
 **/server
 **/doc
 *.go
@@ -8,3 +9,5 @@ client/src/index.js
 circle.yml
 LICENSE
 package.json
+dump.rdb
+/client/build/*

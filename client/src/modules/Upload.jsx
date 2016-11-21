@@ -15,8 +15,11 @@ export default class Upload extends React.Component {
       description: '',
       private: false,
 
-      // Transcript format: [{"word": "coming", "time": 1}, {"word": "soon", "time": 2}]
+      // transcript looks like [{word: "example", time: 2}]
       transcript: [],
+      hash: "",
+      filename: "",
+      videoReturned: false,
       query: "",
       searchResults: [],
       searchReturned: false,
@@ -112,6 +115,7 @@ export default class Upload extends React.Component {
 
         this.setState({
           transcript: newTranscript,
+          hash: resp.hash
         });
       })
       .catch(err => console.log('Error uploading video to CDN:', err));
@@ -121,7 +125,7 @@ export default class Upload extends React.Component {
   search(e){
     e.preventDefault();
 
-    fetch('http://127.0.0.1:3000/api/videos/search/de5af6e0b1a73ca5ea8d97ef1d7802c2/' + this.state.query, {
+    fetch("http://127.0.0.1:3000/api/videos/search/" + this.state.hash + "/" + this.state.query, {
       method: "GET",
       credentials: 'same-origin',
       headers: {
@@ -192,7 +196,7 @@ export default class Upload extends React.Component {
 
   // search form to find words in query
   renderSearchForm() {
-    if (this.state.transcript.length > 0) {
+    if (this.state.transcript) {
       return (
         <form onSubmit={this.search}>
           Search:
@@ -205,7 +209,7 @@ export default class Upload extends React.Component {
 
   // render results as word and time
   renderSearchResults(){
-    if (this.state.transcript.length > 0) {
+    if (this.state.transcript) {
       return (
         <div>
           <div> Search results: </div>
