@@ -11,9 +11,9 @@ class VideoDetails extends Component {
       currentVideoId: props.params.videoId,
       currentVideoDetails: null,
 
-      // Transcript format: [{"word": "coming", "time": 1}, {"word": "soon", "time": 2}]      
+      // Transcript format: [{'word': 'coming', 'time': 1}, {'word': 'soon', 'time': 2}]      
       transcript: [],
-      query: "",
+      query: '',
       searchResults: [],
       currentTime: 24
     };
@@ -45,7 +45,7 @@ class VideoDetails extends Component {
     .then(response => response.json())
     .then((jsonResponse) => {
       this.setState({ currentVideoDetails: jsonResponse });
-      // console.log("hash is", jsonResponse.hash);
+      // console.log('hash is', jsonResponse.hash);
       var transcript = JSON.parse(jsonResponse.transcript);
       this.saveTranscript(transcript);
 
@@ -69,18 +69,18 @@ class VideoDetails extends Component {
 
   handleChange(event) {
     // Retrieve checkbox data using event.target.checked
-    const value = event.target.name === "private" ? event.target.checked : event.target.value;
+    const value = event.target.name === 'private' ? event.target.checked : event.target.value;
     this.setState({ [event.target.name]: value });
   }
 
   search(e){
     e.preventDefault();
-    // console.log("search hash", this.state.currentVideoDetails.hash);
-    fetch("http://127.0.0.1:3000/api/videos/search/" + this.state.currentVideoDetails.hash + "/" + this.state.query, {
-      method: "GET",
+    // console.log('search hash', this.state.currentVideoDetails.hash);
+    fetch('http://127.0.0.1:3000/api/videos/search/' + this.state.currentVideoDetails.hash + '/' + this.state.query, {
+      method: 'GET',
       credentials: 'same-origin',
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json'
       }
     })
     .then((resp)=> {
@@ -97,8 +97,8 @@ class VideoDetails extends Component {
   }
 
   findTime(time, event){
-    console.log("here");
-    console.log("time is", time);
+    console.log('here');
+    console.log('time is', time);
     this.myVideo.currentTime = time;
     // this.setState({
     //   currentTime: time
@@ -124,8 +124,8 @@ class VideoDetails extends Component {
       return (
         <form onSubmit={this.search}>
           Search:
-          <input type="text" name="query" onChange={this.handleChange}/>
-          <input type="submit" value="Submit" />
+          <input type='text' name='query' onChange={this.handleChange}/>
+          <input type='submit' value='Submit' />
         </form>
       );
     }
@@ -141,7 +141,7 @@ class VideoDetails extends Component {
                 return (
                   <button onClick={this.findTime.bind(this, this.state.transcript[i].time)}>
                     {
-                      Math.floor(this.state.transcript[i].time / 60) + ":" + this.state.transcript[i].time % 60 + '--' + 
+                      Math.floor(this.state.transcript[i].time / 60) + ':' + this.state.transcript[i].time % 60 + '--' + 
                       this.state.transcript.slice(Math.max(i - 4, 0), Math.min(i + 5, this.state.transcript.length))
                       .map(pair => pair.word)
                       .reduce((fword, sword) => {
@@ -168,8 +168,8 @@ class VideoDetails extends Component {
         <div>
           <h1>{this.state.currentVideoDetails.title}</h1>
           <div>
-            <video ref="myVideo" controls width="400" >
-              <source src={this.state.currentVideoDetails.url} type="video/mp4"/>
+            <video ref='myVideo' controls width='400' >
+              <source src={this.state.currentVideoDetails.url} type='video/mp4'/>
             </video>
 
           </div>
