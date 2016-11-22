@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import videojs from 'video.js';
 
 // TODO: prevent errors if there is no transcript
 // TODO: remove duplicate code in upload
@@ -21,6 +22,7 @@ class VideoDetails extends Component {
     this.search = this.search.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.findTime = this.findTime.bind(this);
+    this.myVideo;
     // Fetch initial video data. This is only called once
     this.fetchVideoFromAPI(props.params.videoId);
   }
@@ -147,8 +149,21 @@ class VideoDetails extends Component {
     return null;
   }
 
+  componentDidMount() {
+    videojs(document.getElementById('my-video'), {}, function() {
+      console.log("done");
+    });
+  }
+
+  testHandler() {
+    videojs(document.getElementById('my-video'), {}, function() {
+      console.log("done");
+    });
+  }
+
 
   render() {
+    debugger;
     if (this.state.currentVideoDetails) {
       console.log(this.state.currentVideoDetails);
 
@@ -156,9 +171,12 @@ class VideoDetails extends Component {
         <div>
           <h1>{this.state.currentVideoDetails.title}</h1>
           <div>
-            <video ref="myVideo" controls width="400"
-              src={this.state.currentVideoDetails.url} type="video/mp4"
-            />
+            <video ref="myVideo" controls width="400" >
+              <source src={this.state.currentVideoDetails.url} type="video/mp4"/>
+            </video>
+          <button onClick={this.testHandler}> HELLO </button>
+          <video ref={this.testHandler} id="my-video" className="video-js vjs-sublime-skin" controls preload="auto" width="640" height="264" poster="" data-setup="{}" src={this.state.currentVideoDetails.url} type="video/webm" />
+
 
           </div>
           <div>Creator: {this.state.currentVideoDetails.creator}</div>
