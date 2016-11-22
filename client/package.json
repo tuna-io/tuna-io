@@ -19,6 +19,7 @@
     "react-router": "^3.0.0",
     "react-scripts": "0.7.0",
     "style-loader": "^0.13.1",
+    "video.js": "^5.12.6",
     "videojs-overlay": "^1.1.0"
   },
   "scripts": {

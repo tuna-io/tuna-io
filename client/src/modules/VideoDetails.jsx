@@ -143,10 +143,11 @@ class VideoDetails extends Component {
         <div>
           <div> Search results: </div>
           <div>
-            {this.state.searchResults ? (this.state.searchResults.map((i)=> {
+            {this.state.searchResults ? (this.state.searchResults.map((i) => {
               return (
-                <button onClick={
-                  this.findTime.bind(this, this.state.transcript[i].endtime)}>
+                <button
+                  onClick={this.findTime.bind(this, this.state.transcript[i].endtime)}
+                >
                   {
                     Math.floor(this.state.transcript[i].endtime / 60) + ":" +
                     this.state.transcript[i].endtime % 60 + '--' +
@@ -154,11 +155,11 @@ class VideoDetails extends Component {
                     Math.min(i + 5, this.state.transcript.length))
                     .map(pair => pair.word)
                     .reduce((fword, sword) => {
-                      return `${fword} ${sword}`
+                      return `${fword} ${sword}`;
                     })
                   }
                 </button>
-              )
+              );
             })) : null }
           </div>
         </div>
