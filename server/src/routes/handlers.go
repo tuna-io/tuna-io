@@ -420,6 +420,7 @@ func SetSession(username string, w http.ResponseWriter, req *http.Request) {
 *   Username already exists!
 */
 func RegisterUser(w http.ResponseWriter, req *http.Request) {
+  AllowAccess(w, req)
 
   type Registration struct {
     Username  string  `json:"username"`
@@ -495,6 +496,7 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
 *   Incorrect credentials provided!
 */
 func LoginUser(w http.ResponseWriter, req *http.Request) {
+  AllowAccess(w, req)
 
   type Login struct {
     Username  string  `json:"username"`
@@ -565,6 +567,8 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
 *
 */
 func LogoutUser(w http.ResponseWriter, req *http.Request) {
+  AllowAccess(w, req)
+
   session, err := store.Get(req, "session-id")
   HandleError(err)
   delete(session.Values, "username")
@@ -603,6 +607,7 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
 *   http: named cookie not present
 */
 func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
+  AllowAccess(w, req)
   w.Header().Set("Content-Type", "text/plain")
   session, err := store.Get(req, "session-id")
   HandleError(err)

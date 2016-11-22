@@ -114,8 +114,8 @@ wget http://download.redis.io/releases/redis-3.2.5.tar.gz
 tar xzf redis-3.2.5.tar.gz
 cd redis-3.2.5
 make
-```
 
+```
 Startup Redis Server
 ```
 redis-server
@@ -184,31 +184,14 @@ npm install
 npm install -g mocha
 ```
 
-Configure `webpack` to load `flexboxgrid` with CSS modules
-```
-cd client/node_modules/react-scripts/config
-vim webpack.config.prod.js
-```
-
-Replace the `css` loaders with:
-```
-{
-  test: /\.css$/,
-  loader: 'style!css?modules',
-  include: /flexboxgrid/,
-},
-{
-  test: /\.css$/,
-  loader: 'style!css!postcss',
-  include: path.join(__dirname, 'node_modules'), // oops, this also includes flexboxgrid
-  exclude: /flexboxgrid/, // so we have to exclude it
-},
-```
-
 Build the client
 ```
-cd client
-npm run build
+node compile.js
+```
+
+Start up the static file server
+```
+make run-server
 ```
 
 Install all Go dependencies and start up the server!

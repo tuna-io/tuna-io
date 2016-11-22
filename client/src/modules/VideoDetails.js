@@ -51,12 +51,46 @@ class VideoDetails extends Component {
     .then(response => response.json())
     .then((jsonResponse) => {
       this.setState({ currentVideoDetails: jsonResponse });
+
       var transcript = JSON.parse(jsonResponse.transcript);
       this.saveTranscript(transcript);
+
+      var likes = jsonResponse.likes.split(',')
+      var dislikes = jsonResponse.dislikes.split(',')
+      var comments = jsonResponse.comments.split(',')
+      this.parseMetadata(likes, dislikes, comments);
     })
     .catch((err) => {
       console.log('Error fetching video with ID', videoId, err);
     });
+  }
+
+  parseMetadata(likes, dislikes, comments) {
+    const likesArray = [];
+    const dislikesArray = [];
+    const commentsArray = [];
+
+    likes.forEach(e => {
+      if (e.length !== 0) {
+        likesArray.push(e);
+      }
+    });
+    dislikes.forEach(e => {
+      if (e.length !== 0) {
+        dislikesArray.push(e);
+      }
+    })
+    comments.forEach(e => {
+      if (e.length !== 0) {
+        comments.push(e);
+      }
+    })
+
+    const videoDetails = this.state.currentVideoDetails;
+    videoDetails.likes = likes.slice(1);
+    videoDetails.dislikes = dislikes.slice(1);
+    videoDetails.comments = comments.slice(1);
+    this.setState({currentVideoDetails: videoDetails});
   }
 
   // save transcript words and times
@@ -193,7 +227,6 @@ class VideoDetails extends Component {
 
   render() {
     if (this.state.currentVideoDetails) {
-      console.log(this.state.currentVideoDetails);
 
       return (
         <div>
@@ -210,9 +243,11 @@ class VideoDetails extends Component {
           <div>Description: {this.state.currentVideoDetails.description}</div>
           <div>Extension: {this.state.currentVideoDetails.extension}</div>
           <div>Views: {this.state.currentVideoDetails.views}</div>
-          <div>Likes: {this.state.currentVideoDetails.likes}</div>
-          <div>Dislikes: {this.state.currentVideoDetails.dislikes}</div>
-          <div>Private: {this.state.currentVideoDetails.private}</div>
+          <div>Likes: {this.state.currentVideoDetails.likes.length}</div>
+          <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div>
+          {this.state.currentVideoDetails.private === 1 ?
+            <div>PRIVATE</div> : null
+          }
           {
             this.renderTranscript()
           }

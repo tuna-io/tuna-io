@@ -1,9 +1,12 @@
 # Compiled Go files
 /server/bin
+/build
 
 # Go dependencies
 /server/src/github.com
 /server/pkg/darwin_amd64/github.com
+/server/src/golang.org
+/server/src/gopkg.in
 
 # Node dependencies
 /node_modules
