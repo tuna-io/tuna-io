@@ -23,6 +23,7 @@ class VideoDetails extends Component {
 
     this.myVideo;
     this.myPlayer;
+    this.overlay = [];
 
     this.search = this.search.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -73,6 +74,8 @@ class VideoDetails extends Component {
     this.setState({
       transcript: newTranscript,
     });
+
+    this.generateOverlay(newTranscript);
   }
 
   handleChange(event) {
@@ -171,14 +174,20 @@ class VideoDetails extends Component {
     });
   }
 
-  generateOverlay() {
-    this.myPlayer.overlay({
-      overlays: [{
-        content: 'HELLO TEST TEST',
-        start: 3,
-        end: 15,
+  generateOverlay(transcript) {
+    transcript.forEach(word => {
+      this.overlay.push({
+        content: word.word,
+        start: word.starttime,
+        end: word.endtime,
         align: 'bottom'
-      }]
+      });
+    });
+  }
+
+  renderOverlay() {
+    videojs(document.getElementById('my-video')).overlay({
+      overlays: this.overlay
     });
   }
 
@@ -194,7 +203,7 @@ class VideoDetails extends Component {
               className="video-js vjs-sublime-skin" controls preload="auto"
               width="640" height="264" poster="" data-setup="{}"
               src={this.state.currentVideoDetails.url} type="video/webm" />
-            <button onClick={this.generateOverlay}> CLICK ME </button>
+            <button onClick={() => this.renderOverlay()}>Turn on subtitles</button>
           </div>
           <div>Creator: {this.state.currentVideoDetails.creator}</div>
           <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
