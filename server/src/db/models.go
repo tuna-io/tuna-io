@@ -104,9 +104,9 @@ func CreateVideo(v Video) (string, error) {
   conn.Send("HSET", "video:" + v.Hash, "description", v.Description)
   conn.Send("HSET", "video:" + v.Hash, "extension", v.Extension)
   conn.Send("HSET", "video:" + v.Hash, "views", 0)
-  conn.Send("HSET", "video:" + v.Hash, "likes", []string{})
-  conn.Send("HSET", "video:" + v.Hash, "dislikes", []string{})
-  conn.Send("HSET", "video:" + v.Hash, "comments", []int{})
+  conn.Send("SADD", "video_likes:" + v.Hash, "")
+  conn.Send("SADD", "video_dislikes:" + v.Hash, "")
+  conn.Send("SADD", "video_comments:" + v.Hash, "")
 
   reply, err := redis.Values(conn.Do("EXEC"))
 
