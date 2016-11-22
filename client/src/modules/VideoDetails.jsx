@@ -44,10 +44,9 @@ class VideoDetails extends Component {
     fetch(request)
     .then(response => response.json())
     .then((jsonResponse) => {
-      const transcript = JSON.parse(jsonResponse.transcript);
-      this.saveTranscript(transcript);
       this.setState({ currentVideoDetails: jsonResponse });
-      this.myVideo = this.refs.myVideo;
+      var transcript = JSON.parse(jsonResponse.transcript);
+      this.saveTranscript(transcript);
     })
     .catch((err) => {
       console.log('Error fetching video with ID', videoId, err);
@@ -73,9 +72,8 @@ class VideoDetails extends Component {
 
   search(e) {
     e.preventDefault();
-    // console.log('search hash', this.state.currentVideoDetails.hash);
-    fetch('http://127.0.0.1:3000/api/videos/search/' + this.state.currentVideoDetails.hash + '/' + this.state.query, {
-      method: 'GET',
+    fetch("http://127.0.0.1:3000/api/videos/search/" + this.state.currentVideoDetails.hash + "/" + this.state.query, {
+      method: "GET",
       credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
@@ -96,6 +94,7 @@ class VideoDetails extends Component {
     console.log('time is', time);
     this.myVideo.currentTime = time;
   }
+
   // Transcript is rendered after server-side transcription
   renderTranscript() {
     return (
@@ -129,18 +128,24 @@ class VideoDetails extends Component {
       return (
         <div>
           <div> Search results: </div>
-          <div>
-            {this.state.searchResults ? (this.state.searchResults.map(i =>
-              (
-                <button onClick={this.findTime(this.state.transcript[i].time)}>
-                  {
-                    Math.floor(this.state.transcript[i].time / 60) + ':' + (this.state.transcript[i].time % 60) + '--' +
-                    this.state.transcript.slice(Math.max(i - 4, 0), Math.min(i + 5, this.state.transcript.length))
-                    .map(pair => pair.word)
-                    .reduce((fword, sword) => `${fword} ${sword}`)
-                  }
-                </button>
-              ))) : null
+          <div> 
+            {this.state.searchResults ? (this.state.searchResults.map((i)=> {
+                return (
+                  <button onClick={this.findTime.bind(this, this.state.transcript[i].time)}>
+                    {
+                      Math.floor(this.state.transcript[i].time / 60) + ":" +
+                      this.state.transcript[i].time % 60 + '--' +
+                      this.state.transcript.slice(Math.max(i - 4, 0),
+                      Math.min(i + 5, this.state.transcript.length))
+                      .map(pair => pair.word)
+                      .reduce((fword, sword) => {
+                        return `${fword} ${sword}`
+                      })
+                    }
+                  </button>
+                  )
+                })
+              ) : null 
             }
           </div>
         </div>
@@ -149,21 +154,13 @@ class VideoDetails extends Component {
     return null;
   }
 
-  componentDidMount() {
-    videojs(document.getElementById('my-video'), {}, function() {
-      console.log("done");
+  loadVideoJS(input) {
+    videojs(document.getElementById('my-video'), {}, () => {
+      this.myVideo = input;
     });
   }
-
-  testHandler() {
-    videojs(document.getElementById('my-video'), {}, function() {
-      console.log("done");
-    });
-  }
-
 
   render() {
-    debugger;
     if (this.state.currentVideoDetails) {
       console.log(this.state.currentVideoDetails);
 
@@ -171,13 +168,10 @@ class VideoDetails extends Component {
         <div>
           <h1>{this.state.currentVideoDetails.title}</h1>
           <div>
-            <video ref="myVideo" controls width="400" >
-              <source src={this.state.currentVideoDetails.url} type="video/mp4"/>
-            </video>
-          <button onClick={this.testHandler}> HELLO </button>
-          <video ref={this.testHandler} id="my-video" className="video-js vjs-sublime-skin" controls preload="auto" width="640" height="264" poster="" data-setup="{}" src={this.state.currentVideoDetails.url} type="video/webm" />
-
-
+            <video ref={(input) => this.loadVideoJS(input)} id="my-video"
+              className="video-js vjs-sublime-skin" controls preload="auto"
+              width="640" height="264" poster="" data-setup="{}"
+              src={this.state.currentVideoDetails.url} type="video/webm" />
           </div>
           <div>Creator: {this.state.currentVideoDetails.creator}</div>
           <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
@@ -198,10 +192,9 @@ class VideoDetails extends Component {
           }
         </div>
       );
+    } else {
+      return (<div />);
     }
-
-    // Need to return valid JSX before the initial API call has returned
-    return (<div />);
   }
 }
 
