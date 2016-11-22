@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import videojs from 'video.js';
+import overlay from 'videojs-overlay';
 
 // TODO: prevent errors if there is no transcript
 // TODO: remove duplicate code in upload
@@ -60,9 +61,15 @@ class VideoDetails extends Component {
   // save transcript words and times
   saveTranscript(transcript) {
     const newTranscript = [];
-    transcript.Words.forEach((word) => {
-      newTranscript.push({ word: word.Token, time: Math.floor(word.End) });
-    });
+
+    transcript.Words.forEach(word =>
+      newTranscript.push({ 
+        word: word.Token,
+        starttime: word.Begin,
+        endtime: word.End
+      })
+    );
+
     this.setState({
       transcript: newTranscript,
     });
@@ -94,8 +101,8 @@ class VideoDetails extends Component {
     });
   }
 
-  findTime(time) {
-    console.log('time is', time);
+
+  findTime(time, event) {
     this.myVideo.currentTime = time;
   }
 
@@ -132,25 +139,24 @@ class VideoDetails extends Component {
       return (
         <div>
           <div> Search results: </div>
-          <div> 
+          <div>
             {this.state.searchResults ? (this.state.searchResults.map((i)=> {
-                return (
-                  <button onClick={this.findTime.bind(this, this.state.transcript[i].time)}>
-                    {
-                      Math.floor(this.state.transcript[i].time / 60) + ":" +
-                      this.state.transcript[i].time % 60 + '--' +
-                      this.state.transcript.slice(Math.max(i - 4, 0),
-                      Math.min(i + 5, this.state.transcript.length))
-                      .map(pair => pair.word)
-                      .reduce((fword, sword) => {
-                        return `${fword} ${sword}`
-                      })
-                    }
-                  </button>
-                  )
-                })
-              ) : null 
-            }
+              return (
+                <button onClick={
+                  this.findTime.bind(this, this.state.transcript[i].endtime)}>
+                  {
+                    Math.floor(this.state.transcript[i].endtime / 60) + ":" +
+                    this.state.transcript[i].endtime % 60 + '--' +
+                    this.state.transcript.slice(Math.max(i - 4, 0),
+                    Math.min(i + 5, this.state.transcript.length))
+                    .map(pair => pair.word)
+                    .reduce((fword, sword) => {
+                      return `${fword} ${sword}`
+                    })
+                  }
+                </button>
+              )
+            })) : null }
           </div>
         </div>
       );
@@ -162,6 +168,17 @@ class VideoDetails extends Component {
     videojs(document.getElementById('my-video'), {}, () => {
       this.myVideo = input;
       this.myPlayer = this;
+    });
+  }
+
+  generateOverlay() {
+    this.myPlayer.overlay({
+      overlays: [{
+        content: 'HELLO TEST TEST',
+        start: 3,
+        end: 15,
+        align: 'bottom'
+      }]
     });
   }
 
@@ -177,6 +194,7 @@ class VideoDetails extends Component {
               className="video-js vjs-sublime-skin" controls preload="auto"
               width="640" height="264" poster="" data-setup="{}"
               src={this.state.currentVideoDetails.url} type="video/webm" />
+            <button onClick={this.generateOverlay}> CLICK ME </button>
           </div>
           <div>Creator: {this.state.currentVideoDetails.creator}</div>
           <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>

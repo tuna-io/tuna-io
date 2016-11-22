@@ -18,7 +18,8 @@
     "react-flexgrid": "^0.8.0",
     "react-router": "^3.0.0",
     "react-scripts": "0.7.0",
-    "style-loader": "^0.13.1"
+    "style-loader": "^0.13.1",
+    "videojs-overlay": "^1.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
