@@ -13,29 +13,25 @@ export default class App extends React.Component {
     this.authenticateUser = this.authenticateUser.bind(this);
   }
 
-  authenticateUser() {
-    var context = this;
+  componentDidMount() {
+    !this.state.loggedIn ? this.authenticateUser() : null;
+  }
 
+  authenticateUser() {
     fetch('http://127.0.0.1:3000/api/users/authenticate', {
       method: 'GET',
       credentials: 'include',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
     })
-    .then(function(response) {
-      return response.json()
+    .then(response => response.json())
+    .then((jsonResponse) => {
+      this.setState({ loggedIn: jsonResponse.username });
     })
-    .then(function(jsonResponse) {
-      context.setState({loggedIn: jsonResponse.username});
-    })
-    .catch(function(err) {
+    .catch((err) => {
       console.log(err);
     });
-  }
-
-  componentDidMount() {
-    !this.state.loggedIn ? this.authenticateUser() : null;
   }
 
   render() {

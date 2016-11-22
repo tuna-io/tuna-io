@@ -1,5 +1,6 @@
 import React from 'react';
 import Dropzone from 'react-dropzone';
+import { Link } from 'react-router';
 
 // TODO: render video details page instead of duplicating functionality
 export default class Upload extends React.Component {
@@ -14,15 +15,7 @@ export default class Upload extends React.Component {
       title: '',
       description: '',
       private: false,
-
-      // transcript looks like [{word: "example", time: 2}]
-      transcript: [],
-      hash: "",
-      filename: "",
-      videoReturned: false,
-      query: "",
-      searchResults: [],
-      searchReturned: false,
+      hash: '',
     };
 
     // Bind helper functions in constructor
@@ -30,43 +23,42 @@ export default class Upload extends React.Component {
     this.submitVideoToCDN = this.submitVideoToCDN.bind(this);
     this.attachUsingDropzone = this.attachUsingDropzone.bind(this);
     this.renderVideoOptionsForm = this.renderVideoOptionsForm.bind(this);
-    this.renderVideoModule = this.renderVideoModule.bind(this);
-    this.renderTranscript = this.renderTranscript.bind(this);
-    this.search = this.search.bind(this);
   }
 
   // Triggered when user drops file into Dropzone
   // Use file information to retrieve signed URL
   attachUsingDropzone(files) {
-    const file = files[0];
+    const currFile = files[0];
     this.setState({
       videoReturned: false,
-      file: file,
-      title: file.name,
+      file: currFile,
+      title: currFile.name,
     });
 
     // Fetch signed URL
     fetch('http://127.0.0.1:3000/api/s3', {
       method: 'POST',
       body: JSON.stringify({
-        filename: file.name,
-        filetype: file.type,
+        filename: currFile.name,
+        filetype: currFile.type,
       }),
       headers: {
         'Content-Type': 'application/json',
       },
     })
     .then(data => data.json())
-    .then((signedUrl) => {
-      this.setState({ signedUrl: signedUrl });
+    .then((url) => {
+      this.setState({ signedUrl: url });
     })
-    .catch(err => console.log('Error retrieving signed URL:', err));
+    .catch((err) => {
+      console.log('Error retrieving signed URL:', err);
+    });
   }
 
   // Handle video options form change
   handleChange(event) {
     // Retrieve checkbox data using event.target.checked
-    const value = event.target.name === "private" ? event.target.checked : event.target.value;
+    const value = event.target.name === 'private' ? event.target.checked : event.target.value;
     this.setState({ [event.target.name]: value });
   }
 
@@ -108,41 +100,13 @@ export default class Upload extends React.Component {
       })
       .then(rawResp => rawResp.json())
       .then((resp) => {
-        // Parse transcript
-        const newTranscript = [];
-        resp.transcript.Words.forEach(word =>
-          newTranscript.push({ word: word.Token, time: word.End }));
-
+        console.log('resp.hash', resp.hash);
         this.setState({
-          transcript: newTranscript,
           hash: resp.hash
         });
       })
       .catch(err => console.log('Error uploading video to CDN:', err));
     }
-  }
-
-  search(e){
-    e.preventDefault();
-
-    fetch("http://127.0.0.1:3000/api/videos/search/" + this.state.hash + "/" + this.state.query, {
-      method: "GET",
-      credentials: 'same-origin',
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-    .then(resp => resp.json())
-    .then((searchResults)=>{
-      this.setState({
-        searchResults: searchResults,
-        searchReturned: true,
-      });
-      // this.render();
-    })
-    .catch((err)=> {
-      console.log('error', err);
-    });
   }
 
   // Video options form is rendered when the user has attached a file using Dropzone
@@ -152,10 +116,25 @@ export default class Upload extends React.Component {
       <div>
         <h3>Upload options</h3>
         <form onSubmit={this.submitVideoToCDN}>
-          <div><input name="title" type="text" onChange={this.handleChange} placeholder={this.state.file.name} defaultValue={this.state.file.name} /></div>
-          <div><input name="description" type="text" onChange={this.handleChange} placeholder="description" /></div>
-          <div><span>Private:</span><input name="private" type="checkbox" onChange={this.handleChange} /></div>
-          <div><input name="submit" type="submit" value="Upload into cloud" /></div>
+          <div>
+            <input
+              name="title" type="text" onChange={this.handleChange}
+              placeholder={this.state.file.name} defaultValue={this.state.file.name}
+            />
+          </div>
+          <div>
+            <input
+              name="description" type="text" onChange={this.handleChange}
+              placeholder="description"
+            />
+          </div>
+          <div>
+            <span>Private:</span>
+            <input name="private" type="checkbox" onChange={this.handleChange} />
+          </div>
+          <div>
+            <input name="submit" type="submit" value="Upload into cloud" />
+          </div>
         </form>
       </div>
     ) : null;
@@ -163,66 +142,8 @@ export default class Upload extends React.Component {
 
   // Video is rendered after a successful upload to the CDN
   renderVideoModule() {
-    return this.state.videoReturned ?
-    (
-      <div>
-        <h3>Your video</h3>
-        <video src={`https://d2bezlfyzapny1.cloudfront.net/${this.state.file.name}`} width="400" controls />
-      </div>
-    ) : null;
-  }
-
-  // Transcript is rendered after server-side transcription
-  renderTranscript() {
-    if (this.state.videoReturned) {
-      if (this.state.transcript.length > 0) {
-        return (
-          <div>
-            <h3>Transcript</h3>
-            <div>
-              {this.state.transcript.map(pair => pair.word).reduce((firstword, secondword) => `${firstword} ${secondword}`)}
-            </div>
-          </div>
-        );
-      }
-
-      return (
-        <h3>Creating transcript</h3>
-      );
-    }
-
-    return null;
-  }
-
-  // search form to find words in query
-  renderSearchForm() {
-    if (this.state.transcript) {
-      return (
-        <form onSubmit={this.search}>
-          Search:
-          <input type="text" name="query" onChange={this.handleChange} />
-          <input type="submit" value="Submit" />
-        </form>
-      );
-    }
-  }
-
-  // render results as word and time
-  renderSearchResults(){
-    if (this.state.transcript) {
-      return (
-        <div>
-          <div> Search results: </div>
-          <div>
-            {this.state.searchReturned ? (this.state.searchResults.map((i)=> {
-                return (<div>{"Word: " + this.state.transcript[i].word + ", Time: " + this.state.transcript[i].time}</div>)
-                })
-              ) : null 
-            }
-          </div>
-        </div>
-      );
-    }
+    return this.state.hash ? (<div>See video here: <Link to={`/videos/${this.state.hash}`}>{ this.state.title }</Link></div>) 
+      : null;
   }
 
   render() {
@@ -241,15 +162,6 @@ export default class Upload extends React.Component {
         }
         {
           this.renderVideoModule()
-        }
-        {
-          this.renderTranscript()
-        }
-        {
-          this.renderSearchForm()
-        }
-        {
-          this.renderSearchResults()
         }
       </div>
     );
