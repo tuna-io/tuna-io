@@ -19,6 +19,10 @@ class VideoDetails extends Component {
       currentTime: 24,
     };
 
+
+    this.myVideo;
+    this.myPlayer;
+
     this.search = this.search.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.findTime = this.findTime.bind(this);
@@ -157,6 +161,7 @@ class VideoDetails extends Component {
   loadVideoJS(input) {
     videojs(document.getElementById('my-video'), {}, () => {
       this.myVideo = input;
+      this.myPlayer = this;
     });
   }
 
