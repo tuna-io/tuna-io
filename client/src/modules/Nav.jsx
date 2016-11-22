@@ -18,7 +18,7 @@ export default React.createClass({
     })
     .catch(err => {
       console.log(err);
-    })
+    });
   },
 
   render() {

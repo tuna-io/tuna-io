@@ -15,7 +15,7 @@ export default class Upload extends React.Component {
       title: '',
       description: '',
       private: false,
-      hash: ''
+      hash: '',
     };
 
     // Bind helper functions in constructor
@@ -28,29 +28,31 @@ export default class Upload extends React.Component {
   // Triggered when user drops file into Dropzone
   // Use file information to retrieve signed URL
   attachUsingDropzone(files) {
-    const file = files[0];
+    const currFile = files[0];
     this.setState({
       videoReturned: false,
-      file: file,
-      title: file.name,
+      file: currFile,
+      title: currFile.name,
     });
 
     // Fetch signed URL
     fetch('http://127.0.0.1:3000/api/s3', {
       method: 'POST',
       body: JSON.stringify({
-        filename: file.name,
-        filetype: file.type,
+        filename: currFile.name,
+        filetype: currFile.type,
       }),
       headers: {
         'Content-Type': 'application/json',
       },
     })
     .then(data => data.json())
-    .then((signedUrl) => {
-      this.setState({ signedUrl: signedUrl });
+    .then((url) => {
+      this.setState({ signedUrl: url });
     })
-    .catch(err => console.log('Error retrieving signed URL:', err));
+    .catch((err) => {
+      console.log('Error retrieving signed URL:', err);
+    });
   }
 
   // Handle video options form change
@@ -102,7 +104,6 @@ export default class Upload extends React.Component {
         this.setState({
           hash: resp.hash
         });
-
       })
       .catch(err => console.log('Error uploading video to CDN:', err));
     }
@@ -115,10 +116,25 @@ export default class Upload extends React.Component {
       <div>
         <h3>Upload options</h3>
         <form onSubmit={this.submitVideoToCDN}>
-          <div><input name='title' type='text' onChange={this.handleChange} placeholder={this.state.file.name} defaultValue={this.state.file.name} /></div>
-          <div><input name='description' type='text' onChange={this.handleChange} placeholder='description' /></div>
-          <div><span>Private:</span><input name='private' type='checkbox' onChange={this.handleChange} /></div>
-          <div><input name='submit' type='submit' value='Upload into cloud' /></div>
+          <div>
+            <input
+              name="title" type="text" onChange={this.handleChange}
+              placeholder={this.state.file.name} defaultValue={this.state.file.name}
+            />
+          </div>
+          <div>
+            <input
+              name="description" type="text" onChange={this.handleChange}
+              placeholder="description"
+            />
+          </div>
+          <div>
+            <span>Private:</span>
+            <input name="private" type="checkbox" onChange={this.handleChange} />
+          </div>
+          <div>
+            <input name="submit" type="submit" value="Upload into cloud" />
+          </div>
         </form>
       </div>
     ) : null;

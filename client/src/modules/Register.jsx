@@ -16,35 +16,31 @@ export default class Register extends React.Component {
   }
 
   handleChange(event) {
-    this.setState({[event.target.name]: event.target.value});
+    this.setState({ [event.target.name]: event.target.value });
   }
 
   handleSubmit(event) {
-    var context = this;
-
     fetch('http://127.0.0.1:3000/api/users/register', {
       method: 'POST',
       body: JSON.stringify({
         username: this.state.username,
         email: this.state.email,
-        password: this.state.password
+        password: this.state.password,
       }),
       credentials: 'same-origin',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
     })
-    .then(function(response) {
-      return response.json();
-    })
-    .then(function(jsonResponse) {
+    .then(response => response.json())
+    .then((jsonResponse) => {
       console.log('Registration response:', jsonResponse);
       if (jsonResponse.username) {
-        context.props.auth();
+        this.props.auth();
         browserHistory.push('/');
       }
     })
-    .catch(function(err) {
+    .catch((err) => {
       console.log(err);
     });
 
@@ -58,21 +54,30 @@ export default class Register extends React.Component {
         <form onSubmit={this.handleSubmit}>
           <div>
             Username:
-            <input type="text" name="username" value={this.state.username} onChange={this.handleChange} />
+            <input
+              type="text" name="username" value={this.state.username}
+              onChange={this.handleChange}
+            />
           </div>
           <div>
             Email:
-            <input type="email" name="email" value={this.state.email} onChange={this.handleChange} />
+            <input
+              type="email" name="email" value={this.state.email}
+              onChange={this.handleChange}
+            />
           </div>
           <div>
             Password:
-            <input type="password" name="password" value={this.state.password} onChange={this.handleChange} />
+            <input
+              type="password" name="password" value={this.state.password}
+              onChange={this.handleChange}
+            />
           </div>
           <div>
             <input type="submit" value="Submit" />
           </div>
         </form>
       </div>
-    )
+    );
   }
-};
+}
