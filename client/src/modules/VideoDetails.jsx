@@ -50,6 +50,7 @@ class VideoDetails extends Component {
     fetch(request)
     .then(response => response.json())
     .then((jsonResponse) => {
+      console.log(jsonResponse);
       this.setState({ currentVideoDetails: jsonResponse });
       var transcript = JSON.parse(jsonResponse.transcript);
       this.saveTranscript(transcript);
@@ -210,7 +211,7 @@ class VideoDetails extends Component {
           <div>Description: {this.state.currentVideoDetails.description}</div>
           <div>Extension: {this.state.currentVideoDetails.extension}</div>
           <div>Views: {this.state.currentVideoDetails.views}</div>
-          <div>Likes: {typeof(this.state.currentVideoDetails.likes)}</div>
+          <div>Likes: {this.state.currentVideoDetails.likes}</div>
           <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div>
           <div>Private: {this.state.currentVideoDetails.private}</div>
           {
