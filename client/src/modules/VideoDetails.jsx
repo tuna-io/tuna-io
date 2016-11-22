@@ -50,7 +50,6 @@ class VideoDetails extends Component {
     fetch(request)
     .then(response => response.json())
     .then((jsonResponse) => {
-      console.log(jsonResponse);
       this.setState({ currentVideoDetails: jsonResponse });
 
       var transcript = JSON.parse(jsonResponse.transcript);
@@ -73,7 +72,6 @@ class VideoDetails extends Component {
 
     likes.forEach(e => {
       if (e.length !== 0) {
-        console.log(e, e.length, typeof e)
         likesArray.push(e);
       }
     });
@@ -93,7 +91,6 @@ class VideoDetails extends Component {
     videoDetails.dislikes = dislikes.slice(1);
     videoDetails.comments = comments.slice(1);
     this.setState({currentVideoDetails: videoDetails});
-    console.log(this.currentVideoDetails);
   }
 
   // save transcript words and times
@@ -230,7 +227,6 @@ class VideoDetails extends Component {
 
   render() {
     if (this.state.currentVideoDetails) {
-      console.log(this.state.currentVideoDetails);
 
       return (
         <div>
@@ -249,7 +245,9 @@ class VideoDetails extends Component {
           <div>Views: {this.state.currentVideoDetails.views}</div>
           <div>Likes: {this.state.currentVideoDetails.likes.length}</div>
           <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div>
-          <div>Private: {this.state.currentVideoDetails.private}</div>
+          {this.state.currentVideoDetails.private === 1 ?
+            <div>PRIVATE</div> : null
+          }
           {
             this.renderTranscript()
           }
