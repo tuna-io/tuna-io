@@ -1,11 +1,10 @@
 package main
 
 import (
-	"io/ioutil"
-	"net/http"
 	"os"
 	"time"
-
+	"net/http"
+	"io/ioutil"
 	"github.com/BurntSushi/toml"
 	log "github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"

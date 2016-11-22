@@ -1,12 +1,11 @@
 package main
 
 import (
-	"html/template"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"path"
-
+	"net/http"
+	"io/ioutil"
+	"html/template"
 	log "github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 )

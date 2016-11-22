@@ -1,9 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
-
+	"encoding/json"
 	log "github.com/Sirupsen/logrus"
 	"github.com/julienschmidt/httprouter"
 )
@@ -25,7 +24,6 @@ func VersionEndpoint(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	}
 	log.Infoln(req.RemoteAddr, req.Method, "version api")
 	data, _ := json.Marshal(ver)
-	//w.Header().Add("Content-type", "encoding/json")
 
 	w.Write(data)
 }

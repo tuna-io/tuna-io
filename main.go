@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+
   r := mux.NewRouter().StrictSlash(true)
 
   /*-------------------------------------

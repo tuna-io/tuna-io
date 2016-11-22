@@ -1,5 +1,6 @@
 # Compiled Go files
 /server/bin
+/build
 
 # Go dependencies
 /server/src/github.com
