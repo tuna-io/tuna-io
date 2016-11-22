@@ -91,7 +91,6 @@ class VideoDetails extends Component {
   }
 
   findTime(time) {
-    console.log('here');
     console.log('time is', time);
     this.myVideo.currentTime = time;
   }
@@ -157,9 +156,9 @@ class VideoDetails extends Component {
         <div>
           <h1>{this.state.currentVideoDetails.title}</h1>
           <div>
-            <video ref="myVideo" controls width="400" >
-              <source src={this.state.currentVideoDetails.url} type="video/mp4" />
-            </video>
+            <video ref="myVideo" controls width="400"
+              src={this.state.currentVideoDetails.url} type="video/mp4"
+            />
 
           </div>
           <div>Creator: {this.state.currentVideoDetails.creator}</div>

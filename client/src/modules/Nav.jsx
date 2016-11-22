@@ -1,6 +1,6 @@
 import React from 'react';
 import { browserHistory, Link } from 'react-router';
-import { Grid, Row, Col } from 'react-flexbox-grid/lib/index'
+import { Grid, Row, Col } from 'react-flexbox-grid/lib/index';
 
 export default React.createClass({
   logout() {
