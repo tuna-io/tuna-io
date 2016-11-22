@@ -210,8 +210,8 @@ class VideoDetails extends Component {
           <div>Description: {this.state.currentVideoDetails.description}</div>
           <div>Extension: {this.state.currentVideoDetails.extension}</div>
           <div>Views: {this.state.currentVideoDetails.views}</div>
-          <div>Likes: {this.state.currentVideoDetails.likes}</div>
-          <div>Dislikes: {this.state.currentVideoDetails.dislikes}</div>
+          <div>Likes: {typeof(this.state.currentVideoDetails.likes)}</div>
+          <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div>
           <div>Private: {this.state.currentVideoDetails.private}</div>
           {
             this.renderTranscript()

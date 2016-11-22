@@ -119,9 +119,13 @@ func GetVideo(hash string) (string, error) {
   conn := Pool.Get()
   defer conn.Close()
 
-  reply, err := redis.StringMap(conn.Do("HGETALL", "video:" + hash))
+  _, err := conn.Do("HINCRBY", "video:" + hash, "views", 1)
+  HandleError(err)
 
-  rep, _ := json.Marshal(reply)
+  reply, err := redis.StringMap(conn.Do("HGETALL", "video:" + hash))
+  HandleError(err)
+
+  rep, err := json.Marshal(reply)
 
   return string(rep), err
 }
