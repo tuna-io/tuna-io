@@ -11,6 +11,8 @@ import Settings from './modules/Settings';
 import Upload from './modules/Upload';
 import VideoDetails from './modules/VideoDetails';
 import Home from './modules/Home';
+import './index.css';
+import './flexgrid.css';
 
 ReactDOM.render((
   <Router history={browserHistory}>
