@@ -11,7 +11,6 @@ import (
   "crypto/md5"
   "encoding/hex"
   "encoding/json"
-  "github.com/gorilla/mux"
   "github.com/gorilla/sessions"
   "github.com/aws/aws-sdk-go/aws"
   "github.com/mediawen/watson-go-sdk"
@@ -638,9 +637,9 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request, _ httprouter.Par
   }
 }
 
-func SearchVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-  hash := mux.Vars(req)["hash"]
-  query := mux.Vars(req)["query"]
+func SearchVideo(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  hash := ps.ByName("hash")
+  query := ps.ByName("query")
 
   transcript, err := db.GetVideoTranscript(hash)
 
