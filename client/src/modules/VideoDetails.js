@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import videojs from 'video.js';
 import overlay from 'videojs-overlay';
+import { Grid, Row, Col } from 'react-flexgrid';
 
 // TODO: prevent errors if there is no transcript
 // TODO: remove duplicate code in upload
@@ -229,35 +230,39 @@ class VideoDetails extends Component {
     if (this.state.currentVideoDetails) {
 
       return (
-        <div>
-          <h1>{this.state.currentVideoDetails.title}</h1>
-          <div>
-            <video ref={(input) => this.loadVideoJS(input)} id="my-video"
-              className="video-js vjs-sublime-skin" controls preload="auto"
-              width="640" height="264" poster="" data-setup="{}"
-              src={this.state.currentVideoDetails.url} type="video/webm" />
-            <button onClick={() => this.renderOverlay()}>Turn on subtitles</button>
-          </div>
-          <div>Creator: {this.state.currentVideoDetails.creator}</div>
-          <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
-          <div>Description: {this.state.currentVideoDetails.description}</div>
-          <div>Extension: {this.state.currentVideoDetails.extension}</div>
-          <div>Views: {this.state.currentVideoDetails.views}</div>
-          <div>Likes: {this.state.currentVideoDetails.likes.length}</div>
-          <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div>
-          {this.state.currentVideoDetails.private === 1 ?
-            <div>PRIVATE</div> : null
-          }
-          {
-            this.renderTranscript()
-          }
-          {
-            this.renderSearchForm()
-          }
-          {
-            this.renderSearchResults()
-          }
-        </div>
+        <Row>
+          <Col xs={9}>
+            <h1>{this.state.currentVideoDetails.title}</h1>
+            <div>
+              <video ref={(input) => this.loadVideoJS(input)} id="my-video"
+                className="video-js vjs-sublime-skin" controls preload="auto"
+                width="640" height="264" poster="" data-setup="{}"
+                src={this.state.currentVideoDetails.url} type="video/webm" />
+              <button onClick={() => this.renderOverlay()}>Turn on subtitles</button>
+            </div>
+            <div>Creator: {this.state.currentVideoDetails.creator}</div>
+            <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
+            <div>Description: {this.state.currentVideoDetails.description}</div>
+            <div>Extension: {this.state.currentVideoDetails.extension}</div>
+            <div>Views: {this.state.currentVideoDetails.views}</div>
+            <div>Likes: {this.state.currentVideoDetails.likes.length}</div>
+            <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div>
+            {this.state.currentVideoDetails.private === 1 ?
+              <div>PRIVATE</div> : null
+            }
+          </Col>
+          <Col xs={3}>
+            {
+              this.renderTranscript()
+            }
+            {
+              this.renderSearchForm()
+            }
+            {
+              this.renderSearchResults()
+            }
+          </Col>
+        </Row>
       );
     } else {
       return (<div />);
