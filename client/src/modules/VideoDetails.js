@@ -3,6 +3,7 @@ import videojs from 'video.js';
 import overlay from 'videojs-overlay';
 import { Grid, Row, Col } from 'react-flexgrid';
 import { Badge, Space, InlineForm, Panel, PanelHeader, Text, Avatar, Heading, Flex, Donut, Stat } from 'rebass';
+import TimeAgo from 'react-timeago';
 
 // TODO: prevent errors if there is no transcript
 // TODO: remove duplicate code in upload
@@ -262,7 +263,9 @@ class VideoDetails extends Component {
                 <Row>
                   <Col xs={5}>
                     <div>
-                      Uploaded {this.state.currentVideoDetails.timestamp}
+                      Uploaded: 
+                      <TimeAgo 
+                        date={this.state.currentVideoDetails.timestamp} />
                     </div>
                   </Col>
                   <Col xs={3}>
