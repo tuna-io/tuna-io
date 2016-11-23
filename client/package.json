@@ -18,6 +18,7 @@
     "react-flexgrid": "^0.8.0",
     "react-router": "^3.0.0",
     "react-scripts": "0.7.0",
+    "rebass": "^0.3.3",
     "style-loader": "^0.13.1",
     "videojs-overlay": "^1.1.0"
   },
