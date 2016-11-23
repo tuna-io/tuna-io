@@ -11,10 +11,6 @@ export default class Nav extends React.Component {
     this.state = {};
   }
 
-  // onNavClick(id) {
-  //   this.setState({selectedId: id});
-  // }
-
   logout() {
     fetch('/api/users/logout', {
       method: 'GET',
@@ -35,10 +31,10 @@ export default class Nav extends React.Component {
 
   render() {
     return (
-      <div>
-      <Row>
-      <Col xs={2}>
-      <Menu rounded style={{background: 'black'}}>
+      <Menu rounded style={{
+        background: 'black',
+        height: '100vh'
+      }}>
         <Link to="/">
           <NavItem is="a">Home</NavItem>
         </Link>
@@ -64,39 +60,6 @@ export default class Nav extends React.Component {
           <NavItem is="a" onClick={this.logout.bind(this)}>Sign Out</NavItem>
         }
       </Menu>
-      </Col>
-      </Row>
-      <Grid>
-        <Row className="nav-bar">
-          <Col xs>
-            <Link to="/">Home</Link>
-          </Col>
-          <Col xs>
-            <Link to="/about">About</Link>
-          </Col>
-          {!this.props.loggedIn &&
-            <Col xs>
-              <Link to="/signin">Sign in</Link>
-            </Col>
-          }
-          {!this.props.loggedIn &&
-            <Col xs>
-              <Link to="/register">Register</Link>
-            </Col>
-          }
-          {this.props.loggedIn &&
-            <Col xs>
-              <Link to="/dashboard">Dashboard (Logged in as {this.props.loggedIn})</Link>
-            </Col>
-          }
-          {this.props.loggedIn &&
-            <Col xs>
-              <div onClick={this.logout.bind(this)}>Logout</div>
-            </Col>
-          }
-        </Row>
-      </Grid>
-      </div>
     );
   }
 }
