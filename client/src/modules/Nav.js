@@ -1,6 +1,6 @@
 import React from 'react';
 import { browserHistory, Link } from 'react-router';
-import { Menu, NavItem } from 'rebass';
+import { Menu, NavItem, Media, Heading, Text } from 'rebass';
 
 export default class Nav extends React.Component {
 
@@ -59,6 +59,47 @@ export default class Nav extends React.Component {
         {this.props.loggedIn &&
           <NavItem onClick={this.logout.bind(this)}>Sign Out</NavItem>
         }
+        <br /> <br /> <br />
+        <NavItem>
+          <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
+            <Heading level={3}>
+              Video
+            </Heading>
+            <Text>
+              Metadata
+            </Text>
+          </Media>
+        </NavItem>
+        <NavItem>
+          <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
+            <Heading level={3}>
+              Video
+            </Heading>
+            <Text>
+              Metadata
+            </Text>
+          </Media>
+        </NavItem>
+        <NavItem>
+          <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
+            <Heading level={3}>
+              Video
+            </Heading>
+            <Text>
+              Metadata
+            </Text>
+          </Media>
+        </NavItem>
+        <NavItem>
+          <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
+            <Heading level={3}>
+              Video
+            </Heading>
+            <Text>
+              Metadata
+            </Text>
+          </Media>
+        </NavItem>
       </Menu>
     );
   }
