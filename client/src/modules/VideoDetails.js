@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import videojs from 'video.js';
 import overlay from 'videojs-overlay';
 import { Grid, Row, Col } from 'react-flexgrid';
-import { Badge, Space, InlineForm, Panel, PanelHeader, Text } from 'rebass';
+import { Badge, Space, InlineForm, Panel, PanelHeader, Text, Avatar, Heading, Flex } from 'rebass';
 
 // TODO: prevent errors if there is no transcript
 // TODO: remove duplicate code in upload
@@ -243,13 +243,26 @@ class VideoDetails extends Component {
                 {this.state.currentVideoDetails.title}
               </PanelHeader>
               <Text>
-                <div>Creator: {this.state.currentVideoDetails.creator}</div>
-                <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
-                <div>Description: {this.state.currentVideoDetails.description}</div>
-                <div>Extension: {this.state.currentVideoDetails.extension}</div>
-                <div>Views: {this.state.currentVideoDetails.views}</div>
-                <div>Likes: {this.state.currentVideoDetails.likes.length}</div>
-                <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div> 
+                <Row>
+                  <Col xs={0}>
+                    <Avatar circle size={48} src="http://lorempixel.com/output/animals-q-c-64-64-8.jpg"/>
+                  </Col>
+                  <Col xs={1}>
+                    <Heading size={5} alt={true}>
+                      {this.state.currentVideoDetails.creator}
+                    </Heading>
+
+                    <Badge rounded theme="info"> 4.5M </Badge> 
+                  </Col>
+                </Row>
+
+                  <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
+                  <div>Description: {this.state.currentVideoDetails.description}</div>
+                  <div>Extension: {this.state.currentVideoDetails.extension}</div>
+                  <div>Views: {this.state.currentVideoDetails.views}</div>
+                  <div>Likes: {this.state.currentVideoDetails.likes.length}</div>
+                  <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div>
+
                 {console.log(this.state.currentVideoDetails.private)}
                 {this.state.currentVideoDetails.private == 1 ?
                   <Badge pill rounded theme="warning">PRIVATE</Badge> : 

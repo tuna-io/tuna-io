@@ -1,6 +1,6 @@
 import React from 'react';
 import { browserHistory, Link } from 'react-router';
-import { Menu, NavItem, Media, Heading, Text } from 'rebass';
+import { Menu, NavItem, Media, Heading, Text, Divider } from 'rebass';
 
 export default class Nav extends React.Component {
 
@@ -59,7 +59,8 @@ export default class Nav extends React.Component {
         {this.props.loggedIn &&
           <NavItem onClick={this.logout.bind(this)}>Sign Out</NavItem>
         }
-        <br /> <br /> <br />
+        <br /> <br />
+        <Divider width={1000} style={{background: 'white'}} />
         <NavItem>
           <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
             <Heading level={3}>
