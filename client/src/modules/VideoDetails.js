@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import videojs from 'video.js';
 import overlay from 'videojs-overlay';
 import { Grid, Row, Col } from 'react-flexgrid';
-import { Badge, Space } from 'rebass';
+import { Badge, Space, InlineForm } from 'rebass';
 
 // TODO: prevent errors if there is no transcript
 // TODO: remove duplicate code in upload
@@ -163,11 +163,8 @@ class VideoDetails extends Component {
   renderSearchForm() {
     if (this.state.transcript.length) {
       return (
-        <form onSubmit={this.search}>
-          Search:
-          <input type="text" name="query" onChange={this.handleChange} />
-          <input type="submit" value="Submit" />
-        </form>
+        <InlineForm buttonLabel="Search" label="InlineForm" name="query"
+          onChange={this.handleChange} onClick={this.search} />
       );
     }
     return null;
@@ -258,10 +255,10 @@ class VideoDetails extends Component {
           <Space x={4} />
           <Col xs={3}>
             {
-              this.renderTranscript()
+              this.renderSearchForm()
             }
             {
-              this.renderSearchForm()
+              this.renderTranscript()
             }
             {
               this.renderSearchResults()
