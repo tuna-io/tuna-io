@@ -204,7 +204,7 @@ class VideoDetails extends Component {
   }
 
   loadVideoJS(input) {
-    videojs(document.getElementById('my-video'), {}, () => {
+    videojs(document.getElementById('my-video'), {fluid: true}, () => {
       this.myVideo = input;
       this.myPlayer = this;
     });
