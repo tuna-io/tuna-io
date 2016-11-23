@@ -49,7 +49,7 @@ func (s *Server) Bootstrap() {
 	s.DefineEndpoints()
 
 	log.Infoln("serving")
-	if err := http.ListenAndServe(":80", s.router); err != nil {
+	if err := http.ListenAndServe(":3000", s.router); err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
 }
