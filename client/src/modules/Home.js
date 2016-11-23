@@ -23,7 +23,7 @@ export default class Home extends React.Component {
   getLatestVideos() {
     // Create and configure AJAX request using fetch()
     // https://davidwalsh.name/fetch
-    const url = 'http://127.0.0.1:3000/api/videos/latest';
+    const url = '/api/videos/latest';
     const requestOptions = {
       method: 'GET',
       credentials: 'same-origin',

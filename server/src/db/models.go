@@ -4,6 +4,7 @@ import (
   "io"
   "fmt"
   "time"
+  "strings"
   "crypto/md5"
   "encoding/json"
   "github.com/garyburd/redigo/redis"
@@ -104,9 +105,9 @@ func CreateVideo(v Video) (string, error) {
   conn.Send("HSET", "video:" + v.Hash, "description", v.Description)
   conn.Send("HSET", "video:" + v.Hash, "extension", v.Extension)
   conn.Send("HSET", "video:" + v.Hash, "views", 0)
-  conn.Send("HSET", "video:" + v.Hash, "likes", []string{})
-  conn.Send("HSET", "video:" + v.Hash, "dislikes", []string{})
-  conn.Send("HSET", "video:" + v.Hash, "comments", []int{})
+  conn.Send("SADD", "video_likes:" + v.Hash, "")
+  conn.Send("SADD", "video_dislikes:" + v.Hash, "")
+  conn.Send("SADD", "video_comments:" + v.Hash, "")
 
   reply, err := redis.Values(conn.Do("EXEC"))
 
@@ -119,9 +120,28 @@ func GetVideo(hash string) (string, error) {
   conn := Pool.Get()
   defer conn.Close()
 
+  _, err := conn.Do("HINCRBY", "video:" + hash, "views", 1)
+  HandleError(err)
+
+  // each returns type []string, redis cannot bulk convert
+  // bulk would return a slice of interfaces (type: []interface{})
+  // => nightmare conversion
+  likes, err := redis.Strings(conn.Do("SMEMBERS", "video_likes:" + hash))
+  HandleError(err)
+  dislikes, err := redis.Strings(conn.Do("SMEMBERS", "video_dislikes:" + hash))
+  HandleError(err)
+  comments, err := redis.Strings(conn.Do("SMEMBERS", "video_comments:" + hash))
+  HandleError(err)
+
   reply, err := redis.StringMap(conn.Do("HGETALL", "video:" + hash))
 
-  rep, _ := json.Marshal(reply)
+  // type []string must be type asserted to type string
+  // in order to be inserted into type map[string]string
+  reply["likes"] = strings.Join(likes[:], ",")
+  reply["dislikes"] = strings.Join(dislikes[:], ",")
+  reply["comments"] = strings.Join(comments[:], ",")
+
+  rep, err := json.Marshal(reply)
 
   return string(rep), err
 }

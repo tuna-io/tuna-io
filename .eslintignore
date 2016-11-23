@@ -11,3 +11,8 @@ LICENSE
 package.json
 dump.rdb
 /client/build/*
+/client/src/modules/*
+compile.js
+config.toml
+Makefile
+template.html.tpl

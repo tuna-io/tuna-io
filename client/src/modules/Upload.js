@@ -36,7 +36,7 @@ export default class Upload extends React.Component {
     });
 
     // Fetch signed URL
-    fetch('http://127.0.0.1:3000/api/s3', {
+    fetch('/api/s3', {
       method: 'POST',
       body: JSON.stringify({
         filename: currFile.name,
@@ -82,7 +82,7 @@ export default class Upload extends React.Component {
         });
 
         // Post video metadata to the server
-        return fetch('http://127.0.0.1:3000/api/videos', {
+        return fetch('/api/videos', {
           method: 'POST',
           body: JSON.stringify({
             title: this.state.title,

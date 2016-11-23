@@ -14,19 +14,30 @@ import Home from './modules/Home';
 import './index.css';
 import './flexgrid.css';
 
+const routes = {
+  path: '/',
+  component: App,
+  childRoutes: [
+    { path: 'about', component: About },
+    { path: 'repos', component: Repos },
+    { path: 'register', component: Register },
+    { path: 'signin', component: Signin },
+    { path: 'dashboard', component: Dashboard,
+      childRoutes: [
+        { path: 'settings', component: Settings },
+        { path: 'upload', component: Upload }
+      ]
+    },
+    { path: 'videos/:videoId', component: VideoDetails }
+  ]
+}
+
 ReactDOM.render((
-  <Router history={browserHistory}>
-    <Route path="/" component={App} >
-      <IndexRoute component={Home} />
-      <Route path="about" component={About} />
-      <Route path="repos" component={Repos} />
-      <Route path="register" component={Register} />
-      <Route path="signin" component={Signin} />
-      <Route path="dashboard" component={Dashboard} >
-        <Route path="settings" component={Settings} />
-        <Route path="upload" component={Upload} />
-      </Route>
-      <Route path="/videos/:videoId" component={VideoDetails} />
-    </Route>
-  </Router>
-), document.getElementById('root'));
+  <Router 
+    routes={routes}
+    history={browserHistory}
+  />), document.getElementById('root'));
+
+if(module.hot) {
+  module.hot.accept();
+}
