@@ -15,15 +15,20 @@ const (
 // Add api endpoints in here, you are allowed to use httprouter syntax to define parameters
 func (s *Server) DefineEndpoints() {
 	s.Endpoint("version", API_GET|API_POST, VersionEndpoint)
+
 	s.Endpoint("isalive", API_GET, routes.IsAlive)
+
 	s.Endpoint("videos/search/:hash/:query", API_GET, routes.SearchVideo)
 	s.Endpoint("videos/latest", API_GET, routes.GetLatestVideos)
 	s.Endpoint("videos/get/:hash", API_GET, routes.GetVideo)
 	s.Endpoint("videos", API_POST, routes.CreateVideo)
 
+	s.Endpoint("s3", API_POST, routes.SignVideo)
 
-
-
+	s.Endpoint("users/register", API_POST, routes.RegisterUser)
+	s.Endpoint("users/login", API_POST, routes.LoginUser)
+	s.Endpoint("users/logout", API_GET, routes.LogoutUser)
+	s.Endpoint("users/authenticate", API_GET, routes.AuthenticateUser)
 }
 
 func VersionEndpoint(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -37,30 +42,6 @@ func VersionEndpoint(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 
 	w.Write(data)
 }
-
-// api := r.PathPrefix("/api").Subrouter()
-// // allow access for all preflighted requests
-// r.Methods("OPTIONS").HandlerFunc(routes.AllowAccess)
-// /*-------------------------------------
-//  *     `/api/isalive` TEST ROUTE
-//  *------------------------------------*/
-// t := api.Path("/isalive").Subrouter()
-// t.Methods("GET").HandlerFunc(routes.IsAlive)
-
-// /*-------------------------------------
-//  *      `/api/videos` SUB-ROUTER
-//  *------------------------------------*/
-// v := api.PathPrefix("/videos").Subrouter()
-// v.Methods("GET").Path("/latest").HandlerFunc(routes.GetLatestVideos)
-// v.Methods("POST").HandlerFunc(routes.CreateVideo)
-// v.Methods("GET").Path("/search/{hash}/{query}").HandlerFunc(routes.SearchVideo)
-// v.Methods("GET").Path("/{hash}").HandlerFunc(routes.GetVideo)
-
-// -------------------------------------
-//  *      `/api/s3` SUB-ROUTER
-//  *------------------------------------
-// s := api.PathPrefix("/s3").Subrouter()
-// s.Methods("POST").HandlerFunc(routes.SignVideo)
 
 // /*-------------------------------------
 //  *      `/api/users` SUB-ROUTER
