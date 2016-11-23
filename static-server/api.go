@@ -42,21 +42,3 @@ func VersionEndpoint(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 
 	w.Write(data)
 }
-
-// /*-------------------------------------
-//  *      `/api/users` SUB-ROUTER
-//  *------------------------------------*/
-// u := api.PathPrefix("/users").Subrouter()
-// u.Methods("POST").Path("/register").HandlerFunc(routes.RegisterUser)
-// u.Methods("POST").Path("/login").HandlerFunc(routes.LoginUser)
-// u.Methods("GET").Path("/logout").HandlerFunc(routes.LogoutUser)
-// u.Methods("GET").Path("/authenticate").HandlerFunc(routes.AuthenticateUser)
-
-// /*-------------------------------------
-//  *      `/` STATIC FILE SERVER
-//  *------------------------------------*/
-// r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./client/build"))))
-
-// // Start up server and error log
-// log.Println("Listening at port 3000")
-// log.Fatal(http.ListenAndServe(":3000", r))

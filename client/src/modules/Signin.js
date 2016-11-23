@@ -19,7 +19,8 @@ export default class Signin extends React.Component {
   }
 
   handleSubmit(event) {
-    fetch('http://127.0.0.1:3000/api/users/login', {
+
+    fetch('/api/users/login', {
       method: 'POST',
       body: JSON.stringify({
         username: this.state.username,
@@ -27,6 +28,7 @@ export default class Signin extends React.Component {
       }),
       credentials: 'same-origin',
       headers: {
+        Accept: 'application/json',
         'Content-Type': 'application/json',
       },
     })

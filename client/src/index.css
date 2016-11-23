@@ -10,6 +10,10 @@ div.nav-link {
   margin-left: 10px;
 }
 
+.NavItem:hover {
+  background: white;
+}
+
 .video-js {
   /* The base font size controls the size of everything, not just text.
      All dimensions use em-based sizes so that the scale along with the font size.

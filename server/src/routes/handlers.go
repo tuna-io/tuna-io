@@ -153,7 +153,6 @@ func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) 
 *   redigo: nil return
 */
 func GetVideo(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-  AllowAccess(w, req)
   hash := ps.ByName("hash")
   fmt.Println(ps.ByName("hash"))
 
@@ -209,7 +208,6 @@ func GetVideo(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
 *   HTTP/1.1 500 Internal Server Error
 */
 func GetLatestVideos(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-  AllowAccess(w, req)
   videos, err := db.GetLatestVideos()
 
   if (err != nil) {
@@ -396,7 +394,6 @@ var store = sessions.NewCookieStore([]byte("something-very-secret"))
 func init() {
   store.Options = &sessions.Options{
     MaxAge: 3600 * 24 * 30, // 30 days
-    HttpOnly: false,
   }
 }
 
@@ -642,7 +639,6 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request, _ httprouter.Par
 }
 
 func SearchVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-  AllowAccess(w, req)
   hash := mux.Vars(req)["hash"]
   query := mux.Vars(req)["query"]
 

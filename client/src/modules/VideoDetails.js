@@ -40,7 +40,7 @@ class VideoDetails extends Component {
 
   // Helper function to fetch video data
   fetchVideoFromAPI(videoId) {
-    const url = `http://127.0.0.1:3000/api/videos/${videoId}`;
+    const url = `/api/videos/get/${videoId}`;
     const options = {
       method: 'GET',
       headers: new Headers({ 'Content-Type': 'application/json' }),
@@ -120,7 +120,7 @@ class VideoDetails extends Component {
 
   search(e) {
     e.preventDefault();
-    fetch("http://127.0.0.1:3000/api/videos/search/" + this.state.currentVideoDetails.hash + "/" + this.state.query, {
+    fetch("/api/videos/search/" + this.state.currentVideoDetails.hash + "/" + this.state.query, {
       method: "GET",
       credentials: 'same-origin',
       headers: {

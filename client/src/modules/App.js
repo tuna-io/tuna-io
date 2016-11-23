@@ -1,6 +1,7 @@
 import React from 'react';
 import Nav from './Nav';
 import Home from './Home';
+import Rebass from 'rebass';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -18,9 +19,9 @@ export default class App extends React.Component {
   }
 
   authenticateUser() {
-    fetch('http://127.0.0.1:3000/api/users/authenticate', {
+    fetch('/api/users/authenticate', {
       method: 'GET',
-      credentials: 'include',
+      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
       },
