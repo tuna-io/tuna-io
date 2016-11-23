@@ -1,6 +1,8 @@
 import React from 'react';
 import Nav from './Nav';
 import Home from './Home';
+import Rebass from 'rebass';
+import { Grid, Row, Col } from 'react-flexgrid';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -18,9 +20,9 @@ export default class App extends React.Component {
   }
 
   authenticateUser() {
-    fetch('http://127.0.0.1:3000/api/users/authenticate', {
+    fetch('/api/users/authenticate', {
       method: 'GET',
-      credentials: 'include',
+      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -36,18 +38,22 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <div>
-        <Nav loggedIn={this.state.loggedIn} auth={this.authenticateUser} />
+      <Row>
+        <Col xs={2}>
+          <Nav loggedIn={this.state.loggedIn} auth={this.authenticateUser} />
+        </Col>
+        <Col xs={10}>
         {
           this.props.children ?
-          React.cloneElement(
-            this.props.children, {
-              loggedIn: this.state.loggedIn,
-              auth: this.authenticateUser,
-            },
-          ) : <Home loggedIn={this.state.loggedIn} auth={this.authenticateUser} />
+            React.cloneElement(
+              this.props.children, {
+                loggedIn: this.state.loggedIn,
+                auth: this.authenticateUser,
+              },
+            ) : <Home loggedIn={this.state.loggedIn} auth={this.authenticateUser} />
         }
-      </div>
+        </Col>
+      </Row>
     );
   }
 }

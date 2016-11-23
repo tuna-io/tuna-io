@@ -20,7 +20,7 @@ export default class Register extends React.Component {
   }
 
   handleSubmit(event) {
-    fetch('http://127.0.0.1:3000/api/users/register', {
+    fetch('/api/users/register', {
       method: 'POST',
       body: JSON.stringify({
         username: this.state.username,

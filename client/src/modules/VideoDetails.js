@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import videojs from 'video.js';
 import overlay from 'videojs-overlay';
+import { Grid, Row, Col } from 'react-flexgrid';
+import { Badge, Space, InlineForm, Panel, PanelHeader, Text, Avatar, Heading, Flex, Donut, Stat } from 'rebass';
+import TimeAgo from 'react-timeago';
 
 // TODO: prevent errors if there is no transcript
 // TODO: remove duplicate code in upload
@@ -40,7 +43,7 @@ class VideoDetails extends Component {
 
   // Helper function to fetch video data
   fetchVideoFromAPI(videoId) {
-    const url = `http://127.0.0.1:3000/api/videos/${videoId}`;
+    const url = `/api/videos/get/${videoId}`;
     const options = {
       method: 'GET',
       headers: new Headers({ 'Content-Type': 'application/json' }),
@@ -90,6 +93,10 @@ class VideoDetails extends Component {
     videoDetails.likes = likes.slice(1);
     videoDetails.dislikes = dislikes.slice(1);
     videoDetails.comments = comments.slice(1);
+
+    videoDetails.likesCount = videoDetails.likes.length;
+    videoDetails.dislikesCount = videoDetails.dislikes.length;
+    videoDetails.ldRatio = videoDetails.likes.length / (videoDetails.likes.length + videoDetails.dislikes.length);
     this.setState({currentVideoDetails: videoDetails});
   }
 
@@ -120,7 +127,7 @@ class VideoDetails extends Component {
 
   search(e) {
     e.preventDefault();
-    fetch("http://127.0.0.1:3000/api/videos/search/" + this.state.currentVideoDetails.hash + "/" + this.state.query, {
+    fetch("/api/videos/search/" + this.state.currentVideoDetails.hash + "/" + this.state.query, {
       method: "GET",
       credentials: 'same-origin',
       headers: {
@@ -161,11 +168,8 @@ class VideoDetails extends Component {
   renderSearchForm() {
     if (this.state.transcript.length) {
       return (
-        <form onSubmit={this.search}>
-          Search:
-          <input type="text" name="query" onChange={this.handleChange} />
-          <input type="submit" value="Submit" />
-        </form>
+        <InlineForm buttonLabel="Search" label="InlineForm" name="query"
+          onChange={this.handleChange} onClick={this.search} />
       );
     }
     return null;
@@ -202,7 +206,7 @@ class VideoDetails extends Component {
   }
 
   loadVideoJS(input) {
-    videojs(document.getElementById('my-video'), {}, () => {
+    videojs(document.getElementById('my-video'), {fluid: true}, () => {
       this.myVideo = input;
       this.myPlayer = this;
     });
@@ -229,35 +233,87 @@ class VideoDetails extends Component {
     if (this.state.currentVideoDetails) {
 
       return (
-        <div>
-          <h1>{this.state.currentVideoDetails.title}</h1>
-          <div>
-            <video ref={(input) => this.loadVideoJS(input)} id="my-video"
-              className="video-js vjs-sublime-skin" controls preload="auto"
-              width="640" height="264" poster="" data-setup="{}"
-              src={this.state.currentVideoDetails.url} type="video/webm" />
-            <button onClick={() => this.renderOverlay()}>Turn on subtitles</button>
-          </div>
-          <div>Creator: {this.state.currentVideoDetails.creator}</div>
-          <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
-          <div>Description: {this.state.currentVideoDetails.description}</div>
-          <div>Extension: {this.state.currentVideoDetails.extension}</div>
-          <div>Views: {this.state.currentVideoDetails.views}</div>
-          <div>Likes: {this.state.currentVideoDetails.likes.length}</div>
-          <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div>
-          {this.state.currentVideoDetails.private === 1 ?
-            <div>PRIVATE</div> : null
-          }
-          {
-            this.renderTranscript()
-          }
-          {
-            this.renderSearchForm()
-          }
-          {
-            this.renderSearchResults()
-          }
-        </div>
+        <Row>
+          <Space x={4} />
+          <Col xs={8}>
+            <div>
+              <video ref={(input) => this.loadVideoJS(input)} id="my-video"
+                className="video-js vjs-sublime-skin vjs-16-9" controls preload="auto"
+                width="640" height="264" poster="" data-setup="{}"
+                src={this.state.currentVideoDetails.url} type="video/webm" />
+              <button onClick={() => this.renderOverlay()}>Turn on subtitles</button>
+            </div>
+            <Panel theme="default">
+              <PanelHeader inverted theme="default">
+                {this.state.currentVideoDetails.title}
+              </PanelHeader>
+              <Text>
+                <Row>
+                  <Col xs={0}>
+                    <Avatar circle size={48} src="http://lorempixel.com/output/animals-q-c-64-64-8.jpg"/>
+                  </Col>
+                  <Col xs={1}>
+                    <Heading size={5} alt={true}>
+                      {this.state.currentVideoDetails.creator}
+                    </Heading>
+
+                    <Badge rounded theme="info"> 4.5M </Badge> 
+                  </Col>
+                </Row>
+                <Row>
+                  <Col xs={5}>
+                    <div>
+                      Uploaded: 
+                      <TimeAgo 
+                        date={this.state.currentVideoDetails.timestamp} />
+                    </div>
+                  </Col>
+                  <Col xs={3}>
+                    {this.state.currentVideoDetails.private == 1 ?
+                      <Badge pill rounded theme="warning">PRIVATE</Badge> : 
+                      <Badge pill rounded theme="success">PUBLIC</Badge>
+                    }
+                  </Col>
+                </Row>
+                <div>Description: {this.state.currentVideoDetails.description}</div>
+                <Row>
+                  <Col xs={2}>
+                    <Stat label="VIEWS" 
+                    value={this.state.currentVideoDetails.views} />
+                  </Col>
+                  <Col xs={2}>
+                    <Stat label="LIKES" 
+                    value={this.state.currentVideoDetails.likesCount} />
+                  </Col>
+                  <Col xs={2}>
+                    <Stat label="DISLIKES" 
+                    value={this.state.currentVideoDetails.dislikesCount} />
+                  </Col>
+                  <Col xs={2}>
+                    <Donut color="warning" size={100} strokeWidth={12} 
+                      value={this.state.currentVideoDetails.ldRatio}> 
+                      {this.state.currentVideoDetails.likesCount}/
+                      {this.state.currentVideoDetails.dislikesCount + 
+                        this.state.currentVideoDetails.likesCount}
+                    </Donut>
+                  </Col>
+                </Row>
+              </Text>
+            </Panel>
+          </Col>
+          <Space x={4} />
+          <Col xs={3}>
+            {
+              this.renderSearchForm()
+            }
+            {
+              this.renderTranscript()
+            }
+            {
+              this.renderSearchResults()
+            }
+          </Col>
+        </Row>
       );
     } else {
       return (<div />);

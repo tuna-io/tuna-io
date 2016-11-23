@@ -11,10 +11,10 @@ import (
   "crypto/md5"
   "encoding/hex"
   "encoding/json"
-  "github.com/gorilla/mux"
   "github.com/gorilla/sessions"
   "github.com/aws/aws-sdk-go/aws"
   "github.com/mediawen/watson-go-sdk"
+  "github.com/julienschmidt/httprouter"
   "github.com/aws/aws-sdk-go/service/s3"
   "github.com/aws/aws-sdk-go/aws/session"
 )
@@ -38,7 +38,7 @@ func HandleError(err error) {
  *   HTTP/1.1 404 Not Found
  *   Failed to connect to localhost port 3000: Connection refused
  */
-func IsAlive(w http.ResponseWriter, req *http.Request) {
+func IsAlive(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
   w.Write([]byte("I'm Alive"))
 }
 
@@ -84,7 +84,7 @@ type Response struct {
 *   HTTP/1.1 500 Internal Server Error
 *   Redigo failed to create and store the video
 */
-func CreateVideo(w http.ResponseWriter, req *http.Request) {
+func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
   decoder := json.NewDecoder(req.Body)
   video := new(db.Video)
   err := decoder.Decode(&video)
@@ -151,9 +151,9 @@ func CreateVideo(w http.ResponseWriter, req *http.Request) {
 *   HTTP/1.1 404 Not Found
 *   redigo: nil return
 */
-func GetVideo(w http.ResponseWriter, req *http.Request) {
-  AllowAccess(w, req)
-  hash := mux.Vars(req)["hash"]
+func GetVideo(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  hash := ps.ByName("hash")
+  fmt.Println(ps.ByName("hash"))
 
   video, err := db.GetVideo(hash)
   w.Header().Set("Content-Type", "application/json")
@@ -206,8 +206,7 @@ func GetVideo(w http.ResponseWriter, req *http.Request) {
 * @apiErrorExample Error-Response:
 *   HTTP/1.1 500 Internal Server Error
 */
-func GetLatestVideos(w http.ResponseWriter, req *http.Request) {
-  AllowAccess(w, req)
+func GetLatestVideos(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
   videos, err := db.GetLatestVideos()
 
   if (err != nil) {
@@ -320,7 +319,7 @@ type Vidfile struct {
 * @apiErrorExample Error-Response:
 *   HTTP/1.1 403 Permission denied (check your credentials!)
 */
-func SignVideo(w http.ResponseWriter, r *http.Request) {
+func SignVideo(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
   decoder := json.NewDecoder(r.Body)
 
@@ -419,8 +418,7 @@ func SetSession(username string, w http.ResponseWriter, req *http.Request) {
 *   HTTP/1.1 200 OK
 *   Username already exists!
 */
-func RegisterUser(w http.ResponseWriter, req *http.Request) {
-  AllowAccess(w, req)
+func RegisterUser(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
   type Registration struct {
     Username  string  `json:"username"`
@@ -495,8 +493,7 @@ func RegisterUser(w http.ResponseWriter, req *http.Request) {
 *   HTTP/1.1 401 Unauthorized
 *   Incorrect credentials provided!
 */
-func LoginUser(w http.ResponseWriter, req *http.Request) {
-  AllowAccess(w, req)
+func LoginUser(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
   type Login struct {
     Username  string  `json:"username"`
@@ -566,8 +563,7 @@ func LoginUser(w http.ResponseWriter, req *http.Request) {
 *   Cookies successfully cleared!
 *
 */
-func LogoutUser(w http.ResponseWriter, req *http.Request) {
-  AllowAccess(w, req)
+func LogoutUser(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
   session, err := store.Get(req, "session-id")
   HandleError(err)
@@ -606,9 +602,7 @@ func LogoutUser(w http.ResponseWriter, req *http.Request) {
 *   HTTP/1.1 401 Unauthorized
 *   http: named cookie not present
 */
-func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
-  AllowAccess(w, req)
-  w.Header().Set("Content-Type", "text/plain")
+func AuthenticateUser(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
   session, err := store.Get(req, "session-id")
   HandleError(err)
 
@@ -643,10 +637,9 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request) {
   }
 }
 
-func SearchVideo(w http.ResponseWriter, req *http.Request) {
-  AllowAccess(w, req)
-  hash := mux.Vars(req)["hash"]
-  query := mux.Vars(req)["query"]
+func SearchVideo(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  hash := ps.ByName("hash")
+  query := ps.ByName("query")
 
   transcript, err := db.GetVideoTranscript(hash)
 
