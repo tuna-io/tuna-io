@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import videojs from 'video.js';
 import overlay from 'videojs-overlay';
 import { Grid, Row, Col } from 'react-flexgrid';
-import { Badge, Space, InlineForm, Panel, PanelHeader, Text, Avatar, Heading, Flex, Donut } from 'rebass';
+import { Badge, Space, InlineForm, Panel, PanelHeader, Text, Avatar, Heading, Flex, Donut, Stat } from 'rebass';
 
 // TODO: prevent errors if there is no transcript
 // TODO: remove duplicate code in upload
@@ -259,24 +259,42 @@ class VideoDetails extends Component {
                     <Badge rounded theme="info"> 4.5M </Badge> 
                   </Col>
                 </Row>
-                <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
-                <div>Description: {this.state.currentVideoDetails.description}</div>
                 <Row>
+                  <Col xs={5}>
+                    <div>
+                      Uploaded {this.state.currentVideoDetails.timestamp}
+                    </div>
+                  </Col>
                   <Col xs={3}>
-                    Views: {this.state.currentVideoDetails.views}
+                    {this.state.currentVideoDetails.private == 1 ?
+                      <Badge pill rounded theme="warning">PRIVATE</Badge> : 
+                      <Badge pill rounded theme="success">PUBLIC</Badge>
+                    }
                   </Col>
                 </Row>
-                <div>Likes: {this.state.currentVideoDetails.likes.length}</div>
-                <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div>
-                <Donut color="success" size={100} strokeWidth={12} 
-                  value={this.state.currentVideoDetails.ldRatio}> 
-                  {this.state.currentVideoDetails.likesCount}/
-                  {this.state.currentVideoDetails.dislikesCount}
-                </Donut>
-                {this.state.currentVideoDetails.private == 1 ?
-                  <Badge pill rounded theme="warning">PRIVATE</Badge> : 
-                  <Badge pill rounded theme="success">PUBLIC</Badge>
-                }
+                <div>Description: {this.state.currentVideoDetails.description}</div>
+                <Row>
+                  <Col xs={2}>
+                    <Stat label="VIEWS" 
+                    value={this.state.currentVideoDetails.views} />
+                  </Col>
+                  <Col xs={2}>
+                    <Stat label="LIKES" 
+                    value={this.state.currentVideoDetails.likesCount} />
+                  </Col>
+                  <Col xs={2}>
+                    <Stat label="DISLIKES" 
+                    value={this.state.currentVideoDetails.dislikesCount} />
+                  </Col>
+                  <Col xs={2}>
+                    <Donut color="warning" size={100} strokeWidth={12} 
+                      value={this.state.currentVideoDetails.ldRatio}> 
+                      {this.state.currentVideoDetails.likesCount}/
+                      {this.state.currentVideoDetails.dislikesCount + 
+                        this.state.currentVideoDetails.likesCount}
+                    </Donut>
+                  </Col>
+                </Row>
               </Text>
             </Panel>
           </Col>
