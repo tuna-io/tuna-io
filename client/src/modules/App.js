@@ -42,7 +42,7 @@ export default class App extends React.Component {
         <Col xs={2}>
           <Nav loggedIn={this.state.loggedIn} auth={this.authenticateUser} />
         </Col>
-        <Col xs={8}>
+        <Col xs={10}>
         {
           this.props.children ?
             React.cloneElement(

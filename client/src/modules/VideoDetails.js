@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import videojs from 'video.js';
 import overlay from 'videojs-overlay';
 import { Grid, Row, Col } from 'react-flexgrid';
+import { Badge } from 'rebass';
 
 // TODO: prevent errors if there is no transcript
 // TODO: remove duplicate code in upload
@@ -246,9 +247,11 @@ class VideoDetails extends Component {
             <div>Extension: {this.state.currentVideoDetails.extension}</div>
             <div>Views: {this.state.currentVideoDetails.views}</div>
             <div>Likes: {this.state.currentVideoDetails.likes.length}</div>
-            <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div>
-            {this.state.currentVideoDetails.private === 1 ?
-              <div>PRIVATE</div> : null
+            <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div> 
+            {console.log(this.state.currentVideoDetails.private)}
+            {this.state.currentVideoDetails.private == 1 ?
+              <Badge pill rounded theme="warning">PRIVATE</Badge> : 
+              <Badge pill rounded theme="success">PUBLIC</Badge>
             }
           </Col>
           <Col xs={3}>
