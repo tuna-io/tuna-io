@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import videojs from 'video.js';
 import overlay from 'videojs-overlay';
 import { Grid, Row, Col } from 'react-flexgrid';
-import { Badge } from 'rebass';
+import { Badge, Space } from 'rebass';
 
 // TODO: prevent errors if there is no transcript
 // TODO: remove duplicate code in upload
@@ -232,15 +232,16 @@ class VideoDetails extends Component {
 
       return (
         <Row>
-          <Col xs={9}>
-            <h1>{this.state.currentVideoDetails.title}</h1>
+          <Space x={4} />
+          <Col xs={8}>
             <div>
               <video ref={(input) => this.loadVideoJS(input)} id="my-video"
-                className="video-js vjs-sublime-skin" controls preload="auto"
+                className="video-js vjs-sublime-skin vjs-16-9" controls preload="auto"
                 width="640" height="264" poster="" data-setup="{}"
                 src={this.state.currentVideoDetails.url} type="video/webm" />
               <button onClick={() => this.renderOverlay()}>Turn on subtitles</button>
             </div>
+            <h1>{this.state.currentVideoDetails.title}</h1>
             <div>Creator: {this.state.currentVideoDetails.creator}</div>
             <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
             <div>Description: {this.state.currentVideoDetails.description}</div>
@@ -254,6 +255,7 @@ class VideoDetails extends Component {
               <Badge pill rounded theme="success">PUBLIC</Badge>
             }
           </Col>
+          <Space x={4} />
           <Col xs={3}>
             {
               this.renderTranscript()
