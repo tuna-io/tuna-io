@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import videojs from 'video.js';
 import overlay from 'videojs-overlay';
 import { Grid, Row, Col } from 'react-flexgrid';
-import { Badge, Space, InlineForm } from 'rebass';
+import { Badge, Space, InlineForm, Panel, PanelHeader, Text } from 'rebass';
 
 // TODO: prevent errors if there is no transcript
 // TODO: remove duplicate code in upload
@@ -238,19 +238,25 @@ class VideoDetails extends Component {
                 src={this.state.currentVideoDetails.url} type="video/webm" />
               <button onClick={() => this.renderOverlay()}>Turn on subtitles</button>
             </div>
-            <h1>{this.state.currentVideoDetails.title}</h1>
-            <div>Creator: {this.state.currentVideoDetails.creator}</div>
-            <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
-            <div>Description: {this.state.currentVideoDetails.description}</div>
-            <div>Extension: {this.state.currentVideoDetails.extension}</div>
-            <div>Views: {this.state.currentVideoDetails.views}</div>
-            <div>Likes: {this.state.currentVideoDetails.likes.length}</div>
-            <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div> 
-            {console.log(this.state.currentVideoDetails.private)}
-            {this.state.currentVideoDetails.private == 1 ?
-              <Badge pill rounded theme="warning">PRIVATE</Badge> : 
-              <Badge pill rounded theme="success">PUBLIC</Badge>
-            }
+            <Panel theme="default">
+              <PanelHeader inverted theme="default">
+                {this.state.currentVideoDetails.title}
+              </PanelHeader>
+              <Text>
+                <div>Creator: {this.state.currentVideoDetails.creator}</div>
+                <div>Uploaded: {this.state.currentVideoDetails.timestamp}</div>
+                <div>Description: {this.state.currentVideoDetails.description}</div>
+                <div>Extension: {this.state.currentVideoDetails.extension}</div>
+                <div>Views: {this.state.currentVideoDetails.views}</div>
+                <div>Likes: {this.state.currentVideoDetails.likes.length}</div>
+                <div>Dislikes: {this.state.currentVideoDetails.dislikes.length}</div> 
+                {console.log(this.state.currentVideoDetails.private)}
+                {this.state.currentVideoDetails.private == 1 ?
+                  <Badge pill rounded theme="warning">PRIVATE</Badge> : 
+                  <Badge pill rounded theme="success">PUBLIC</Badge>
+                }
+              </Text>
+            </Panel>
           </Col>
           <Space x={4} />
           <Col xs={3}>
