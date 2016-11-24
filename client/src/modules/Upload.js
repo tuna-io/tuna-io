@@ -80,9 +80,19 @@ export default class Upload extends React.Component {
         this.setState({
           videoReturned: true,
         });
+        
+        // Retrieve metadata to inform progress bar
+        fetch(`/api/videos/metadata/https://s3-us-west-1.amazonaws.com/invalidmemories/${this.state.file.name}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
+        .then(res => console.log(res))
+        .catch(err => console.log('Error retrieving metadata:', err));
 
         // Post video metadata to the server
-        return fetch('/api/videos', {
+        fetch('/api/videos', {
           method: 'POST',
           body: JSON.stringify({
             title: this.state.title,
@@ -97,6 +107,7 @@ export default class Upload extends React.Component {
           },
         })
         .catch(err => console.log('Error posting video to /api/videos:', err));
+
       })
       .then(rawResp => rawResp.json())
       .then((resp) => {
