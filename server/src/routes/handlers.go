@@ -238,6 +238,16 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
   return t, err
 }
 
+type Metadata struct {
+  VideoURL  string  `json:"videourl"`
+}
+
+func GetVideoMetadata(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+  video := ps.ByName("videourl")
+  fmt.Println(video)
+}
+
 
 /*-------------------------------------
  *      AUDIO FILE TRANSCRIPTION
