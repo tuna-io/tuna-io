@@ -55,12 +55,12 @@ class VideoDetails extends Component {
     .then((jsonResponse) => {
       this.setState({ currentVideoDetails: jsonResponse });
 
-      var transcript = JSON.parse(jsonResponse.transcript);
+      const transcript = JSON.parse(jsonResponse.transcript);
       this.saveTranscript(transcript);
 
-      var likes = jsonResponse.likes.split(',')
-      var dislikes = jsonResponse.dislikes.split(',')
-      var comments = jsonResponse.comments.split(',')
+      const likes = jsonResponse.likes.split(',');
+      const dislikes = jsonResponse.dislikes.split(',');
+      const comments = jsonResponse.comments.split(',');
       this.parseMetadata(likes, dislikes, comments);
     })
     .catch((err) => {
@@ -73,21 +73,21 @@ class VideoDetails extends Component {
     const dislikesArray = [];
     const commentsArray = [];
 
-    likes.forEach(e => {
+    likes.forEach((e) => {
       if (e.length !== 0) {
         likesArray.push(e);
       }
     });
-    dislikes.forEach(e => {
+    dislikes.forEach((e) => {
       if (e.length !== 0) {
         dislikesArray.push(e);
       }
-    })
-    comments.forEach(e => {
+    });
+    comments.forEach((e) => {
       if (e.length !== 0) {
         comments.push(e);
       }
-    })
+    });
 
     const videoDetails = this.state.currentVideoDetails;
     videoDetails.likes = likes.slice(1);
@@ -96,8 +96,9 @@ class VideoDetails extends Component {
 
     videoDetails.likesCount = videoDetails.likes.length;
     videoDetails.dislikesCount = videoDetails.dislikes.length;
-    videoDetails.ldRatio = videoDetails.likes.length / (videoDetails.likes.length + videoDetails.dislikes.length);
-    this.setState({currentVideoDetails: videoDetails});
+    videoDetails.ldRatio =
+      videoDetails.likes.length / (videoDetails.likes.length + videoDetails.dislikes.length);
+    this.setState({ currentVideoDetails: videoDetails });
   }
 
   // save transcript words and times
@@ -105,12 +106,11 @@ class VideoDetails extends Component {
     const newTranscript = [];
 
     transcript.Words.forEach(word =>
-      newTranscript.push({ 
+      newTranscript.push({
         word: word.Token,
         starttime: word.Begin,
-        endtime: word.End
-      })
-    );
+        endtime: word.End,
+      }));
 
     this.setState({
       transcript: newTranscript,
@@ -127,7 +127,7 @@ class VideoDetails extends Component {
 
   search(e) {
     e.preventDefault();
-    fetch("/api/videos/search/" + this.state.currentVideoDetails.hash + "/" + this.state.query, {
+    fetch('/api/videos/search/' + this.state.currentVideoDetails.hash + '/' + this.state.query, {
       method: "GET",
       credentials: 'same-origin',
       headers: {
@@ -146,8 +146,25 @@ class VideoDetails extends Component {
   }
 
 
-  findTime(time, event) {
+  findTime(time) {
     this.myVideo.currentTime = time;
+  }
+
+  loadVideoJS(input) {
+    videojs(document.getElementById('my-video'), { fluid: true }, () => {
+      this.myVideo = input;
+      this.myPlayer = this;
+    });
+  }
+
+  generateOverlay(transcript) {
+    transcript.forEach(word =>
+      this.overlay.push({
+        content: word.word,
+        start: word.starttime,
+        end: word.endtime,
+        align: 'bottom',
+      }));
   }
 
   // Transcript is rendered after server-side transcription
@@ -168,8 +185,10 @@ class VideoDetails extends Component {
   renderSearchForm() {
     if (this.state.transcript.length) {
       return (
-        <InlineForm buttonLabel="Search" label="InlineForm" name="query"
-          onChange={this.handleChange} onClick={this.search} />
+        <InlineForm
+          buttonLabel="Search" label="InlineForm" name="query"
+          onChange={this.handleChange} onClick={this.search}
+        />
       );
     }
     return null;
@@ -181,23 +200,21 @@ class VideoDetails extends Component {
         <div>
           <div> Search results: </div>
           <div>
-            {this.state.searchResults ? (this.state.searchResults.map((i)=> {
-              return (
+            {this.state.searchResults ? (this.state.searchResults.map(i =>
+              (
                 <button onClick={
-                  this.findTime.bind(this, this.state.transcript[i].endtime)}>
+                  this.findTime.bind(this, this.state.transcript[i].endtime)}
+                >
                   {
                     Math.floor(this.state.transcript[i].endtime / 60) + ":" +
                     this.state.transcript[i].endtime % 60 + '--' +
                     this.state.transcript.slice(Math.max(i - 4, 0),
                     Math.min(i + 5, this.state.transcript.length))
                     .map(pair => pair.word)
-                    .reduce((fword, sword) => {
-                      return `${fword} ${sword}`
-                    })
+                    .reduce((fword, sword) => `${fword} ${sword}`)
                   }
                 </button>
-              )
-            })) : null }
+              ))) : null }
           </div>
         </div>
       );
@@ -205,42 +222,25 @@ class VideoDetails extends Component {
     return null;
   }
 
-  loadVideoJS(input) {
-    videojs(document.getElementById('my-video'), {fluid: true}, () => {
-      this.myVideo = input;
-      this.myPlayer = this;
-    });
-  }
-
-  generateOverlay(transcript) {
-    transcript.forEach(word => {
-      this.overlay.push({
-        content: word.word,
-        start: word.starttime,
-        end: word.endtime,
-        align: 'bottom'
-      });
-    });
-  }
 
   renderOverlay() {
     videojs(document.getElementById('my-video')).overlay({
-      overlays: this.overlay
+      overlays: this.overlay,
     });
   }
 
   render() {
     if (this.state.currentVideoDetails) {
-
       return (
         <Row>
           <Space x={4} />
           <Col xs={8}>
             <div>
-              <video ref={(input) => this.loadVideoJS(input)} id="my-video"
+              <video ref={input => this.loadVideoJS(input)} id="my-video"
                 className="video-js vjs-sublime-skin vjs-16-9" controls preload="auto"
                 width="640" height="264" poster="" data-setup="{}"
-                src={this.state.currentVideoDetails.url} type="video/webm" />
+                src={this.state.currentVideoDetails.url} type="video/webm"
+              />
               <button onClick={() => this.renderOverlay()}>Turn on subtitles</button>
             </div>
             <Panel theme="default">
@@ -250,27 +250,28 @@ class VideoDetails extends Component {
               <Text>
                 <Row>
                   <Col xs={0}>
-                    <Avatar circle size={48} src="http://lorempixel.com/output/animals-q-c-64-64-8.jpg"/>
+                    <Avatar circle size={48} src="http://lorempixel.com/output/animals-q-c-64-64-8.jpg" />
                   </Col>
                   <Col xs={1}>
-                    <Heading size={5} alt={true}>
+                    <Heading size={5} alt>
                       {this.state.currentVideoDetails.creator}
                     </Heading>
 
-                    <Badge rounded theme="info"> 4.5M </Badge> 
+                    <Badge rounded theme="info"> 4.5M </Badge>
                   </Col>
                 </Row>
                 <Row>
                   <Col xs={5}>
                     <div>
-                      Uploaded: 
-                      <TimeAgo 
-                        date={this.state.currentVideoDetails.timestamp} />
+                      Uploaded:
+                      <TimeAgo
+                        date={this.state.currentVideoDetails.timestamp}
+                      />
                     </div>
                   </Col>
                   <Col xs={3}>
                     {this.state.currentVideoDetails.private == 1 ?
-                      <Badge pill rounded theme="warning">PRIVATE</Badge> : 
+                      <Badge pill rounded theme="warning">PRIVATE</Badge> :
                       <Badge pill rounded theme="success">PUBLIC</Badge>
                     }
                   </Col>
@@ -278,22 +279,30 @@ class VideoDetails extends Component {
                 <div>Description: {this.state.currentVideoDetails.description}</div>
                 <Row>
                   <Col xs={2}>
-                    <Stat label="VIEWS" 
-                    value={this.state.currentVideoDetails.views} />
+                    <Stat
+                      label="VIEWS"
+                      value={this.state.currentVideoDetails.views}
+                    />
                   </Col>
                   <Col xs={2}>
-                    <Stat label="LIKES" 
-                    value={this.state.currentVideoDetails.likesCount} />
+                    <Stat
+                      label="LIKES"
+                      value={this.state.currentVideoDetails.likesCount}
+                    />
                   </Col>
                   <Col xs={2}>
-                    <Stat label="DISLIKES" 
-                    value={this.state.currentVideoDetails.dislikesCount} />
+                    <Stat
+                      label="DISLIKES"
+                      value={this.state.currentVideoDetails.dislikesCount}
+                    />
                   </Col>
                   <Col xs={2}>
-                    <Donut color="warning" size={100} strokeWidth={12} 
-                      value={this.state.currentVideoDetails.ldRatio}> 
+                    <Donut
+                      color="warning" size={100} strokeWidth={12}
+                      value={this.state.currentVideoDetails.ldRatio}
+                    >
                       {this.state.currentVideoDetails.likesCount}/
-                      {this.state.currentVideoDetails.dislikesCount + 
+                      {this.state.currentVideoDetails.dislikesCount +
                         this.state.currentVideoDetails.likesCount}
                     </Donut>
                   </Col>
@@ -315,9 +324,8 @@ class VideoDetails extends Component {
           </Col>
         </Row>
       );
-    } else {
-      return (<div />);
     }
+    return (<div />);
   }
 }
 
