@@ -442,18 +442,23 @@ class Wordcloud extends React.Component {
     ];
 
     this.state = {
-      wordCounts: this.transformTranscript(props.transcript),
+      wordCounts: this.transformTranscript(props.transcript, false),
     };
+
+    this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   // Returns an object for the Tagcloud library
-  transformTranscript(transcript) {
+  transformTranscript(transcript, includeStopWords) {
     const counts = {};
 
     transcript
-      .map(obj => obj.word) // get words from transcript
-      .filter(word => !this.stopWords.includes(word)) // filter out stoplist words
-      .forEach((word) => { // turn into count object
+      // get words from transcript
+      .map(obj => obj.word)
+      // filter out stoplist words
+      .filter(word => (includeStopWords ? true : !this.stopWords.includes(word)))
+      // turn into count object
+      .forEach((word) => {
         counts[word] = counts[word] ? counts[word] + 1 : 1;
       });
 
@@ -468,10 +473,17 @@ class Wordcloud extends React.Component {
     return data;
   }
 
+  handleInputChange(event) {
+    const newWordcloud = this.transformTranscript(this.props.transcript, event.target.checked);
+    this.setState({ wordCounts: newWordcloud });
+  }
+
   render() {
     return (
       <div>
         <h3>Word cloud</h3>
+        <span>Include common words: </span>
+        <input type="checkbox" onChange={this.handleInputChange} />
         <TagCloud
           minSize={15}
           maxSize={40}
