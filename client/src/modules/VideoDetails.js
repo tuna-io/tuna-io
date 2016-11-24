@@ -183,7 +183,6 @@ class VideoDetails extends Component {
     );
   }
 
-  // Transcript is rendered after server-side transcription
   renderWordcloud() {
     return this.state.transcript.length ?
       (
