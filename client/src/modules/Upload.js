@@ -16,6 +16,9 @@ export default class Upload extends React.Component {
       description: '',
       private: false,
       hash: '',
+
+      // metadata
+      duration: '',
     };
 
     // Bind helper functions in constructor
@@ -71,7 +74,9 @@ export default class Upload extends React.Component {
       }
     })
     .then(jsonRes => jsonRes.json())
-    .then(res => console.log(res))
+    .then(res => {
+      this.setState({ duration: res });
+    })
     .catch(err => console.log('Error retrieving metadata:', err));
   }
 
