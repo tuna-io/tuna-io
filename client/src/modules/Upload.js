@@ -127,7 +127,8 @@ export default class Upload extends React.Component {
       .then((resp) => {
         console.log('resp.hash', resp.hash);
         this.setState({
-          hash: resp.hash
+          hash: resp.hash,
+          duration: '',
         });
       })
       .catch(err => console.log('Error uploading video to CDN:', err));
@@ -169,13 +170,12 @@ export default class Upload extends React.Component {
     let timer = 0;
 
     setInterval(() => {
-      if (timer <= this.state.duration + 1) {
-        timer++;
-        console.log('timer is:', timer);
+      if (timer <= this.state.duration) {
+        timer += 0.1;
         let progress = timer / this.state.duration;
         this.setState({progress: progress});
       }
-    }, 1000).bind(this);
+    }, 100).bind(this);
   }
 
   renderProgressBar() {
@@ -184,16 +184,14 @@ export default class Upload extends React.Component {
       <div>
         <Circle
           progress={this.state.progress}
-          text={'Transcribing video'}
-          options={{strokeWidth: 2}}
+          text={'Transcribing video... ' + Math.floor(this.state.progress * 100, 2) + '%'}
+          options={{strokeWidth: 5}}
           initialAnimate={true}
           containerStyle={{
             width: '200px',
             height: '200px',
           }}
           containerClassName={'.progressbar'} />
-        Progress is {this.state.progress}
-        Duration is {this.state.duration}
       </div>
     ) : null;
   }
