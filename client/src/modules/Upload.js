@@ -102,7 +102,7 @@ export default class Upload extends React.Component {
       .then((resp) => {
         console.log('resp.hash', resp.hash);
         this.setState({
-          hash: resp.hash
+          hash: resp.hash,
         });
       })
       .catch(err => console.log('Error uploading video to CDN:', err));
