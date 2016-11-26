@@ -1,6 +1,7 @@
 import React from 'react';
 import Dropzone from 'react-dropzone';
 import { Link } from 'react-router';
+import Timer from 'react-timer';
 
 // TODO: render video details page instead of duplicating functionality
 export default class Upload extends React.Component {
@@ -161,6 +162,17 @@ export default class Upload extends React.Component {
     ) : null;
   }
 
+  renderProgressBar() {
+    let OPTIONS = { delay: 100 }
+    return this.state.duration ? 
+    (
+      <div>
+        <Timer options={OPTIONS} />
+        Duration is {this.state.duration}
+      </div>
+    ) : null;
+  }
+
   // Video is rendered after a successful upload to the CDN
   renderVideoModule() {
     return this.state.hash ? (<div>See video here: <Link to={`/videos/${this.state.hash}`}>{ this.state.title }</Link></div>) 
@@ -180,6 +192,9 @@ export default class Upload extends React.Component {
         </Dropzone>
         {
           this.renderVideoOptionsForm()
+        }
+        {
+          this.renderProgressBar()
         }
         {
           this.renderVideoModule()
