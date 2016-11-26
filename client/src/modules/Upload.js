@@ -62,6 +62,19 @@ export default class Upload extends React.Component {
     this.setState({ [event.target.name]: value });
   }
 
+  // Get video metadata
+  getVideoMetadata(url) {
+    return fetch(`/api/videos/metadata/${url}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(jsonRes => jsonRes.json())
+    .then(res => console.log(res))
+    .catch(err => console.log('Error retrieving metadata:', err));
+  }
+
   // Triggered on video options form submission
   submitVideoToCDN(event) {
     // Prevent page refresh
@@ -81,18 +94,10 @@ export default class Upload extends React.Component {
           videoReturned: true,
         });
         
-        // Retrieve metadata to inform progress bar
-        fetch(`/api/videos/metadata/https://s3-us-west-1.amazonaws.com/invalidmemories/${this.state.file.name}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        })
-        .then(res => console.log(res))
-        .catch(err => console.log('Error retrieving metadata:', err));
-
         // Post video metadata to the server
-        fetch('/api/videos', {
+        this.getVideoMetadata(this.state.file.name);
+
+        return fetch('/api/videos', {
           method: 'POST',
           body: JSON.stringify({
             title: this.state.title,
