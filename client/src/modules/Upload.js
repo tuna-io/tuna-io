@@ -1,7 +1,8 @@
 import React from 'react';
 import Dropzone from 'react-dropzone';
 import { Link } from 'react-router';
-import Timer from 'react-timer';
+// import { Line } from 'rc-progress';
+import { Circle } from 'react-progressbar.js';
 
 // TODO: render video details page instead of duplicating functionality
 export default class Upload extends React.Component {
@@ -20,6 +21,7 @@ export default class Upload extends React.Component {
 
       // metadata
       duration: '',
+      progress: '',
     };
 
     // Bind helper functions in constructor
@@ -77,6 +79,7 @@ export default class Upload extends React.Component {
     .then(jsonRes => jsonRes.json())
     .then(res => {
       this.setState({ duration: res });
+      this.trackProgress();
     })
     .catch(err => console.log('Error retrieving metadata:', err));
   }
@@ -162,12 +165,34 @@ export default class Upload extends React.Component {
     ) : null;
   }
 
+  trackProgress() {
+    let timer = 0;
+
+    setInterval(() => {
+      if (timer <= this.state.duration + 1) {
+        timer++;
+        console.log('timer is:', timer);
+        let progress = timer / this.state.duration;
+        this.setState({progress: progress});
+      }
+    }, 1000).bind(this);
+  }
+
   renderProgressBar() {
-    let OPTIONS = { delay: 100 }
     return this.state.duration ? 
     (
       <div>
-        <Timer options={OPTIONS} />
+        <Circle
+          progress={this.state.progress}
+          text={'Transcribing video'}
+          options={{strokeWidth: 2}}
+          initialAnimate={true}
+          containerStyle={{
+            width: '200px',
+            height: '200px',
+          }}
+          containerClassName={'.progressbar'} />
+        Progress is {this.state.progress}
         Duration is {this.state.duration}
       </div>
     ) : null;
