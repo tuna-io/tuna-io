@@ -22,13 +22,9 @@ func (s *Server) DefineEndpoints() {
 	s.Endpoint("videos/search/:hash/:query", API_GET, routes.SearchVideo)
 	s.Endpoint("videos/latest", API_GET, routes.GetLatestVideos)
 	s.Endpoint("videos/get/:hash", API_GET, routes.GetVideo)
-<<<<<<< HEAD
 	s.Endpoint("videos", API_POST, routes.CreateVideo)
 	s.Endpoint("videos/metadata/:url", API_GET, routes.GetVideoMetadata)
-=======
-	// change back to create video eventually
-	s.Endpoint("videos", API_POST, routes.DownloadVideo)
->>>>>>> def5093... Download one video given link
+	s.Endpoint("videos/youtube/:hash", API_POST, routes.DownloadVideo)
 
 	s.Endpoint("s3", API_POST, routes.SignVideo)
 
