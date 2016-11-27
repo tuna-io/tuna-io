@@ -1,8 +1,7 @@
 import React from 'react';
-import Dropzone from 'react-dropzone';
 import { Link } from 'react-router';
-// import { Line } from 'rc-progress';
 import { Circle } from 'react-progressbar.js';
+import DropzoneComponent from 'react-dropzone-component';
 
 // TODO: render video details page instead of duplicating functionality
 export default class Upload extends React.Component {
@@ -29,12 +28,27 @@ export default class Upload extends React.Component {
     this.submitVideoToCDN = this.submitVideoToCDN.bind(this);
     this.attachUsingDropzone = this.attachUsingDropzone.bind(this);
     this.renderVideoOptionsForm = this.renderVideoOptionsForm.bind(this);
+
+    this.djsConfig = {
+      addRemoveLinks: true,
+      acceptedFiles: 'video/*',
+      autoProcessQueue: false,
+    };
+
+    this.componentConfig = {
+      iconFiletypes: ['.mov', '.mp4', '.webm', '.mkv'],
+      showFiletypeIcon: true,
+      postUrl: 'no-url',
+    };
+
+    this.dropzone = null;
   }
 
   // Triggered when user drops file into Dropzone
   // Use file information to retrieve signed URL
   attachUsingDropzone(files) {
-    const currFile = files[0];
+    // We can refactor this if we want to support multiple upload
+    const currFile = files;
     this.setState({
       videoReturned: false,
       file: currFile,
@@ -202,17 +216,33 @@ export default class Upload extends React.Component {
       : null;
   }
 
+  removeVideo() {
+    console.log('this.signedurl', this.state.signedUrl);
+    return this.setState({ signedUrl: '' });
+  }
+
   render() {
+    const config = this.componentConfig;
+    const djsConfig = this.djsConfig;
+
+    const eventHandlers = {
+      init: dz => this.dropzone = dz,
+      drop: this.attachUsingDropzone.bind(this),
+      addedfile: this.attachUsingDropzone.bind(this),
+    }
+
     return (
       <div>
         <h1>
           Upload a video!
         </h1>
-        <Dropzone onDrop={this.attachUsingDropzone} size={150}>
+        <DropzoneComponent
+          config={config}
+          eventHandlers={eventHandlers}
+          djsConfig={djsConfig} />
           <div>
             Drop some files here!
           </div>
-        </Dropzone>
         {
           this.renderVideoOptionsForm()
         }
