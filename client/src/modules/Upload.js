@@ -46,6 +46,7 @@ export default class Upload extends React.Component {
   }
 
   hash(str) {
+    console.log('string is', str);
     return str.split("").reduce((a,b) => {
       a = ((a << 5) - a) + b.charCodeAt(0);
       return a&a;
@@ -57,6 +58,7 @@ export default class Upload extends React.Component {
   attachUsingDropzone(files) {
     // We can refactor this if we want to support multiple upload
     const currFile = files;
+    console.log('files are', files, 'files 1 is', files[0]);
     currFile.hash = this.hash(currFile.name) + '.mp4';
     this.setState({
       videoReturned: false,
@@ -101,7 +103,7 @@ export default class Upload extends React.Component {
       },
     })
     .then(jsonRes => jsonRes.json())
-    .then(res => {
+    .then((res) => {
       this.setState({ duration: res });
       this.trackProgress();
     })
@@ -160,11 +162,13 @@ export default class Upload extends React.Component {
   }
 
   testYoutube(event) {
-    console.log('this', this, 'event', event);
+    event.preventDefault();
+    console.log('called testyoutube');
+    // console.log('this', this, 'event', event);
     return fetch('/api/videos/youtube', {
       method: 'POST',
       body: JSON.stringify({
-        face: 'true',
+        hashes: ['https://www.youtube.com/watch?v=-DC_KF-F_bs'],
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -180,6 +184,18 @@ export default class Upload extends React.Component {
     .catch((err) => {
       console.log('error', err);
     });
+  }
+
+  trackProgress() {
+    let timer = 0;
+
+    setInterval(() => {
+      if (timer <= this.state.duration) {
+        timer += 0.1;
+        const progress = timer / this.state.duration;
+        this.setState({ progress: progress });
+      }
+    }, 100).bind(this);
   }
 
   // Video options form is rendered when the user has attached a file using Dropzone
@@ -213,16 +229,18 @@ export default class Upload extends React.Component {
     ) : null;
   }
 
-  trackProgress() {
-    let timer = 0;
-
-    setInterval(() => {
-      if (timer <= this.state.duration) {
-        timer += 0.1;
-        const progress = timer / this.state.duration;
-        this.setState({ progress: progress });
-      }
-    }, 100).bind(this);
+  renderYoutubeUploadForm() {
+    return (
+      <div>
+        <form onSubmit={this.testYoutube}>
+          <span>Upload to youtube</span>
+          <input
+            name="link" type="text"
+            onChange={this.handleChange}
+          />
+        </form>
+      </div>
+    );
   }
 
   renderProgressBar() {
@@ -231,14 +249,14 @@ export default class Upload extends React.Component {
       <div>
         <Circle
           progress={this.state.progress}
-          text={'Transcribing video... ' + Math.floor(this.state.progress * 100, 2) + '%'}
+          text={"Transcribing video... " + Math.floor(this.state.progress * 100, 2) + "%"}
           options={{ strokeWidth: 5 }}
           initialAnimate
           containerStyle={{
-            width: '200px',
-            height: '200px',
+            width: "200px",
+            height: "200px",
           }}
-          containerClassName={'.progressbar'} />
+          containerClassName={".progressbar"} />
       </div>
     ) : null;
   }
@@ -282,6 +300,9 @@ export default class Upload extends React.Component {
         }
         {
           this.renderVideoModule()
+        }
+        {
+          this.renderYoutubeUploadForm()
         }
       </div>
     );
