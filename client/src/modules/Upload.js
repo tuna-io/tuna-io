@@ -163,12 +163,20 @@ export default class Upload extends React.Component {
 
   testYoutube(event) {
     event.preventDefault();
-    console.log('called testyoutube');
-    // console.log('this', this, 'event', event);
+
+
+    const linkHash = this.hash(this.state.link) + '.mp4';
+    const id = this.state.link.split("v=")[1].slice(0, 11);
+
+    console.log('called testyoutube', this.state.link);
+    console.log('hash', linkHash, 'id', id);
+
     return fetch('/api/videos/youtube', {
       method: 'POST',
       body: JSON.stringify({
-        hashes: ['https://www.youtube.com/watch?v=-DC_KF-F_bs'],
+        youtubeID: id,
+        filename: linkHash,
+        filetype: '.mp4',
       }),
       headers: {
         'Content-Type': 'application/json',

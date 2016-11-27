@@ -694,22 +694,36 @@ type YoutubeResponse struct {
   Success string `json:"success"`
 }
 
-func DownloadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-  fmt.Println("download video called", req.Body)
+type YoutubeVidfile struct {
+  YoutubeID string `json:"youtubeID"`
+  Filename  string `json:"filename"`
+  Filetype  string `json:"filetype"`
+}
 
+func DownloadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+
+  // decode req.body to get the title
+  decoder := json.NewDecoder(req.Body)
+
+  v := new(YoutubeVidfile)
+  err := decoder.Decode(&v)
+  HandleError(err)
+
+  fmt.Println("download video called and filename", v.Filename, "youtubeID", v.YoutubeID)
   // list of all videos to donwload
-  idList := [...]string{"EUHcNeg_e9g"}
+  idList := [...]string{v.YoutubeID}
   // name of folder to save file in
   // is there way to automate saving to different
   // file name? 
   rep := "test"
   // for each video in list, download it
   for _, id := range idList {
-      vl, err := GetVideoListFromId(id)
-      HandleError(err)
+    vl, err := GetVideoListFromId(id)
+    HandleError(err)
 
-      err = vl.Download(rep, "hello", "", "video/mp4")
-      HandleError(err)
+    fmt.Println("downloading one")
+    err = vl.Download(rep, v.Filename, "", "video/mp4")
+    HandleError(err)
   }
 
   // send hello world back as test for now
