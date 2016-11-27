@@ -151,7 +151,7 @@ export default class Upload extends React.Component {
 
   // Video options form is rendered when the user has attached a file using Dropzone
   renderVideoOptionsForm() {
-    return this.state.signedUrl ?
+    return this.state.signedUrl && !this.state.duration && !this.state.hash ?
     (
       <div>
         <h3>Upload options</h3>
@@ -212,7 +212,7 @@ export default class Upload extends React.Component {
 
   // Video is rendered after a successful upload to the CDN
   renderVideoModule() {
-    return this.state.hash ? (<div>See video here: <Link to={`/videos/${this.state.hash}`}>{ this.state.title }</Link></div>) 
+    return this.state.hash ? (<div>See video here: <Link to={`/videos/${this.state.hash}`}>{ this.state.title }</Link></div>)
       : null;
   }
 
@@ -240,9 +240,6 @@ export default class Upload extends React.Component {
           config={config}
           eventHandlers={eventHandlers}
           djsConfig={djsConfig} />
-          <div>
-            Drop some files here!
-          </div>
         {
           this.renderVideoOptionsForm()
         }
