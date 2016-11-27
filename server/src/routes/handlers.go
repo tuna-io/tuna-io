@@ -238,6 +238,23 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
   return t, err
 }
 
+func GetVideoMetadata(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+
+  // Note: ffmpeg and ffprobe does not support https protocol out of box
+  // Note: passing in whole path seems to result in react router taking over
+  // Note: executing command as single string seems to cause errors
+  s := []string{"http://s3-us-west-1.amazonaws.com/invalidmemories/", ps.ByName("url")}
+  video := strings.Join(s, "")
+  cmd := exec.Command("ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=duration", "-of", "default=noprint_wrappers=1:nokey=1", video)
+  out, err := cmd.Output()
+  fmt.Println(out)
+  HandleError(err)
+
+  w.Header().Set("Content-Type", "application/json")
+  w.WriteHeader(http.StatusOK)
+  fmt.Fprintln(w, string(out))
+}
+
 
 /*-------------------------------------
  *      AUDIO FILE TRANSCRIPTION

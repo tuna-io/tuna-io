@@ -22,6 +22,7 @@ func (s *Server) DefineEndpoints() {
 	s.Endpoint("videos/latest", API_GET, routes.GetLatestVideos)
 	s.Endpoint("videos/get/:hash", API_GET, routes.GetVideo)
 	s.Endpoint("videos", API_POST, routes.CreateVideo)
+	s.Endpoint("videos/metadata/:url", API_GET, routes.GetVideoMetadata)
 
 	s.Endpoint("s3", API_POST, routes.SignVideo)
 
