@@ -45,7 +45,7 @@ export default class Upload extends React.Component {
   }
 
   hash(str) {
-    return s.split("").reduce(function(a,b) {
+    return str.split("").reduce(function(a,b) {
       a = ((a << 5) - a) + b.charCodeAt(0);
       return a&a;
     }, 0); 
@@ -56,17 +56,18 @@ export default class Upload extends React.Component {
   attachUsingDropzone(files) {
     // We can refactor this if we want to support multiple upload
     const currFile = files;
+    currFile.hash = this.hash(currFile.name) + '.mp4';
     this.setState({
       videoReturned: false,
       file: currFile,
-      title: currFile.name,
+      title: currFile.hash,
     });
 
     // Fetch signed URL
     fetch('/api/s3', {
       method: 'POST',
       body: JSON.stringify({
-        filename: currFile.name,
+        filename: currFile.hash,
         filetype: currFile.type,
       }),
       headers: {
@@ -125,7 +126,7 @@ export default class Upload extends React.Component {
         });
         
         // Post video metadata to the server
-        this.getVideoMetadata(this.state.file.name);
+        this.getVideoMetadata(this.state.file.hash);
 
         return fetch('/api/videos', {
           method: 'POST',
@@ -135,7 +136,7 @@ export default class Upload extends React.Component {
             description: this.state.description,
             extension: this.state.file.type,
             private: this.state.private,
-            url: `https://s3-us-west-1.amazonaws.com/invalidmemories/${this.state.file.name}`,
+            url: `https://s3-us-west-1.amazonaws.com/invalidmemories/${this.state.file.hash}`,
           }),
           headers: {
             'Content-Type': 'application/json',
