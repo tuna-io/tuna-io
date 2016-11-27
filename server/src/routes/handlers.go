@@ -3,6 +3,8 @@ package routes
 import (
   "db"
   "os"
+  // "io"
+  "log"
   "fmt"
   "time"
   "strings"
@@ -10,15 +12,17 @@ import (
   "net/http"
   "crypto/md5"
   "encoding/hex"
+  // "compress/gzip"
   "encoding/json"
-  // "path/filepath"
-  . "github.com/kkdai/youtube"
+  . "github.com/KeluDiao/gotube/api"
   "github.com/gorilla/sessions"
   "github.com/aws/aws-sdk-go/aws"
   "github.com/mediawen/watson-go-sdk"
   "github.com/julienschmidt/httprouter"
   "github.com/aws/aws-sdk-go/service/s3"
   "github.com/aws/aws-sdk-go/aws/session"
+  "github.com/aws/aws-sdk-go/service/s3/s3manager"
+
 )
 
 func HandleError(err error) {
@@ -691,12 +695,28 @@ func SearchVideo(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
 
 func DownloadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
   fmt.Println("download video called")
+ 
+  // version with single downloader
   // currentDir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
-  currentDir := "/Users/billzito/Documents/HR/projects/tuna-io/test/me"
-  fmt.Println("download to dir=", currentDir)
-  y := NewYoutube()
-  y.DecodeURL("https://www.youtube.com/watch?v=XEcV7Y5gjQA")
-  y.StartDownload(currentDir)
+  // currentDir := "/Users/billzito/Documents/HR/projects/tuna-io/test/me"
+  // fmt.Println("download to dir=", currentDir)
+  // y := NewYoutube()
+  // y.DecodeURL("https://www.youtube.com/watch?v=XEcV7Y5gjQA")
+  // y.StartDownload(currentDir)
+
+
+  idList := [...]string{"EUHcNeg_e9g"}
+  rep := "test"
+  for _, id := range idList {
+      vl, err := GetVideoListFromId(id)
+      if err != nil {
+          log.Fatal(err)
+      }
+      err = vl.Download(rep, "", "", "video/mp4")
+      if err != nil {
+          log.Fatal(err)
+      }
+  }
 
   resp := []string{"hello", "world"}
 
@@ -711,7 +731,28 @@ func DownloadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params
 
 }
 
-// func UploadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-//   svc := s3.New(session.New(&aws.Config{Region: aws.String("us-west-1")}))
+func UploadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+  // svc := s3.New(session.New(&aws.Config{Region: aws.String("us-west-1")}))
+  file, err := os.Open("/Users/billzito/Documents/HR/projects/tuna-io/test/test.mp4")
+  HandleError(err)
 
-// }
+  // this makes go faster but isnt necessary, see aws docs
+  // reader, writer := io.Pipe()
+  // go func() {
+  //   gw := gzip.NewWriter(writer)
+  //   io.Copy(gw, file)
+  //   file.Close()
+  //   gw.Close()
+  //   writer.Close()
+  // }()
+
+  uploader := s3manager.NewUploader(session.New(&aws.Config{Region: aws.String("us-west-1")}))
+  result, err := uploader.Upload(&s3manager.UploadInput{
+    Body: file,
+    Bucket: aws.String("invalidmemories"),
+    Key: aws.String("test.mp4"),
+  })
+
+  HandleError(err)
+  log.Println("Successfully uploaded to", result.Location)
+}

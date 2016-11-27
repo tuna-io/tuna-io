@@ -26,6 +26,9 @@ func (s *Server) DefineEndpoints() {
 	s.Endpoint("videos/metadata/:url", API_GET, routes.GetVideoMetadata)
 	s.Endpoint("videos/youtube/:hash", API_POST, routes.DownloadVideo)
 
+	//delete once complete functionality in one route
+	s.Endpoint("upload", API_GET, routes.UploadVideo)
+	
 	s.Endpoint("s3", API_POST, routes.SignVideo)
 
 	s.Endpoint("users/register", API_POST, routes.RegisterUser)
