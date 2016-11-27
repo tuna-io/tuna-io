@@ -24,3 +24,5 @@ npm-debug.log
 server/.DS_Store
 server/src/.DS_Store
 
+# Video downloads
+/test/*

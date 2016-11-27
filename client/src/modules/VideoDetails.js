@@ -4,6 +4,7 @@ import overlay from 'videojs-overlay';
 import { Grid, Row, Col } from 'react-flexgrid';
 import { Badge, Space, InlineForm, Panel, PanelHeader, Text, Avatar, Heading, Flex, Donut, Stat } from 'rebass';
 import TimeAgo from 'react-timeago';
+import Wordcloud from './Wordcloud';
 
 // TODO: prevent errors if there is no transcript
 // TODO: remove duplicate code in upload
@@ -182,6 +183,13 @@ class VideoDetails extends Component {
     );
   }
 
+  renderWordcloud() {
+    return this.state.transcript.length ?
+      (
+        <Wordcloud transcript={this.state.transcript} />
+      ) : null;
+  }
+
   renderSearchForm() {
     if (this.state.transcript.length) {
       return (
@@ -317,6 +325,9 @@ class VideoDetails extends Component {
             }
             {
               this.renderTranscript()
+            }
+            {
+              this.renderWordcloud()
             }
             {
               this.renderSearchResults()

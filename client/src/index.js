@@ -13,6 +13,8 @@ import VideoDetails from './modules/VideoDetails';
 import Home from './modules/Home';
 import './index.css';
 import './flexgrid.css';
+import '../node_modules/react-dropzone-component/styles/filepicker.css';
+import '../node_modules/dropzone/dist/min/dropzone.min.css';
 
 const routes = {
   path: '/',
