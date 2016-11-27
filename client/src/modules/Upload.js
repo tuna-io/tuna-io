@@ -21,6 +21,9 @@ export default class Upload extends React.Component {
       // metadata
       duration: '',
       progress: '',
+
+      // youtubeid
+      youtubeID: '',
     };
 
     // Bind helper functions in constructor
@@ -31,6 +34,7 @@ export default class Upload extends React.Component {
     this.addToDb = this.addToDb.bind(this);
     this.downloadYoutube = this.downloadYoutube.bind(this);
     this.processVideo = this.processVideo.bind(this);
+    this.getYoutubeID = this.getYoutubeID.bind(this);
 
     this.djsConfig = {
       addRemoveLinks: true,
@@ -181,21 +185,33 @@ export default class Upload extends React.Component {
     }
   }
 
+  // on submite, hash youtube key and set to state
+  getYoutubeID(event) {
+    event.preventDefault();
+    const maybeNegHash = this.hash(this.state.link);
+    const positiveHash = maybeNegHash > 0 ? maybeNegHash : maybeNegHash * -1;
+    const newFilename = positiveHash + '.mp4';
+    const id = this.state.link.split("v=")[1].slice(0, 11);
+    this.setState({
+      youtubeID: id,
+      file: { name: newFilename, type: 'video/mp4', hash: newFilename },
+    });
+    console.log("got youtube id");
+  }
+
+  // Send to server to donwload vid and then processes video
   // we can refactor this to support multiple youtube links at once
   downloadYoutube(event) {
     event.preventDefault();
 
-    const linkHash = this.hash(this.state.link) + '.mp4';
-    const id = this.state.link.split("v=")[1].slice(0, 11);
-
     console.log('called downloadyoutube', this.state.link);
-    console.log('hash', linkHash, 'id', id);
+    console.log('hash', this.state.youtubeID, 'id', this.state.file.name);
 
     return fetch('/api/videos/youtube', {
       method: 'POST',
       body: JSON.stringify({
-        youtubeID: id,
-        filename: linkHash,
+        youtubeID: this.state.youtubeID,
+        filename: this.state.file.name,
         filetype: '.mp4',
       }),
       headers: {
@@ -205,6 +221,7 @@ export default class Upload extends React.Component {
     .then(resp => resp.json())
     .then((handledResp) => {
       console.log('resp is', handledResp);
+      this.processVideo();
     })
     .catch((err) => {
       console.log('error', err);
@@ -225,11 +242,11 @@ export default class Upload extends React.Component {
 
   // Video options form is rendered when the user has attached a file using Dropzone
   renderVideoOptionsForm() {
-    return this.state.signedUrl && !this.state.duration && !this.state.hash ?
+    return this.state.signedUrl || this.state.youtubeID && !this.state.duration && !this.state.hash ?
     (
       <div>
         <h3>Upload options</h3>
-        <form onSubmit={this.submitVideoToCDN}>
+        <form onSubmit={this.state.signedUrl ? this.submitVideoToCDN : this.downloadYoutube}>
           <div>
             <input
               name="title" type="text" onChange={this.handleChange}
@@ -255,10 +272,10 @@ export default class Upload extends React.Component {
   }
 
   renderYoutubeUploadForm() {
-    return (
+    return this.state.signedUrl ? null : (
       <div>
-        <form onSubmit={this.downloadYoutube}>
-          <span>Upload from youtube</span>
+        <form onSubmit={this.getYoutubeID}>
+          <span>Enter youtube link:</span>
           <input
             name="link" type="text"
             onChange={this.handleChange}
@@ -287,7 +304,7 @@ export default class Upload extends React.Component {
   }
 
   // Video is rendered after a successful upload to the CDN
-  renderVideoModule() {
+  renderVideoLink() {
     return this.state.hash ? (<div>See video here: <Link to={`/videos/${this.state.hash}`}>{ this.state.title }</Link></div>)
       : null;
   }
@@ -318,16 +335,16 @@ export default class Upload extends React.Component {
           djsConfig={djsConfig}
         />
         {
+          this.renderYoutubeUploadForm()
+        }
+        {
           this.renderVideoOptionsForm()
         }
         {
           this.renderProgressBar()
         }
         {
-          this.renderVideoModule()
-        }
-        {
-          this.renderYoutubeUploadForm()
+          this.renderVideoLink()
         }
       </div>
     );

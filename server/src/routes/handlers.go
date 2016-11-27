@@ -92,18 +92,22 @@ func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) 
   decoder := json.NewDecoder(req.Body)
   video := new(db.Video)
   err := decoder.Decode(&video)
+  // fmt.Println("video has url", video.Url)
   HandleError(err)
   
   hasher := md5.New()
   hasher.Write([]byte(video.Url))
   hash := hex.EncodeToString(hasher.Sum(nil))
   video.Hash = hash
+  fmt.Println("made it after decoding and hash", video.Hash)
 
   db.CreateVideo(*video)
+  // fmt.Println("made it after video creation")
 
   w.Header().Set("Content-Type", "application/json")
 
   t, err := ProcessVideo(video.Url, hash)
+  fmt.Println("made it after processing")
   HandleError(err)
 
   u := Response{
@@ -114,6 +118,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) 
   }
 
   j, err := json.Marshal(u)
+  fmt.Println("made it after marshalling")
   HandleError(err)
 
   w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -223,13 +228,16 @@ func GetLatestVideos(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 }
 
 func ProcessVideo(url string, hash string) (*watson.Text, error) {
-
+  fmt.Println("processing started")
   applicationName := "ffmpeg"
   arg0 := "-i"
   destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
+  fmt.Println("destination is", destination)
+  fmt.Println("applicationName", applicationName, "arg0", arg0, "url", url)
   cmd := exec.Command(applicationName, arg0, url, destination)
   _, err := cmd.Output()
   HandleError(err)
+  fmt.Println("made it past ffmpeg")
 
   t := TranscribeAudio(destination)
   db.AddTranscript(hash, t)
@@ -238,6 +246,7 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
   _, err = cmd.Output()
 
   HandleError(err)
+  fmt.Println("made it past transcription")
 
   return t, err
 }
@@ -702,6 +711,7 @@ type YoutubeVidfile struct {
   Filetype  string `json:"filetype"`
 }
 
+// TODO: add documentation
 func DownloadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
   // decode req.body to get the title
@@ -747,6 +757,7 @@ func DownloadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params
 
 }
 
+// TODO: delete locla file after upload is complete 
 func UploadVideo(filename string) (string) {
   // svc := s3.New(session.New(&aws.Config{Region: aws.String("us-west-1")}))
   fmt.Println("upload called")
