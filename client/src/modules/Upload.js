@@ -28,7 +28,9 @@ export default class Upload extends React.Component {
     this.submitVideoToCDN = this.submitVideoToCDN.bind(this);
     this.attachUsingDropzone = this.attachUsingDropzone.bind(this);
     this.renderVideoOptionsForm = this.renderVideoOptionsForm.bind(this);
-    this.testYoutube = this.testYoutube.bind(this);
+    this.addToDb = this.addToDb.bind(this);
+    this.downloadYoutube = this.downloadYoutube.bind(this);
+    this.processVideo = this.processVideo.bind(this);
 
     this.djsConfig = {
       addRemoveLinks: true,
@@ -45,6 +47,7 @@ export default class Upload extends React.Component {
     this.dropzone = null;
   }
 
+  // TODO: make Hash non-negative for youtube vids
   hash(str) {
     console.log('string is', str);
     return str.split("").reduce((a,b) => {
@@ -53,12 +56,12 @@ export default class Upload extends React.Component {
     }, 0);
   }
 
-  // Triggered when user drops file into Dropzone
+  // TODO: make this work for dragged files
+  // Triggered when user selects file for Dropzone
   // Use file information to retrieve signed URL
   attachUsingDropzone(files) {
     // We can refactor this if we want to support multiple upload
     const currFile = files;
-    console.log('files are', files, 'files 1 is', files[0]);
     currFile.hash = this.hash(currFile.name) + '.mp4';
     this.setState({
       videoReturned: false,
@@ -94,6 +97,7 @@ export default class Upload extends React.Component {
     this.setState({ [event.target.name]: value });
   }
 
+  // TODO: make this work for webm format as well (server side?)
   // Get video metadata
   getVideoMetadata(url) {
     return fetch(`/api/videos/metadata/${url}`, {
@@ -104,10 +108,54 @@ export default class Upload extends React.Component {
     })
     .then(jsonRes => jsonRes.json())
     .then((res) => {
+      console.log("metadata res is", res);
       this.setState({ duration: res });
       this.trackProgress();
     })
     .catch(err => console.log('Error retrieving metadata:', err));
+  }
+
+  //send video info to server
+  addToDb(){
+    console.log('adding to db');
+    return fetch('/api/videos', {
+      method: 'POST',
+      body: JSON.stringify({
+        title: this.state.title,
+        creator: this.props.loggedIn,
+        description: this.state.description,
+        extension: this.state.file.type,
+        private: this.state.private,
+        url: `https://s3-us-west-1.amazonaws.com/invalidmemories/${this.state.file.hash}`,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .catch(err => console.log('Error posting video to /api/videos:', err));
+  }
+
+
+  // get metadata and add video to db
+  processVideo(){
+    this.setState({
+      videoReturned: true,
+    });
+
+    // Get video metadata from the server
+    this.getVideoMetadata(this.state.file.hash);
+
+    // add info to database
+    return this.addToDb()
+    .then(rawResp => rawResp.json())
+    .then((resp) => {
+      console.log('resp.hash', resp.hash);
+      this.setState({
+        hash: resp.hash,
+        duration: '',
+      });
+    })
+    .catch(err => console.log('Error adding to db', err));
   }
 
   // Triggered on video options form submission
@@ -117,58 +165,30 @@ export default class Upload extends React.Component {
 
     if (this.state.signedUrl) {
       // Upload video into CDN
-      fetch(this.state.signedUrl, {
+      return fetch(this.state.signedUrl, {
         method: 'PUT',
         body: this.state.file,
         headers: {
           'x-amz-acl': 'public-read',
         },
       })
-      .then((data) => {
-        this.setState({
-          videoReturned: true,
-        });
-
-        // Post video metadata to the server
-        this.getVideoMetadata(this.state.file.hash);
-
-        return fetch('/api/videos', {
-          method: 'POST',
-          body: JSON.stringify({
-            title: this.state.title,
-            creator: this.props.loggedIn,
-            description: this.state.description,
-            extension: this.state.file.type,
-            private: this.state.private,
-            url: `https://s3-us-west-1.amazonaws.com/invalidmemories/${this.state.file.hash}`,
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        .catch(err => console.log('Error posting video to /api/videos:', err));
-
+      .then(() => {
+        this.processVideo();
       })
-      .then(rawResp => rawResp.json())
-      .then((resp) => {
-        console.log('resp.hash', resp.hash);
-        this.setState({
-          hash: resp.hash,
-          duration: '',
-        });
-      })
-      .catch(err => console.log('Error uploading video to CDN:', err));
+      .catch((err) => {
+        console.log("error putting to aws", err);
+      });
     }
   }
 
-  testYoutube(event) {
+  // we can refactor this to support multiple youtube links at once
+  downloadYoutube(event) {
     event.preventDefault();
-
 
     const linkHash = this.hash(this.state.link) + '.mp4';
     const id = this.state.link.split("v=")[1].slice(0, 11);
 
-    console.log('called testyoutube', this.state.link);
+    console.log('called downloadyoutube', this.state.link);
     console.log('hash', linkHash, 'id', id);
 
     return fetch('/api/videos/youtube', {
@@ -182,10 +202,7 @@ export default class Upload extends React.Component {
         'Content-Type': 'application/json',
       },
     })
-    .then((resp) => {
-      console.log('got a resp', resp);
-      return resp.json();
-    })
+    .then(resp => resp.json())
     .then((handledResp) => {
       console.log('resp is', handledResp);
     })
@@ -203,7 +220,7 @@ export default class Upload extends React.Component {
         const progress = timer / this.state.duration;
         this.setState({ progress: progress });
       }
-    }, 100).bind(this);
+    }, 100);
   }
 
   // Video options form is rendered when the user has attached a file using Dropzone
@@ -240,8 +257,8 @@ export default class Upload extends React.Component {
   renderYoutubeUploadForm() {
     return (
       <div>
-        <form onSubmit={this.testYoutube}>
-          <span>Upload to youtube</span>
+        <form onSubmit={this.downloadYoutube}>
+          <span>Upload from youtube</span>
           <input
             name="link" type="text"
             onChange={this.handleChange}

@@ -247,11 +247,12 @@ func GetVideoMetadata(w http.ResponseWriter, r *http.Request, ps httprouter.Para
   // Note: ffmpeg and ffprobe does not support https protocol out of box
   // Note: passing in whole path seems to result in react router taking over
   // Note: executing command as single string seems to cause errors
+  fmt.Println("url is", ps.ByName("url"))
   s := []string{"http://s3-us-west-1.amazonaws.com/invalidmemories/", ps.ByName("url")}
   video := strings.Join(s, "")
   cmd := exec.Command("ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=duration", "-of", "default=noprint_wrappers=1:nokey=1", video)
   out, err := cmd.Output()
-  fmt.Println(out)
+  fmt.Println("output is", string(out))
   HandleError(err)
 
   w.Header().Set("Content-Type", "application/json")
@@ -692,6 +693,7 @@ func SearchVideo(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
 
 type YoutubeResponse struct {
   Success string `json:"success"`
+  Location string `json:"location"`
 }
 
 type YoutubeVidfile struct {
@@ -726,9 +728,12 @@ func DownloadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params
     HandleError(err)
   }
 
+  location := UploadVideo(v.Filename)
+
   // send hello world back as test for now
   resp := YoutubeResponse{
     Success: "Successfully downloaded file",
+    Location: location,
   }
 
   j, err := json.Marshal(resp)
@@ -742,18 +747,20 @@ func DownloadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params
 
 }
 
-func UploadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func UploadVideo(filename string) (string) {
   // svc := s3.New(session.New(&aws.Config{Region: aws.String("us-west-1")}))
-  file, err := os.Open("/Users/billzito/Documents/HR/projects/tuna-io/test/test.mp4")
+  fmt.Println("upload called")
+  file, err := os.Open("/Users/billzito/Documents/HR/projects/tuna-io/test/" + filename)
   HandleError(err)
 
   uploader := s3manager.NewUploader(session.New(&aws.Config{Region: aws.String("us-west-1")}))
   result, err := uploader.Upload(&s3manager.UploadInput{
     Body: file,
     Bucket: aws.String("invalidmemories"),
-    Key: aws.String("test.mp4"),
+    Key: aws.String(filename),
   })
 
   HandleError(err)
   fmt.Println("Successfully uploaded to", result.Location)
+  return result.Location
 }
