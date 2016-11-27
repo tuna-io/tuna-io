@@ -28,6 +28,7 @@ export default class Upload extends React.Component {
     this.submitVideoToCDN = this.submitVideoToCDN.bind(this);
     this.attachUsingDropzone = this.attachUsingDropzone.bind(this);
     this.renderVideoOptionsForm = this.renderVideoOptionsForm.bind(this);
+    this.testYoutube = this.testYoutube.bind(this);
 
     this.djsConfig = {
       addRemoveLinks: true,
@@ -48,7 +49,7 @@ export default class Upload extends React.Component {
     return str.split("").reduce((a,b) => {
       a = ((a << 5) - a) + b.charCodeAt(0);
       return a&a;
-    }, 0); 
+    }, 0);
   }
 
   // Triggered when user drops file into Dropzone
@@ -77,6 +78,7 @@ export default class Upload extends React.Component {
     .then(data => data.json())
     .then((url) => {
       this.setState({ signedUrl: url });
+      console.log('signed url received');
     })
     .catch((err) => {
       console.log('Error retrieving signed URL:', err);
@@ -157,6 +159,29 @@ export default class Upload extends React.Component {
     }
   }
 
+  testYoutube(event) {
+    console.log('this', this, 'event', event);
+    return fetch('/api/videos/youtube', {
+      method: 'POST',
+      body: JSON.stringify({
+        face: 'true',
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then((resp) => {
+      console.log('got a resp', resp);
+      return resp.json();
+    })
+    .then((handledResp) => {
+      console.log('resp is', handledResp);
+    })
+    .catch((err) => {
+      console.log('error', err);
+    });
+  }
+
   // Video options form is rendered when the user has attached a file using Dropzone
   renderVideoOptionsForm() {
     return this.state.signedUrl && !this.state.duration && !this.state.hash ?
@@ -194,21 +219,21 @@ export default class Upload extends React.Component {
     setInterval(() => {
       if (timer <= this.state.duration) {
         timer += 0.1;
-        let progress = timer / this.state.duration;
-        this.setState({progress: progress});
+        const progress = timer / this.state.duration;
+        this.setState({ progress: progress });
       }
     }, 100).bind(this);
   }
 
   renderProgressBar() {
-    return this.state.duration ? 
+    return this.state.duration ?
     (
       <div>
         <Circle
           progress={this.state.progress}
           text={'Transcribing video... ' + Math.floor(this.state.progress * 100, 2) + '%'}
-          options={{strokeWidth: 5}}
-          initialAnimate={true}
+          options={{ strokeWidth: 5 }}
+          initialAnimate
           containerStyle={{
             width: '200px',
             height: '200px',

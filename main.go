@@ -1,3 +1,4 @@
+// THIS FILE NO LONGER USED
 package main
 
 import (
@@ -8,9 +9,7 @@ import (
 )
 
 func main() {
-
   r := mux.NewRouter().StrictSlash(true)
-
   /*-------------------------------------
    *         `/api` ROUTER
    *------------------------------------*/

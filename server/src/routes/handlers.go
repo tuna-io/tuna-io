@@ -11,6 +11,8 @@ import (
   "crypto/md5"
   "encoding/hex"
   "encoding/json"
+  // "path/filepath"
+  . "github.com/kkdai/youtube"
   "github.com/gorilla/sessions"
   "github.com/aws/aws-sdk-go/aws"
   "github.com/mediawen/watson-go-sdk"
@@ -85,6 +87,7 @@ type Response struct {
 *   Redigo failed to create and store the video
 */
 func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+  fmt.Println("create video called")
   decoder := json.NewDecoder(req.Body)
   video := new(db.Video)
   err := decoder.Decode(&video)
@@ -686,4 +689,29 @@ func SearchVideo(w http.ResponseWriter, req *http.Request, ps httprouter.Params)
   }
 }
 
+func DownloadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+  fmt.Println("download video called")
+  // currentDir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+  currentDir := "/Users/billzito/Documents/HR/projects/tuna-io/test/me"
+  fmt.Println("download to dir=", currentDir)
+  y := NewYoutube()
+  y.DecodeURL("https://www.youtube.com/watch?v=XEcV7Y5gjQA")
+  y.StartDownload(currentDir)
 
+  resp := []string{"hello", "world"}
+
+  j, err := json.Marshal(resp)
+  HandleError(err)
+
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Header().Set("Content-Type", "application/json")
+  w.WriteHeader(http.StatusOK)
+
+  w.Write(j)
+
+}
+
+// func UploadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+//   svc := s3.New(session.New(&aws.Config{Region: aws.String("us-west-1")}))
+
+// }

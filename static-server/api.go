@@ -18,11 +18,17 @@ func (s *Server) DefineEndpoints() {
 
 	s.Endpoint("isalive", API_GET, routes.IsAlive)
 
+	// s.Endpong("videos", API_OPTIONS, routes.AllowAccess)
 	s.Endpoint("videos/search/:hash/:query", API_GET, routes.SearchVideo)
 	s.Endpoint("videos/latest", API_GET, routes.GetLatestVideos)
 	s.Endpoint("videos/get/:hash", API_GET, routes.GetVideo)
+<<<<<<< HEAD
 	s.Endpoint("videos", API_POST, routes.CreateVideo)
 	s.Endpoint("videos/metadata/:url", API_GET, routes.GetVideoMetadata)
+=======
+	// change back to create video eventually
+	s.Endpoint("videos", API_POST, routes.DownloadVideo)
+>>>>>>> def5093... Download one video given link
 
 	s.Endpoint("s3", API_POST, routes.SignVideo)
 
