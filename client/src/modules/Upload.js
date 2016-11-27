@@ -44,6 +44,13 @@ export default class Upload extends React.Component {
     this.dropzone = null;
   }
 
+  hash(str) {
+    return s.split("").reduce(function(a,b) {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a&a;
+    }, 0); 
+  }
+
   // Triggered when user drops file into Dropzone
   // Use file information to retrieve signed URL
   attachUsingDropzone(files) {
