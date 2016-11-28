@@ -51,12 +51,14 @@ export default class Upload extends React.Component {
   }
 
   // given title, make unique hash id for video
-  hash(str) {
-    console.log('string is', str);
-    return str.split("").reduce((a,b) => {
-      a = ((a << 5) - a) + b.charCodeAt(0);
-      return a&a;
-    }, 0);
+  hash(len, an) {
+    an = an && an.toLowerCase();
+    var str = '', i = 0, min = an == 'a' ? 10 : 0, max = an == 'n' ? 10 : 62;
+    for(; i++ < len; ) {
+      var r = Math.random() * (max - min) + min << 0;
+      str += String.fromCharCode(r += r > 9 ? r < 36 ? 55 : 61 : 48);
+    }
+    return str;
   }
 
   // TODO: make this work for dragged files
@@ -65,7 +67,7 @@ export default class Upload extends React.Component {
   attachUsingDropzone(files) {
     // We can refactor this if we want to support multiple upload
     const currFile = files;
-    currFile.hash = this.hash(currFile.name) + '.mp4';
+    currFile.hash = this.hash(10) + '.webm';
     this.setState({
       videoReturned: false,
       file: currFile,
@@ -86,7 +88,6 @@ export default class Upload extends React.Component {
     .then(data => data.json())
     .then((url) => {
       this.setState({ signedUrl: url });
-      console.log('signed url received');
     })
     .catch((err) => {
       console.log('Error retrieving signed URL:', err);
@@ -121,7 +122,6 @@ export default class Upload extends React.Component {
 
   // send video info to server
   addToDb(){
-    console.log('adding to db');
     return fetch('/api/videos', {
       method: 'POST',
       body: JSON.stringify({

@@ -8,8 +8,6 @@ import (
   "strings"
   "os/exec"
   "net/http"
-  "crypto/md5"
-  "encoding/hex"
   "encoding/json"
   . "github.com/KeluDiao/gotube/api"
   "github.com/gorilla/sessions"
@@ -95,9 +93,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) 
   err := decoder.Decode(&video)
   HandleError(err)
   
-  hasher := md5.New()
-  hasher.Write([]byte(video.Url))
-  hash := hex.EncodeToString(hasher.Sum(nil))
+  hash := strings.Split(strings.Split(video.Url, "/")[4], ".")[0]
   video.Hash = hash
 
   db.CreateVideo(*video)
