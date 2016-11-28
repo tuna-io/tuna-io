@@ -19,6 +19,13 @@ a {
   color: #BFDFED;
 }
 
+.captions {
+  font-size: 32px;
+  color: yellow !important;
+  background-color: black !important;
+  margin-bottom: -70px !important;
+}
+
 .video-js {
   /* The base font size controls the size of everything, not just text.
      All dimensions use em-based sizes so that the scale along with the font size.

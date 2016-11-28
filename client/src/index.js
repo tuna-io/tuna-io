@@ -15,6 +15,7 @@ import './index.css';
 import './flexgrid.css';
 import '../node_modules/react-dropzone-component/styles/filepicker.css';
 import '../node_modules/dropzone/dist/min/dropzone.min.css';
+import '../node_modules/videojs-overlay/dist/videojs-overlay.css';
 
 const routes = {
   path: '/',

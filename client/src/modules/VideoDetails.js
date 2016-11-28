@@ -164,7 +164,6 @@ class VideoDetails extends Component {
         content: word.word,
         start: word.starttime,
         end: word.endtime,
-        align: 'bottom',
       }));
   }
 
@@ -234,6 +233,8 @@ class VideoDetails extends Component {
   renderOverlay() {
     videojs(document.getElementById('my-video')).overlay({
       overlays: this.overlay,
+      class: 'captions',
+      align: 'bottom',
     });
   }
 
