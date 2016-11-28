@@ -5,8 +5,13 @@ class Transcript extends React.Component {
   constructor(props) {
     super(props);
 
+    // Shallow copy transcript to preserve potential changes
+    const transcriptCopy = _.assign({}, props.transcript);
+
     this.state = {
       inEditMode: false,
+      transcript: props.transcript,
+      transcriptCopy,
     };
 
     this.changeMode = this.changeMode.bind(this);
@@ -16,16 +21,36 @@ class Transcript extends React.Component {
     this.submitTranscriptForm = this.submitTranscriptForm.bind(this);
   }
 
+  // Handles checkbox toggle
   changeMode(event) {
     this.setState({ inEditMode: event.target.checked });
   }
 
+  // Handles form submission
+  submitTranscriptForm(event) {
+    event.preventDefault();
+    console.log(this.state.transcriptCopy);
+    // TODO send a POST or PUT request to submit the transcript
+    // Upon success, replace current transcript
+  }
+
+  // Handles editing of every transcript word
+  handleTranscriptEdit(event) {
+    this.state.transcriptCopy[event.target.name].word = event.target.value;
+
+    this.setState({
+      'transcriptCopy': this.state.transcriptCopy,
+    });
+  }
+
+  // Render the transcript paragraph-style
   renderTranscriptAsParagraph() {
     return (
-      this.props.transcript.map(pair => pair.word).reduce((firstword, secondword) => `${firstword} ${secondword}`)
+      this.state.transcript.map(pair => pair.word).reduce((firstword, secondword) => `${firstword} ${secondword}`)
     );
   }
 
+  // Render an editable table
   renderEditableTranscript() {
     return (
       <div>
@@ -38,7 +63,7 @@ class Transcript extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {this.props.transcript.map((pair, index) => (
+            {this.state.transcript.map((pair, index) => (
               <tr>
                 <td>
                   {pair.endtime}
@@ -58,15 +83,6 @@ class Transcript extends React.Component {
         </form>
       </div>
     );
-  }
-
-  handleTranscriptEdit(event) {
-    console.log(event.target.name, event.target.value);
-  }
-
-  submitTranscriptForm(event) {
-    event.preventDefault();
-    console.log('form submitted');
   }
 
   render() {
