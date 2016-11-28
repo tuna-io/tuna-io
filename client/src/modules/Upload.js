@@ -51,9 +51,59 @@ export default class Upload extends React.Component {
   }
 
   // given title, make unique hash id for video
+  /**
+   * JS Implementation of MurmurHash2
+   * 
+   * @author <a href="mailto:gary.court@gmail.com">Gary Court</a>
+   * @see http://github.com/garycourt/murmurhash-js
+   * @author <a href="mailto:aappleby@gmail.com">Austin Appleby</a>
+   * @see http://sites.google.com/site/murmurhash/
+   * 
+   * @param {string} str ASCII only
+   * @param {number} seed Positive integer only
+   * @return {number} 32-bit positive integer hash
+   */
+
+  murmurhash2_32_gc(str, seed) {
+    var
+      l = str.length,
+      h = seed ^ l,
+      i = 0,
+      k;
+    
+    while (l >= 4) {
+      k = 
+        ((str.charCodeAt(i) & 0xff)) |
+        ((str.charCodeAt(++i) & 0xff) << 8) |
+        ((str.charCodeAt(++i) & 0xff) << 16) |
+        ((str.charCodeAt(++i) & 0xff) << 24);
+      
+      k = (((k & 0xffff) * 0x5bd1e995) + ((((k >>> 16) * 0x5bd1e995) & 0xffff) << 16));
+      k ^= k >>> 24;
+      k = (((k & 0xffff) * 0x5bd1e995) + ((((k >>> 16) * 0x5bd1e995) & 0xffff) << 16));
+
+    h = (((h & 0xffff) * 0x5bd1e995) + ((((h >>> 16) * 0x5bd1e995) & 0xffff) << 16)) ^ k;
+
+      l -= 4;
+      ++i;
+    }
+    
+    switch (l) {
+    case 3: h ^= (str.charCodeAt(i + 2) & 0xff) << 16;
+    case 2: h ^= (str.charCodeAt(i + 1) & 0xff) << 8;
+    case 1: h ^= (str.charCodeAt(i) & 0xff);
+            h = (((h & 0xffff) * 0x5bd1e995) + ((((h >>> 16) * 0x5bd1e995) & 0xffff) << 16));
+    }
+
+    h ^= h >>> 13;
+    h = (((h & 0xffff) * 0x5bd1e995) + ((((h >>> 16) * 0x5bd1e995) & 0xffff) << 16));
+    h ^= h >>> 15;
+
+    return h >>> 0;
+  }
   hash(str) {
     console.log('string is', str);
-    return str.split("").reduce((a,b) => {
+    return str.split('').reduce((a,b) => {
       a = ((a << 5) - a) + b.charCodeAt(0);
       return a&a;
     }, 0);
@@ -65,7 +115,7 @@ export default class Upload extends React.Component {
   attachUsingDropzone(files) {
     // We can refactor this if we want to support multiple upload
     const currFile = files;
-    currFile.hash = this.hash(currFile.name) + '.mp4';
+    currFile.hash = this.murmurhash2_32_gc(currFile.name, 0) + '.mp4';
     this.setState({
       videoReturned: false,
       file: currFile,
@@ -188,7 +238,7 @@ export default class Upload extends React.Component {
   // on submit, hash youtube key and set to state
   getYoutubeID(event) {
     event.preventDefault();
-    const maybeNegHash = this.hash(this.state.link);
+    const maybeNegHash = this.murmurhash2_32_gc(this.state.link, 0);
     const positiveHash = maybeNegHash > 0 ? maybeNegHash : maybeNegHash * -1;
     const newFilename = `${positiveHash}.mp4`;
 
