@@ -29,7 +29,7 @@ class Transcript extends React.Component {
   // Handles form submission
   submitTranscriptForm(event) {
     event.preventDefault();
-    console.log(this.state.transcriptCopy);
+    console.log(JSON.stringify(this.state.transcriptCopy[0]));
     // TODO send a POST or PUT request to submit the transcript
     // Upon success, replace current transcript
   }
