@@ -3,7 +3,6 @@ import { Link } from 'react-router';
 import { Circle } from 'react-progressbar.js';
 import DropzoneComponent from 'react-dropzone-component';
 
-// TODO: render video details page instead of duplicating functionality
 export default class Upload extends React.Component {
   constructor(props) {
     super(props);
@@ -51,7 +50,7 @@ export default class Upload extends React.Component {
     this.dropzone = null;
   }
 
-  // TODO: make Hash non-negative for youtube vids
+  // given title, make unique hash id for video
   hash(str) {
     console.log('string is', str);
     return str.split("").reduce((a,b) => {
@@ -111,10 +110,10 @@ export default class Upload extends React.Component {
         'Content-Type': 'application/json',
       },
     })
-    .then(jsonRes => jsonRes.json())
-    .then((res) => {
-      console.log("metadata res is", res);
-      this.setState({ duration: res });
+    .then(data => data.json())
+    .then((time) => {
+      console.log("metadata time is", time);
+      this.setState({ duration: time });
       this.trackProgress();
     })
     .catch(err => console.log('Error retrieving metadata:', err));
@@ -152,7 +151,7 @@ export default class Upload extends React.Component {
 
     // add info to database
     return this.addToDb()
-    .then(rawResp => rawResp.json())
+    .then(data => data.json())
     .then((resp) => {
       console.log('resp.hash', resp.hash);
       this.setState({
@@ -186,12 +185,14 @@ export default class Upload extends React.Component {
     }
   }
 
-  // on submite, hash youtube key and set to state
+  // on submit, hash youtube key and set to state
   getYoutubeID(event) {
     event.preventDefault();
     const maybeNegHash = this.hash(this.state.link);
     const positiveHash = maybeNegHash > 0 ? maybeNegHash : maybeNegHash * -1;
-    const newFilename = positiveHash + '.mp4';
+    const newFilename = `${positiveHash}.mp4`;
+
+    // youtube ids are the 11 numbers after the v=
     const id = this.state.link.split("v=")[1].slice(0, 11);
     this.setState({
       youtubeID: id,
@@ -206,9 +207,9 @@ export default class Upload extends React.Component {
   downloadYoutube(event) {
     event.preventDefault();
 
-    console.log('called downloadyoutube', this.state.link);
-    console.log('hash', this.state.youtubeID, 'id', this.state.file.name);
+    console.log('called downloadyoutube', this.state.file.name);
 
+    // send video info to server for donwload
     return fetch('/api/videos/youtube', {
       method: 'POST',
       body: JSON.stringify({
@@ -220,9 +221,10 @@ export default class Upload extends React.Component {
         'Content-Type': 'application/json',
       },
     })
-    .then(resp => resp.json())
-    .then((handledResp) => {
-      console.log('resp is', handledResp);
+    .then(data => data.json())
+    .then((resp) => {
+      console.log('resp is', resp);
+      // add video info to db
       this.processVideo();
     })
     .catch((err) => {
@@ -230,6 +232,7 @@ export default class Upload extends React.Component {
     });
   }
 
+  // move progress bar given predicted transcription time
   trackProgress() {
     let timer = 0;
 
@@ -243,8 +246,10 @@ export default class Upload extends React.Component {
   }
 
   // Video options form is rendered when the user has attached a file using Dropzone
+  // or linked to a youtube clip
   renderVideoOptionsForm() {
-    return this.state.signedUrl || this.state.youtubeID && !this.state.duration && !this.state.hash ?
+    return (this.state.signedUrl || this.state.youtubeID)
+      && !this.state.duration && !this.state.hash ?
     (
       <div>
         <h3>Upload options</h3>
@@ -273,6 +278,7 @@ export default class Upload extends React.Component {
     ) : null;
   }
 
+  // form for getting a youtube link
   renderYoutubeUploadForm() {
     return this.state.signedUrl ? null : (
       <div>
@@ -283,10 +289,12 @@ export default class Upload extends React.Component {
             onChange={this.handleChange}
           />
         </form>
+        <button onClick={this.getYoutubeID}> Submit </button>
       </div>
     );
   }
 
+  // circular progress bar
   renderProgressBar() {
     return this.state.duration ?
     (
@@ -316,6 +324,7 @@ export default class Upload extends React.Component {
     return this.setState({ signedUrl: '' });
   }
 
+  // TODO: determine if event handlers can go in constructor
   render() {
     const config = this.componentConfig;
     const djsConfig = this.djsConfig;

@@ -12,28 +12,35 @@ const (
 	VERSION = 1
 )
 
-// Add api endpoints in here, you are allowed to use httprouter syntax to define parameters
+// API endpoints use httprouter syntax to define parameters
 func (s *Server) DefineEndpoints() {
+	// check basic info about server
 	s.Endpoint("version", API_GET|API_POST, VersionEndpoint)
-
 	s.Endpoint("isalive", API_GET, routes.IsAlive)
 
-	// s.Endpong("videos", API_OPTIONS, routes.AllowAccess)
-	s.Endpoint("videos/search/:hash/:query", API_GET, routes.SearchVideo)
+	// handle upload of local video and youtube video
+	s.Endpoint("videos", API_POST, routes.CreateVideo)
+	s.Endpoint("videos/youtube", API_POST, routes.DownloadVideo)	
+
+	// get desired videos
 	s.Endpoint("videos/latest", API_GET, routes.GetLatestVideos)
 	s.Endpoint("videos/get/:hash", API_GET, routes.GetVideo)
-	s.Endpoint("videos", API_POST, routes.CreateVideo)
+
+	// get information about one video
 	s.Endpoint("videos/metadata/:url", API_GET, routes.GetVideoMetadata)
-	s.Endpoint("videos/youtube", API_POST, routes.DownloadVideo)	
-	
+	s.Endpoint("videos/search/:hash/:query", API_GET, routes.SearchVideo)
+
+	// sign aws upload link
 	s.Endpoint("s3", API_POST, routes.SignVideo)
 
-	s.Endpoint("users/register", API_POST, routes.RegisterUser)
+	// support user information
 	s.Endpoint("users/login", API_POST, routes.LoginUser)
 	s.Endpoint("users/logout", API_GET, routes.LogoutUser)
+	s.Endpoint("users/register", API_POST, routes.RegisterUser)
 	s.Endpoint("users/authenticate", API_GET, routes.AuthenticateUser)
 }
 
+// set server version
 func VersionEndpoint(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	ver := struct {
 		Version float64 `json:"ver"`
