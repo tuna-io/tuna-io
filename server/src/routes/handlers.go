@@ -400,8 +400,9 @@ func UploadVideo(directory string, filename string) (string) {
   fmt.Println("upload called")
   currDir, err := os.Getwd()
   HandleError(err)
-  fmt.Println("working directory is", currDir)
-  file, err := os.Open(currDir + "/" + directory + "/" + filename)
+
+  videoFile := currDir + "/" + directory + "/" + filename
+  file, err := os.Open(videoFile)
   HandleError(err)
 
   uploader := s3manager.NewUploader(session.New(&aws.Config{Region: aws.String("us-west-1")}))
@@ -415,7 +416,7 @@ func UploadVideo(directory string, filename string) (string) {
   HandleError(err)
 
   // after upload complete, remove local file
-  err = os.Remove(currDir + "/" + directory + "/" + filename)
+  err = os.Remove(videoFile)
   HandleError(err)
 
   fmt.Println("Successfuly deleted", filename)
