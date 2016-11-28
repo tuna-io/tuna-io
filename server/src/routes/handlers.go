@@ -11,12 +11,15 @@ import (
   "crypto/md5"
   "encoding/hex"
   "encoding/json"
+  . "github.com/KeluDiao/gotube/api"
   "github.com/gorilla/sessions"
   "github.com/aws/aws-sdk-go/aws"
   "github.com/mediawen/watson-go-sdk"
   "github.com/julienschmidt/httprouter"
   "github.com/aws/aws-sdk-go/service/s3"
   "github.com/aws/aws-sdk-go/aws/session"
+  "github.com/aws/aws-sdk-go/service/s3/s3manager"
+
 )
 
 func HandleError(err error) {
@@ -84,7 +87,9 @@ type Response struct {
 *   HTTP/1.1 500 Internal Server Error
 *   Redigo failed to create and store the video
 */
+// TODO: make sure this works for .mp4 and .webm, not just .mov
 func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+  fmt.Println("create video called")
   decoder := json.NewDecoder(req.Body)
   video := new(db.Video)
   err := decoder.Decode(&video)
@@ -153,7 +158,7 @@ func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) 
 */
 func GetVideo(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
   hash := ps.ByName("hash")
-  fmt.Println(ps.ByName("hash"))
+  fmt.Println("get video called on hash", ps.ByName("hash"))
 
   video, err := db.GetVideo(hash)
   w.Header().Set("Content-Type", "application/json")
@@ -219,7 +224,7 @@ func GetLatestVideos(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 }
 
 func ProcessVideo(url string, hash string) (*watson.Text, error) {
-
+  fmt.Println("process video called")
   applicationName := "ffmpeg"
   arg0 := "-i"
   destination := strings.Split(strings.Split(url, "/")[4], ".")[0] + ".wav"
@@ -243,11 +248,18 @@ func GetVideoMetadata(w http.ResponseWriter, r *http.Request, ps httprouter.Para
   // Note: ffmpeg and ffprobe does not support https protocol out of box
   // Note: passing in whole path seems to result in react router taking over
   // Note: executing command as single string seems to cause errors
+  fmt.Println("getvideo metadata called on url", ps.ByName("url"))
   s := []string{"http://s3-us-west-1.amazonaws.com/invalidmemories/", ps.ByName("url")}
   video := strings.Join(s, "")
+  
+
   cmd := exec.Command("ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=duration", "-of", "default=noprint_wrappers=1:nokey=1", video)
+  // if you want more specific info on error, use below code
+  // // at top, import bytes
+  // var stderr bytes.Buffer
+  // cmd.Stderr = &stderr
+  // fmt.Println("error getting metadata", stderr)
   out, err := cmd.Output()
-  fmt.Println(out)
   HandleError(err)
 
   w.Header().Set("Content-Type", "application/json")
@@ -255,6 +267,157 @@ func GetVideoMetadata(w http.ResponseWriter, r *http.Request, ps httprouter.Para
   fmt.Fprintln(w, string(out))
 }
 
+/**
+* @api {get} /api/videos/search/:hash/:query Get all times in which query appears
+* @apiName SearchVideo
+* @apiGroup Videos
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   {
+*     [2.46, 7.19, 13.24]
+*   }
+* 
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 404 Not Found
+*   Error jsonifying transcript array
+*/
+func SearchVideo(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  hash := ps.ByName("hash")
+  query := ps.ByName("query")
+
+  transcript, err := db.GetVideoTranscript(hash)
+
+  HandleError(err)
+
+  var words = transcript.Words
+  var foundWords []int
+  for i := 0; i < len(words); i++ {
+    if words[i].Token == query {
+      foundWords = append(foundWords, i)
+    }
+  }
+
+  fmt.Println("foundWords", foundWords)
+
+  w.Header().Set("Content-Type", "application/json")
+
+  j, err := json.Marshal(foundWords)
+
+  if err != nil {
+    fmt.Println("error jsonifying transcript array", err)
+    w.WriteHeader(http.StatusNotFound)
+    w.Write([]byte("error marshalling foundwords"))
+  } else {
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte(j))
+  }
+}
+
+// info to send back to client after youtube download
+type YoutubeResponse struct {
+  Success string `json:"success"`
+  Location string `json:"location"`
+}
+
+// info sent from client to allow downloading
+type YoutubeVidfile struct {
+  YoutubeID string `json:"youtubeID"`
+  Filename  string `json:"filename"`
+  Filetype  string `json:"filetype"`
+}
+
+/**
+* @api {get} /api/videos/youtube Get all times in which query appears
+* @apiName DownloadVideo
+* @apiGroup Videos
+*
+* @apiParam {String} youtubeID Unique youtube.com identifier
+* @apiParam {String} filename File's name for saving and uploading
+* @apiParam {String} filetype File's type for knowhing how to save correctly
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   {
+*     success: "Successfully downloaded file", 
+*     location: "https://invalidmemories.s3-us-west-1.amazonaws.com/488835613.mp4"
+*   }
+* 
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 404 Not Found
+*   Error marshalling location
+*/
+func DownloadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+
+  // decode req.body to get the title
+  decoder := json.NewDecoder(req.Body)
+
+  v := new(YoutubeVidfile)
+  err := decoder.Decode(&v)
+  HandleError(err)
+
+  fmt.Println("download video called and filename", v.Filename, "youtubeID", v.YoutubeID)
+  // list of all videos to donwload
+  idList := [...]string{v.YoutubeID}
+
+  // name of folder to save file in
+  rep := "youtubeVideos"
+  
+  // for each video in list, download it
+  for _, id := range idList {
+    vl, err := GetVideoListFromId(id)
+    HandleError(err)
+
+    fmt.Println("downloading one")
+    err = vl.Download(rep, v.Filename, "", "video/mp4")
+    HandleError(err)
+  }
+
+  location := UploadVideo(v.Filename)
+
+  // send hello world back as test for now
+  resp := YoutubeResponse{
+    Success: "Successfully downloaded file",
+    Location: location,
+  }
+
+  j, err := json.Marshal(resp)
+
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Header().Set("Content-Type", "application/json")
+
+  if err != nil {
+    w.WriteHeader(http.StatusNotFound)
+    w.Write([]byte("error marshalling location"))
+  } else {
+    w.WriteHeader(http.StatusOK)
+    w.Write(j)
+  }
+}
+
+// Upload file to AWS, delete local file, and then return its aws location
+func UploadVideo(filename string) (string) {
+  fmt.Println("upload called")
+  file, err := os.Open("/Users/billzito/Documents/HR/projects/tuna-io/youtubeVideos/" + filename)
+  HandleError(err)
+
+  uploader := s3manager.NewUploader(session.New(&aws.Config{Region: aws.String("us-west-1")}))
+  result, err := uploader.Upload(&s3manager.UploadInput{
+    Body: file,
+    Bucket: aws.String("invalidmemories"),
+    Key: aws.String(filename),
+    ACL: aws.String("public-read"),
+  })
+
+  HandleError(err)
+
+  // after upload complete, remove local file
+  err = os.Remove("/Users/billzito/Documents/HR/projects/tuna-io/youtubeVideos/" + filename)
+  HandleError(err)
+
+  fmt.Println("Successfuly deleted", filename)
+  return result.Location
+}
 
 /*-------------------------------------
  *      AUDIO FILE TRANSCRIPTION
@@ -653,37 +816,3 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request, _ httprouter.Par
     w.Write(j)
   }
 }
-
-func SearchVideo(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-  hash := ps.ByName("hash")
-  query := ps.ByName("query")
-
-  transcript, err := db.GetVideoTranscript(hash)
-
-  HandleError(err)
-
-  var words = transcript.Words
-  var foundWords []int
-  for i := 0; i < len(words); i++ {
-    if words[i].Token == query {
-      foundWords = append(foundWords, i)
-    }
-  }
-
-  fmt.Println("foundWords", foundWords)
-
-  w.Header().Set("Content-Type", "application/json")
-
-  j, err := json.Marshal(foundWords)
-
-  if err != nil {
-    fmt.Println("error marshalling foundowrds", err)
-    w.WriteHeader(http.StatusNotFound)
-    w.Write([]byte("sad"))
-  } else {
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte(j))
-  }
-}
-
-

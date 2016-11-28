@@ -191,14 +191,11 @@ node compile.js
 
 Start up the static file server
 ```
+go get (and go get *filename* if you're having issues)
 make run-server
 ```
 
-Install all Go dependencies and start up the server!
-```
-go get
-go run main.go
-```
+Open up 127.0.0.1:3000 and have fun!
 
 ### Roadmap
 

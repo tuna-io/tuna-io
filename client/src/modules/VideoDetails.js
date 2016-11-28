@@ -7,7 +7,7 @@ import TimeAgo from 'react-timeago';
 import Wordcloud from './Wordcloud';
 
 // TODO: prevent errors if there is no transcript
-// TODO: remove duplicate code in upload
+// TODO: make sure subtitles are still working
 class VideoDetails extends Component {
   constructor(props) {
     super(props);
