@@ -104,6 +104,7 @@ export default class Upload extends React.Component {
   // TODO: make this work for webm format as well (server side?)
   // Get video metadata
   getVideoMetadata(url) {
+    console.log("url for metadata is", url);
     return fetch(`/api/videos/metadata/${url}`, {
       method: 'GET',
       headers: {
@@ -119,7 +120,7 @@ export default class Upload extends React.Component {
     .catch(err => console.log('Error retrieving metadata:', err));
   }
 
-  //send video info to server
+  // send video info to server
   addToDb(){
     console.log('adding to db');
     return fetch('/api/videos', {
@@ -195,6 +196,7 @@ export default class Upload extends React.Component {
     this.setState({
       youtubeID: id,
       file: { name: newFilename, type: 'video/mp4', hash: newFilename },
+      title: newFilename,
     });
     console.log("got youtube id");
   }

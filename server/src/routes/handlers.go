@@ -5,6 +5,7 @@ import (
   "os"
   "fmt"
   "time"
+  "bytes"
   "strings"
   "os/exec"
   "net/http"
@@ -259,9 +260,14 @@ func GetVideoMetadata(w http.ResponseWriter, r *http.Request, ps httprouter.Para
   fmt.Println("url is", ps.ByName("url"))
   s := []string{"http://s3-us-west-1.amazonaws.com/invalidmemories/", ps.ByName("url")}
   video := strings.Join(s, "")
+  
+  var stderr bytes.Buffer
+
   cmd := exec.Command("ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=duration", "-of", "default=noprint_wrappers=1:nokey=1", video)
+  cmd.Stderr = &stderr
   out, err := cmd.Output()
   fmt.Println("output is", string(out))
+  fmt.Println("error ffprobing the video is", stderr.String())
   HandleError(err)
 
   w.Header().Set("Content-Type", "application/json")
@@ -769,6 +775,7 @@ func UploadVideo(filename string) (string) {
     Body: file,
     Bucket: aws.String("invalidmemories"),
     Key: aws.String(filename),
+    ACL: aws.String("public-read"),
   })
 
   HandleError(err)
