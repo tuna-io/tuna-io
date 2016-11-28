@@ -179,16 +179,6 @@ class VideoDetails extends Component {
         this.overlay.push(partial);
       }
     }
-
-    console.log(this.overlay);
-
-
-    // transcript.forEach(word =>
-    //   this.overlay.push({
-    //     content: word.word,
-    //     start: word.starttime,
-    //     end: word.endtime,
-    //   }));
   }
 
   // Transcript is rendered after server-side transcription
