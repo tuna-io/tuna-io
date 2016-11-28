@@ -329,7 +329,6 @@ export default class Upload extends React.Component {
 
     const eventHandlers = {
       init: dz => this.dropzone = dz,
-      drop: this.attachUsingDropzone.bind(this),
       addedfile: this.attachUsingDropzone.bind(this),
     };
 
