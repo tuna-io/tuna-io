@@ -180,7 +180,7 @@ export default class Upload extends React.Component {
         this.processVideo();
       })
       .catch((err) => {
-        console.log("error putting to aws", err);
+        console.log('error putting to aws', err);
       });
     }
   }
@@ -188,17 +188,16 @@ export default class Upload extends React.Component {
   // on submit, hash youtube key and set to state
   getYoutubeID(event) {
     event.preventDefault();
-    const generatedHash = this.hash(this.state.link);
+    const generatedHash = this.hash(10);
     const newFilename = `${generatedHash}.mp4`;
 
     // youtube ids are the 11 numbers after the v=
-    const id = this.state.link.split("v=")[1].slice(0, 11);
+    const id = this.state.link.split('v=')[1].slice(0, 11);
     this.setState({
       youtubeID: id,
       file: { name: newFilename, type: 'video/mp4', hash: newFilename },
       title: newFilename,
     });
-    console.log("got youtube id");
   }
 
   // Send to server to donwload vid and then processes video
