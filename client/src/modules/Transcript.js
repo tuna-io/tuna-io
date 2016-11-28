@@ -9,10 +9,47 @@ class Transcript extends React.Component {
     };
 
     this.changeMode = this.changeMode.bind(this);
+    this.renderTranscriptAsParagraph = this.renderTranscriptAsParagraph.bind(this);
+    this.renderEditableTranscript = this.renderEditableTranscript.bind(this);
   }
 
   changeMode(event) {
     this.setState({ inEditMode: event.target.checked });
+  }
+
+  renderTranscriptAsParagraph() {
+    return (
+      this.props.transcript.map(pair => pair.word).reduce((firstword, secondword) => `${firstword} ${secondword}`)
+    );
+  }
+
+  renderEditableTranscript() {
+    return (
+      <table>
+        <thead>
+          <tr>
+            <th>Start</th>
+            <th>End</th>
+            <th>Word</th>
+          </tr>
+        </thead>
+        <tbody>
+          {this.props.transcript.map(pair => (
+            <tr>
+              <td>
+                {pair.endtime}
+              </td>
+              <td>
+                {pair.starttime}
+              </td>
+              <td>
+                {pair.word}
+              </td>
+            </tr>
+            ))}
+        </tbody>
+      </table>
+    );
   }
 
   render() {
@@ -22,7 +59,7 @@ class Transcript extends React.Component {
         <div>
           {
             !this.state.inEditMode ?
-            this.props.transcript.map(pair => pair.word).reduce((firstword, secondword) => `${firstword} ${secondword}`) : null
+            this.renderTranscriptAsParagraph() : this.renderEditableTranscript()
           }
         </div>
       </div>
