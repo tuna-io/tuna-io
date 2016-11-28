@@ -11,6 +11,7 @@ class Transcript extends React.Component {
     this.changeMode = this.changeMode.bind(this);
     this.renderTranscriptAsParagraph = this.renderTranscriptAsParagraph.bind(this);
     this.renderEditableTranscript = this.renderEditableTranscript.bind(this);
+    this.handleTranscriptEdit = this.handleTranscriptEdit.bind(this);
   }
 
   changeMode(event) {
@@ -34,7 +35,7 @@ class Transcript extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {this.props.transcript.map(pair => (
+          {this.props.transcript.map((pair, index) => (
             <tr>
               <td>
                 {pair.endtime}
@@ -43,13 +44,17 @@ class Transcript extends React.Component {
                 {pair.starttime}
               </td>
               <td>
-                {pair.word}
+                <input type="text" key={index} name={index} onChange={this.handleTranscriptEdit} defaultValue={pair.word}></input>
               </td>
             </tr>
             ))}
         </tbody>
       </table>
     );
+  }
+
+  handleTranscriptEdit(event) {
+    console.log(event.target.name, event.target.value);
   }
 
   render() {
