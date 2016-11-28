@@ -13,6 +13,7 @@ class Transcript extends React.Component {
     this.renderTranscriptAsParagraph = this.renderTranscriptAsParagraph.bind(this);
     this.renderEditableTranscript = this.renderEditableTranscript.bind(this);
     this.handleTranscriptEdit = this.handleTranscriptEdit.bind(this);
+    this.submitTranscriptForm = this.submitTranscriptForm.bind(this);
   }
 
   changeMode(event) {
@@ -27,35 +28,45 @@ class Transcript extends React.Component {
 
   renderEditableTranscript() {
     return (
-      <table>
-        <thead>
-          <tr>
-            <th>Start</th>
-            <th>End</th>
-            <th>Word</th>
-          </tr>
-        </thead>
-        <tbody>
-          {this.props.transcript.map((pair, index) => (
+      <div>
+        <table>
+          <thead>
             <tr>
-              <td>
-                {pair.endtime}
-              </td>
-              <td>
-                {pair.starttime}
-              </td>
-              <td>
-                <input type="text" key={index} name={index} onChange={this.handleTranscriptEdit} defaultValue={pair.word}></input>
-              </td>
+              <th>Start</th>
+              <th>End</th>
+              <th>Word</th>
             </tr>
-            ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {this.props.transcript.map((pair, index) => (
+              <tr>
+                <td>
+                  {pair.endtime}
+                </td>
+                <td>
+                  {pair.starttime}
+                </td>
+                <td>
+                  <input type="text" key={index} name={index} onChange={this.handleTranscriptEdit} defaultValue={pair.word}></input>
+                </td>
+              </tr>
+              ))}
+          </tbody>
+        </table>
+        <form onSubmit={this.submitTranscriptForm}>
+          <input type="submit" value="Submit" />
+        </form>
+      </div>
     );
   }
 
   handleTranscriptEdit(event) {
     console.log(event.target.name, event.target.value);
+  }
+
+  submitTranscriptForm(event) {
+    event.preventDefault();
+    console.log('form submitted');
   }
 
   render() {
