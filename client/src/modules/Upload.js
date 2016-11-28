@@ -188,9 +188,8 @@ export default class Upload extends React.Component {
   // on submit, hash youtube key and set to state
   getYoutubeID(event) {
     event.preventDefault();
-    const maybeNegHash = this.hash(this.state.link);
-    const positiveHash = maybeNegHash > 0 ? maybeNegHash : maybeNegHash * -1;
-    const newFilename = `${positiveHash}.mp4`;
+    const generatedHash = this.hash(this.state.link);
+    const newFilename = `${generatedHash}.mp4`;
 
     // youtube ids are the 11 numbers after the v=
     const id = this.state.link.split("v=")[1].slice(0, 11);
