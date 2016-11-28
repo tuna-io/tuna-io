@@ -159,12 +159,36 @@ class VideoDetails extends Component {
   }
 
   generateOverlay(transcript) {
-    transcript.forEach(word =>
-      this.overlay.push({
-        content: word.word,
-        start: word.starttime,
-        end: word.endtime,
-      }));
+    var i = 0;
+    var partial = {content: '', start: i, end: i + 5,};
+
+    for (var j = 0; j < transcript.length; j++) {
+      var word = transcript[j];
+
+      if (word.endtime >= i + 5) {
+        i += 5;
+        partial.content += ' ' + word.word;
+        this.overlay.push(partial);
+        partial = {content: '', start: i, end: i + 5,};
+      } else {
+        partial.content += ' ' + word.word;
+      }
+
+      if (j === transcript.length - 1) {
+        partial.content += ' ' + word.word;
+        this.overlay.push(partial);
+      }
+    }
+
+    console.log(this.overlay);
+
+
+    // transcript.forEach(word =>
+    //   this.overlay.push({
+    //     content: word.word,
+    //     start: word.starttime,
+    //     end: word.endtime,
+    //   }));
   }
 
   // Transcript is rendered after server-side transcription
