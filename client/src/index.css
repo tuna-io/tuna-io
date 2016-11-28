@@ -23,7 +23,7 @@ a {
   /* The base font size controls the size of everything, not just text.
      All dimensions use em-based sizes so that the scale along with the font size.
      Try increasing it to 15px and see what happens. */
-  font-size: 10px;
+  font-size: 15px;
   /* The main font color changes the ICON COLORS as well as the text */
   color: #fff;
 }
@@ -181,7 +181,8 @@ a {
   width: 3em;
   position: absolute;
   right: 0;
-  margin-right: 40px;
+  margin-top: 9px;
+  margin-right: 30px;
 }
 
 .vjs-sublime-skin .vjs-menu-button .vjs-menu-content, .vjs-sublime-skin .vjs-menu-button-inline:hover, .vjs-sublime-skin .vjs-menu-button-inline:focus, .vjs-sublime-skin .vjs-menu-button-inline.vjs-slider-active {
@@ -217,10 +218,11 @@ a {
   height: 100%;
 }
 
-/**
- * videojs-overlay
- * @version 1.1.0
- * @copyright 2016 Brightcove, Inc.
- * @license Apache-2.0
- */
-.video-js .vjs-overlay{color:#fff;position:absolute;text-align:center;max-width:33%}.video-js .vjs-overlay-background{background-color:#646464;background-color:rgba(255,255,255,0.4);border-radius:3px;padding:10px;width:33%}.video-js .vjs-overlay-top-left{top:5px;left:5px}.video-js .vjs-overlay-top{left:50%;margin-left:-16.5%;top:5px}.video-js .vjs-overlay-top-right{right:5px;top:5px}.video-js .vjs-overlay-right{margin-top:-15px;right:5px;top:50%}.video-js .vjs-overlay-bottom-right{bottom:3.5em;right:5px}.video-js .vjs-overlay-bottom{bottom:3.5em;left:50%;margin-left:-16.5%}.video-js .vjs-overlay-bottom-left{bottom:3.5em;left:5px}.video-js .vjs-overlay-left{left:5px;margin-top:-15px;top:50%}
+.captions {
+  font-size: 32px;
+  color: white !important;
+  background-color: black !important;
+  margin-bottom: -70px !important;
+  min-width: 80%;
+  margin-left: -40% !important;
+}
