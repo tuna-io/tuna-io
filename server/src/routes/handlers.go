@@ -373,7 +373,7 @@ func DownloadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params
     HandleError(err)
   }
 
-  location := UploadVideo(v.Filename)
+  location := UploadVideo(rep, v.Filename)
 
   // send hello world back as test for now
   resp := YoutubeResponse{
@@ -396,9 +396,13 @@ func DownloadVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params
 }
 
 // Upload file to AWS, delete local file, and then return its aws location
-func UploadVideo(filename string) (string) {
+func UploadVideo(directory string, filename string) (string) {
   fmt.Println("upload called")
-  file, err := os.Open("/Users/billzito/Documents/HR/projects/tuna-io/youtubeVideos/" + filename)
+  currDir, err := os.Getwd()
+  HandleError(err)
+
+  videoFile := currDir + "/" + directory + "/" + filename
+  file, err := os.Open(videoFile)
   HandleError(err)
 
   uploader := s3manager.NewUploader(session.New(&aws.Config{Region: aws.String("us-west-1")}))
@@ -412,7 +416,7 @@ func UploadVideo(filename string) (string) {
   HandleError(err)
 
   // after upload complete, remove local file
-  err = os.Remove("/Users/billzito/Documents/HR/projects/tuna-io/youtubeVideos/" + filename)
+  err = os.Remove(videoFile)
   HandleError(err)
 
   fmt.Println("Successfuly deleted", filename)
