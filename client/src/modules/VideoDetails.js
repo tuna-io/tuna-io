@@ -35,7 +35,7 @@ class VideoDetails extends Component {
     this.findTime = this.findTime.bind(this);
     this.myVideo;
     // Fetch initial video data. This is only called once
-    this.fetchVideoFromAPI(props.params.videoId, this.state);
+    this.fetchVideoFromAPI(props.params.videoId);
   }
 
   // Upon going to a different video details page, fetch video data
@@ -44,7 +44,7 @@ class VideoDetails extends Component {
   }
 
   // Helper function to fetch video data
-  fetchVideoFromAPI(videoId, state) {
+  fetchVideoFromAPI(videoId) {
     const url = `/api/videos/get/${videoId}`;
     const options = {
       method: 'GET',
