@@ -5,6 +5,7 @@ import math
 # Splits a document into words
 tokenize = lambda doc: doc.lower().split(" ")
 
+# Currently hardcoded, change to read from redis pipe
 document_0 = "China has a strong economy that is growing at a rapid pace. However politically it differs greatly from the US Economy."
 document_1 = "At last, China seems serious about confronting an endemic problem: domestic violence and corruption."
 document_2 = "Japan's prime minister, Shinzo Abe, is working towards healing the economic turmoil in his own country for his view on the future of his people."
@@ -16,7 +17,7 @@ document_6 = "Vladimir Putin was found to be riding a horse, again, without a sh
 # Collect all documents into a list
 all_documents = [document_0, document_1, document_2, document_3, document_4, document_5, document_6]
 
-tokenized_documents = [tokenize(d) for d in all_documents] # tokenized docs
+tokenized_documents = [tokenize(d) for d in all_documents]
 
 # Removes all duplicates
 all_tokens_set = set([item for sublist in tokenized_documents for item in sublist])
@@ -59,3 +60,19 @@ def tfidf(documents):
 
 # Generate tf-idf representation for all documents
 tfidf_representation = tfidf(all_documents)
+
+# Generate cosine similarity between 2 vectors
+def cosine_similarity(vector1, vector2):
+  dot_product = sum(p*q for p,q in zip(vector1, vector2))
+  magnitude = math.sqrt(sum([val**2 for val in vector1])) * math.sqrt(sum([val**2 for val in vector2]))
+  if not magnitude:
+    return 0
+  return dot_product/magnitude
+
+# Generate similarity ranking of all documents
+our_tfidf_comparisons = []
+
+for count_0, doc_0 in enumerate(tfidf_representation):
+  for count_1, doc_1 in enumerate(tfidf_representation):
+    our_tfidf_comparisons.append((cosine_similarity(doc_0, doc_1), count_0, count_1))
+
