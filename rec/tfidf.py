@@ -23,15 +23,39 @@ all_tokens_set = set([item for sublist in tokenized_documents for item in sublis
 
 # Retrieve normalized frequency of words
 def sublinear_term_frequency(term, tokenized_document):
+  count = tokenized_document.count(term)
+
+  # log(0) returns undefined, so return 0 if word not found in doc
+  if count == 0:
+    return 0
+
+  # Otherwise, return normalized frequency of word in document
   return 1 + math.log(tokenized_document.count(term))
 
 def inverse_document_frequencies(tokenized_documents):
   idf_values = {}
+
   # For each token in the unique token set, see if token exists in all other docs
   # The weighted sum of its existence is our IDF score (importance of word) for the token
   for tkn in all_tokens_set:
     contains_token = map(lambda doc: tkn in doc, tokenized_documents)
-    idf_values[tkn] = 1 + math.log(len(tokenized_documents)/(sum(contains_token)))
+    idf_values[tkn] = 1 + math.log(len(tokenized_documents) / (sum(contains_token)))
+
   return idf_values
 
+# Generate idf values for all documents
 idf_values = inverse_document_frequencies(tokenized_documents)
+
+# Vectorize documents (transform into matrices)
+def tfidf(documents):
+  tfidf_documents = []
+  for document in tokenized_documents:
+    doc_tfidf = []
+    for term in idf_values.keys():
+      tf = sublinear_term_frequency(term, document)
+      doc_tfidf.append(tf * idf_values[term])
+    tfidf_documents.append(doc_tfidf)
+  return tfidf_documents
+
+# Generate tf-idf representation for all documents
+tfidf_representation = tfidf(all_documents)
