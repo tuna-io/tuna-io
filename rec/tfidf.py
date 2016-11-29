@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from __future__ import division
 import string
 import math
@@ -133,7 +134,13 @@ class Tfidf:
     pipe.execute()
 
 
-test = Tfidf()
-test.generate_similarity_rankings()
-print(test.our_tfidf_comparisons)
-test.send_top_rankings()
+if __name__ == "__main__":
+  similar_videos = Tfidf()
+
+  # save top comparisons into our_tfidf_comparisons
+  similar_videos.generate_similarity_rankings()
+  print(similar_videos.our_tfidf_comparisons)
+
+  # send similar videos to redis
+  similar_videos.send_top_rankings()
+
