@@ -11,19 +11,20 @@ class Tfidf:
     self.tokenized_documents = []
     self.all_tokens_set = set()
     self.idf_values = {}
-    self.our_tfidf_comparisons = []
+    self.our_tfidf_comparisons = {}
+    self.r = redis.StrictRedis(host="localhost", port=6379, db=0, charset="utf-8", decode_responses=True)
+
 
   """
   pipe in all transcripts from redis
   """
   def get_latest_transcripts(self): 
     #set up connection to redis
-    r = redis.StrictRedis(host="localhost", port=6379, db=0, charset="utf-8", decode_responses=True)
     # get all keys
-    keys = r.keys("video:*")
+    keys = self.r.keys("video:*")
 
     #create pipeline
-    pipe = r.pipeline()
+    pipe = self.r.pipeline()
 
     # hgetall each one (or get just the transcript)
     for key in keys: 
@@ -107,8 +108,32 @@ class Tfidf:
 
     for count_0, doc_0 in enumerate(self.tfidf_representation):
       for count_1, doc_1 in enumerate(self.tfidf_representation):
-        self.our_tfidf_comparisons.append((self.cosine_similarity(doc_0, doc_1), self.all_documents[count_0][0], self.all_documents[count_1][0]))
+        if self.our_tfidf_comparisons.get(self.all_documents[count_0][0]) == None: 
+          self.our_tfidf_comparisons[self.all_documents[count_0][0]] = []
+        else: 
+          self.our_tfidf_comparisons[self.all_documents[count_0][0]].append((self.cosine_similarity(doc_0, doc_1), self.all_documents[count_1][0]))
+        # self.our_tfidf_comparisons.append((self.cosine_similarity(doc_0, doc_1), self.all_documents[count_0][0], self.all_documents[count_1][0]))
+
+    for key in self.our_tfidf_comparisons:
+      self.our_tfidf_comparisons[key] = sorted(self.our_tfidf_comparisons[key], key=lambda element: (-element[0]))
+
+  """
+  pipe all results back to redis
+  in form: string({video: score})
+  """
+  def send_top_rankings(self):
+    pipe = self.r.pipeline()
+
+
+    #for each key
+    for key in self.our_tfidf_comparisons:
+      #dictionary of top videos
+      pipe.hset("video:%s" % (key), "similar_videos", json.dumps(self.our_tfidf_comparisons[key][0:10]))
+
+    pipe.execute()
 
 
 test = Tfidf()
 test.generate_similarity_rankings()
+print(test.our_tfidf_comparisons)
+test.send_top_rankings()
