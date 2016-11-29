@@ -125,6 +125,31 @@ func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) 
   }
 }
 
+type TempGroup struct {
+  Words []Temps `json:"words"`
+}
+
+type Temps struct {
+  Text     string        `json:"word"`
+  Start    float64       `json:"starttime"`
+  End      float64       `json:"endtime"`
+}
+
+func UpdateTranscriptHandler(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  fmt.Println("POST /api/videos/transcript/{hash}")
+
+  hash := ps.ByName("hash")
+
+  // Decode the transcript from JSON binary data
+  decoder := json.NewDecoder(req.Body)
+  var transcript db.Transcript
+  err := decoder.Decode(&transcript)
+  HandleError(err)
+
+  // Helper function to update transcript
+  db.UpdateTranscript(hash, &transcript)
+}
+
 /**
 * @api {get} /api/videos/{hash} Retrieve a stored video
 * @apiName GetVideo

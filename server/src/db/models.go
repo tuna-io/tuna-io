@@ -179,6 +179,14 @@ func AddTranscript(hash string, transcript *watson.Text) (string, error) {
   return string(rep), err
 }
 
+func UpdateTranscript(hash string, transcript *Transcript) {
+  conn := Pool.Get()
+  defer conn.Close()
+  t, _ := json.Marshal(transcript)
+
+  _, _ = redis.StringMap(conn.Do("HSET", "video:" + hash, "transcript", t))
+}
+
 func GetLatestVideos() (string, error) {
   conn := Pool.Get()
   defer conn.Close()
