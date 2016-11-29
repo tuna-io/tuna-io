@@ -188,7 +188,7 @@ class VideoDetails extends Component {
       <div>
         <h3>Transcript: </h3>
         {this.state.transcript.length ? (
-          <Transcript transcript={this.state.transcript} />
+          <Transcript transcript={this.state.transcript} videoId={this.props.params.videoId} />
           ) : null
         }
       </div>

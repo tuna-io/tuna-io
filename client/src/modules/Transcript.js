@@ -29,7 +29,10 @@ class Transcript extends React.Component {
   // Handles form submission
   submitTranscriptForm(event) {
     event.preventDefault();
-    console.log(JSON.stringify(this.state.transcriptCopy[0]));
+    // console.log(JSON.stringify(this.state.transcriptCopy[0]));
+
+    console.log(`/api/videos/transcript/${this.props.videoId}`);
+    // fetch(`/api/videos/transcript${this.props.currentVideoId}`)
     // TODO send a POST or PUT request to submit the transcript
     // Upon success, replace current transcript
   }
