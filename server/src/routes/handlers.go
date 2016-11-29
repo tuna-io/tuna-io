@@ -499,7 +499,7 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
  *         S3 VIDEO UPLOADING
  *------------------------------------*/
 
-type Vidfile struct {
+type File struct {
   Filename string `json:"filename"`
   Filetype string `json:"filetype"`
 }
@@ -529,7 +529,7 @@ func SignVideo(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
   decoder := json.NewDecoder(r.Body)
 
-  v := new(Vidfile)
+  v := new(File)
   err := decoder.Decode(&v)
   HandleError(err)
 
@@ -543,6 +543,35 @@ func SignVideo(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
   // allow upload with url for 5min
   urlStr, err := req.Presign(5 * time.Minute)
+  HandleError(err)
+
+  j, err := json.Marshal(urlStr)
+  HandleError(err)
+
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Header().Set("Content-Type", "application/json")
+  w.Write(j)
+}
+
+func SignThumbnailHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+  decoder := json.NewDecoder(r.Body)
+
+  f := new(File)
+  err := decoder.Decode(&f)
+  HandleError(err)
+
+  // get presigned url to allow upload on client side
+  svc := s3.New(session.New(&aws.Config{Region: aws.String("us-west-1")}))
+  req, _ := svc.PutObjectRequest(&s3.PutObjectInput{
+    Bucket: aws.String("invalidmemories"),
+    Key:    aws.String(f.Filename),
+    ACL:    aws.String("public-read"),
+  })
+
+  // allow upload with url for 5min
+  urlStr, err := req.Presign(5 * time.Minute)
+  fmt.Println("thumb url:", urlStr)
   HandleError(err)
 
   j, err := json.Marshal(urlStr)
