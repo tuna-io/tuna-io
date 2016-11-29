@@ -30,12 +30,44 @@ class ThumbnailGenerator extends React.Component {
   handleThumbnailSave(event) {
     event.preventDefault();
 
-    // Save the image to a CDN
+    // Retrieve the signed URL from server
+    fetch('/api/s3/thumbnail', { // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
+      method: 'POST',
+      body: JSON.stringify({
+        filename: `${this.props.videoID}_thumbnail`,
+        filetype: 'image/png',
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(res => res.json())
+    .then((url) => {
+      console.log('Retrieved signed URL:', url);
+
+      // Given the signed URL, submit to the CDN
+      fetch(url, {
+        method: 'PUT',
+        body: 'TODO.file',
+        headers: {
+          'x-amz-acl': 'public-read',
+        },
+      })
+      .then(() => {
+        console.log('Success putting into Amazon');
+      })
+      .catch((err) => {
+        console.log('Error putting thumbnail in AWS', err);
+      });
+    })
+    .catch((err) => {
+      console.log("Error getting signed URL:", err);
+    });
   }
 
   renderThumbnailPicker() {
     if (this.state.showPicker) { // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
-      const video = document.getElementById('my-video_html5_api');
+      const video = document.getElementById('my-video_html5_api'); // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
       const canvasWidth = video.getBoundingClientRect().width / 2;
       const canvasHeight = video.getBoundingClientRect().height / 2;
 

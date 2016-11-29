@@ -571,7 +571,6 @@ func SignThumbnailHandler(w http.ResponseWriter, r *http.Request, _ httprouter.P
 
   // allow upload with url for 5min
   urlStr, err := req.Presign(5 * time.Minute)
-  fmt.Println("thumb url:", urlStr)
   HandleError(err)
 
   j, err := json.Marshal(urlStr)
