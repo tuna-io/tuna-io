@@ -196,7 +196,6 @@ class VideoDetails extends Component {
   }
 
   renderWordcloud() {
-    console.log('about to render, length is:', this.state.transcript.length);
     return this.state.transcript.length ?
       (
         <Wordcloud transcript={this.state.transcript} />

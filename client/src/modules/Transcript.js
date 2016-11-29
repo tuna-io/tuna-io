@@ -1,12 +1,11 @@
 import React from 'react';
-import _ from 'lodash';
 
 class Transcript extends React.Component {
   constructor(props) {
     super(props);
 
     // Shallow copy transcript to preserve potential changes
-    const transcriptCopy = _.assign({}, props.transcript);
+    const transcriptCopy = props.transcript.slice();
 
     this.state = {
       inEditMode: false,
@@ -29,19 +28,18 @@ class Transcript extends React.Component {
   // Handles form submission
   submitTranscriptForm(event) {
     event.preventDefault();
-    // console.log(JSON.stringify(this.state.transcriptCopy[0]));
-    const transformedTranscript = this.state.transcript.map((obj) => {
-      return {
-        token: obj.word,
-        begin: obj.starttime,
-        end: obj.endtime,
-      };
-    });
+    const transformedTranscript = this.state.transcript.map(obj => ({
+      token: obj.word,
+      begin: obj.starttime,
+      end: obj.endtime,
+    }));
 
+    // Wrap array of words with outer object
     const transcriptWrapper = {
       words: transformedTranscript,
     };
 
+    // Fetch data from API endpoint
     const apiEndpoint = `/api/videos/transcript/${this.props.videoId}`;
     fetch(apiEndpoint, {
       method: 'POST',
@@ -51,13 +49,13 @@ class Transcript extends React.Component {
       },
     })
     .then(data => data.json())
-    .then((res) => {
-      console.log('Response:', res);
+    .then(() => {
+      // Replace current transcript
+      this.setState({ transcript: this.state.transcriptCopy });
     })
     .catch((err) => {
       console.log('Error updating transcript:', err);
     });
-    // Upon success, replace current transcript
   }
 
   // Handles editing of every transcript word
@@ -65,7 +63,7 @@ class Transcript extends React.Component {
     this.state.transcriptCopy[event.target.name].word = event.target.value;
 
     this.setState({
-      'transcriptCopy': this.state.transcriptCopy,
+      transcriptCopy: this.state.transcriptCopy,
     });
   }
 
