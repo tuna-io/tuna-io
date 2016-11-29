@@ -28,15 +28,10 @@ class Transcript extends React.Component {
   // Handles form submission
   submitTranscriptForm(event) {
     event.preventDefault();
-    const transformedTranscript = this.state.transcript.map(obj => ({
-      token: obj.word,
-      begin: obj.starttime,
-      end: obj.endtime,
-    }));
 
     // Wrap array of words with outer object
     const transcriptWrapper = {
-      words: transformedTranscript,
+      Words: this.state.transcript,
     };
 
     // Fetch data from API endpoint
@@ -60,7 +55,7 @@ class Transcript extends React.Component {
 
   // Handles editing of every transcript word
   handleTranscriptEdit(event) {
-    this.state.transcriptCopy[event.target.name].word = event.target.value;
+    this.state.transcriptCopy[event.target.name].Token = event.target.value;
 
     this.setState({
       transcriptCopy: this.state.transcriptCopy,
@@ -70,7 +65,7 @@ class Transcript extends React.Component {
   // Render the transcript paragraph-style
   renderTranscriptAsParagraph() {
     return (
-      this.state.transcript.map(pair => pair.word).reduce((firstword, secondword) => `${firstword} ${secondword}`)
+      this.state.transcript.map(pair => pair.Token).reduce((firstword, secondword) => `${firstword} ${secondword}`)
     );
   }
 
@@ -90,13 +85,13 @@ class Transcript extends React.Component {
             {this.state.transcript.map((pair, index) => (
               <tr>
                 <td>
-                  {pair.endtime}
+                  {pair.Begin}
                 </td>
                 <td>
-                  {pair.starttime}
+                  {pair.End}
                 </td>
                 <td>
-                  <input type="text" key={index} name={index} onChange={this.handleTranscriptEdit} defaultValue={pair.word}></input>
+                  <input type="text" key={index} name={index} onChange={this.handleTranscriptEdit} defaultValue={pair.Token}></input>
                 </td>
               </tr>
               ))}

@@ -107,11 +107,13 @@ class VideoDetails extends Component {
   saveTranscript(transcript) {
     const newTranscript = [];
 
-    transcript.words.forEach(word =>
+    console.log('transcript', transcript);
+
+    transcript.Words.forEach(word =>
       newTranscript.push({
-        word: word.token,
-        starttime: word.begin,
-        endtime: word.end,
+        Token: word.Token,
+        Begin: word.Begin,
+        End: word.End,
       }));
 
     this.setState({
@@ -166,17 +168,17 @@ class VideoDetails extends Component {
     for (var j = 0; j < transcript.length; j++) {
       var word = transcript[j];
 
-      if (word.endtime >= i + 5) {
+      if (word.End >= i + 5) {
         i += 5;
-        partial.content += ' ' + word.word;
+        partial.content += ' ' + word.Token;
         this.overlay.push(partial);
         partial = {content: '', start: i, end: i + 5,};
       } else {
-        partial.content += ' ' + word.word;
+        partial.content += ' ' + word.Token;
       }
 
       if (j === transcript.length - 1) {
-        partial.content += ' ' + word.word;
+        partial.content += ' ' + word.Token;
         this.overlay.push(partial);
       }
     }
@@ -223,14 +225,14 @@ class VideoDetails extends Component {
             {this.state.searchResults ? (this.state.searchResults.map(i =>
               (
                 <button onClick={
-                  this.findTime.bind(this, this.state.transcript[i].endtime)}
+                  this.findTime.bind(this, this.state.transcript[i].End)}
                 >
                   {
-                    Math.floor(this.state.transcript[i].endtime / 60) + ":" +
-                    this.state.transcript[i].endtime % 60 + '--' +
+                    Math.floor(this.state.transcript[i].End / 60) + ":" +
+                    this.state.transcript[i].End % 60 + '--' +
                     this.state.transcript.slice(Math.max(i - 4, 0),
                     Math.min(i + 5, this.state.transcript.length))
-                    .map(pair => pair.word)
+                    .map(pair => pair.Token)
                     .reduce((fword, sword) => `${fword} ${sword}`)
                   }
                 </button>
