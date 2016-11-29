@@ -454,7 +454,7 @@ class Wordcloud extends React.Component {
 
     transcript
       // get words from transcript
-      .map(obj => obj.word)
+      .map(obj => obj.Token)
       // filter out stoplist words
       .filter(word => (includeStopWords ? true : !this.stopWords.includes(word)))
       // turn into count object
