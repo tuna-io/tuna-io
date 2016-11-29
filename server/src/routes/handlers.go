@@ -125,6 +125,32 @@ func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) 
   }
 }
 
+func UpdateTranscriptHandler(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  fmt.Println("POST /api/videos/transcript/{hash}")
+
+  hash := ps.ByName("hash")
+
+  // Decode the transcript from JSON binary data
+  decoder := json.NewDecoder(req.Body)
+  var transcript db.Transcript
+  err := decoder.Decode(&transcript)
+  HandleError(err)
+
+  // Helper function to update transcript
+  db.UpdateTranscript(hash, &transcript)
+
+  // Craft response
+  u := Response{
+    Success: "Successfully updated video transcript",
+    Hash: hash,
+  }
+
+  j, err := json.Marshal(u)
+
+  w.WriteHeader(http.StatusOK)
+  fmt.Fprintln(w, string(j))
+}
+
 /**
 * @api {get} /api/videos/{hash} Retrieve a stored video
 * @apiName GetVideo

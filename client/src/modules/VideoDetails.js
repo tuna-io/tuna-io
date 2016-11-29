@@ -5,6 +5,7 @@ import { Grid, Row, Col } from 'react-flexgrid';
 import { Badge, Space, InlineForm, Panel, PanelHeader, Text, Avatar, Heading, Flex, Donut, Stat } from 'rebass';
 import TimeAgo from 'react-timeago';
 import Wordcloud from './Wordcloud';
+import Transcript from './Transcript';
 
 // TODO: prevent errors if there is no transcript
 // TODO: make sure subtitles are still working
@@ -106,11 +107,11 @@ class VideoDetails extends Component {
   saveTranscript(transcript) {
     const newTranscript = [];
 
-    transcript.Words.forEach(word =>
+    transcript.words.forEach(word =>
       newTranscript.push({
-        word: word.Token,
-        starttime: word.Begin,
-        endtime: word.End,
+        word: word.token,
+        starttime: word.begin,
+        endtime: word.end,
       }));
 
     this.setState({
@@ -187,9 +188,7 @@ class VideoDetails extends Component {
       <div>
         <h3>Transcript: </h3>
         {this.state.transcript.length ? (
-          <div>
-            {this.state.transcript.map(pair => pair.word).reduce((firstword, secondword) => `${firstword} ${secondword}`)}
-          </div>
+          <Transcript transcript={this.state.transcript} videoId={this.props.params.videoId} />
           ) : null
         }
       </div>
