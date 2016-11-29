@@ -30,8 +30,30 @@ class Transcript extends React.Component {
   submitTranscriptForm(event) {
     event.preventDefault();
     // console.log(JSON.stringify(this.state.transcriptCopy[0]));
+    const transformedTranscript = this.state.transcript.map((obj) => {
+      return {
+        token: obj.word,
+        begin: obj.starttime,
+        end: obj.endtime,
+      };
+    });
 
-    console.log(`/api/videos/transcript/${this.props.videoId}`);
+    const transcriptWrapper = {
+      words: transformedTranscript,
+    };
+
+    const apiEndpoint = `/api/videos/transcript/${this.props.videoId}`;
+    // fetch(url, {
+    //   method: 'POST',
+    //   body: JSON.stringify(transformedTranscript)
+    // })
+    // .then(data => data.json())
+    // .then((url) => {
+
+    // })
+    // .catch((err) => {
+    //   console.log('Error updating transcript:', err);
+    // });
     // fetch(`/api/videos/transcript${this.props.currentVideoId}`)
     // TODO send a POST or PUT request to submit the transcript
     // Upon success, replace current transcript
