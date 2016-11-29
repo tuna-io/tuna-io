@@ -333,7 +333,7 @@ class VideoDetails extends Component {
                   </Col>
                 </Row>
                 <Row>
-                  <ThumbnailGenerator />
+                  <ThumbnailGenerator videoID={this.props.params.videoId} />
                 </Row>
               </Text>
             </Panel>
