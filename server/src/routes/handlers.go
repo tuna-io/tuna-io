@@ -125,16 +125,6 @@ func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) 
   }
 }
 
-type TempGroup struct {
-  Words []Temps `json:"words"`
-}
-
-type Temps struct {
-  Text     string        `json:"word"`
-  Start    float64       `json:"starttime"`
-  End      float64       `json:"endtime"`
-}
-
 func UpdateTranscriptHandler(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
   fmt.Println("POST /api/videos/transcript/{hash}")
 
@@ -148,6 +138,17 @@ func UpdateTranscriptHandler(w http.ResponseWriter, req *http.Request, ps httpro
 
   // Helper function to update transcript
   db.UpdateTranscript(hash, &transcript)
+
+  // Craft response
+  u := Response{
+    Success: "Successfully updated video transcript",
+    Hash: hash,
+  }
+
+  j, err := json.Marshal(u)
+
+  w.WriteHeader(http.StatusOK)
+  fmt.Fprintln(w, string(j))
 }
 
 /**
