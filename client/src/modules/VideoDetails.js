@@ -35,7 +35,7 @@ class VideoDetails extends Component {
     this.findTime = this.findTime.bind(this);
     this.myVideo;
     // Fetch initial video data. This is only called once
-    this.fetchVideoFromAPI(props.params.videoId);
+    this.fetchVideoFromAPI(props.params.videoId, this.state);
   }
 
   // Upon going to a different video details page, fetch video data
@@ -44,7 +44,7 @@ class VideoDetails extends Component {
   }
 
   // Helper function to fetch video data
-  fetchVideoFromAPI(videoId) {
+  fetchVideoFromAPI(videoId, state) {
     const url = `/api/videos/get/${videoId}`;
     const options = {
       method: 'GET',
@@ -107,11 +107,11 @@ class VideoDetails extends Component {
   saveTranscript(transcript) {
     const newTranscript = [];
 
-    transcript.Words.forEach(word =>
+    transcript.words.forEach(word =>
       newTranscript.push({
-        word: word.Token,
-        starttime: word.Begin,
-        endtime: word.End,
+        word: word.token,
+        starttime: word.begin,
+        endtime: word.end,
       }));
 
     this.setState({
@@ -196,6 +196,7 @@ class VideoDetails extends Component {
   }
 
   renderWordcloud() {
+    console.log('about to render, length is:', this.state.transcript.length);
     return this.state.transcript.length ?
       (
         <Wordcloud transcript={this.state.transcript} />
