@@ -1,6 +1,45 @@
 from __future__ import division
 import string
 import math
+import redis
+import json
+
+#set up connection to redis
+r = redis.StrictRedis(host='localhost', port=6379, db=0, charset="utf-8", decode_responses=True)
+
+#pipe in all transcripts from redis
+# def get_transcripts(): 
+
+# get all keys
+keys = r.keys("video:*")
+
+#create pipeline
+pipe = r.pipeline()
+
+# hgetall each one (or get just the transcript)
+for key in keys: 
+  pipe.hgetall(key)
+
+all_videos_array = pipe.execute()
+
+transcripts = {}
+
+for video in all_videos_array:
+  transcripts[video["hash"]] = ""
+  transcript = video["transcript"]
+  #for each token in transcript
+  transcriptObject = json.loads(transcript)
+  words = transcriptObject["Words"]
+  # print words
+  for word in words:
+    print(word)
+    transcripts[video['hash']] += " " + word['Token']
+
+print transcripts  
+      # document +  += word[token]
+      #save to that documents transcript
+
+
 
 # Splits a document into words
 tokenize = lambda doc: doc.lower().split(" ")
@@ -75,4 +114,6 @@ our_tfidf_comparisons = []
 for count_0, doc_0 in enumerate(tfidf_representation):
   for count_1, doc_1 in enumerate(tfidf_representation):
     our_tfidf_comparisons.append((cosine_similarity(doc_0, doc_1), count_0, count_1))
+
+
 
