@@ -6,6 +6,7 @@ import { Badge, Space, InlineForm, Panel, PanelHeader, Text, Avatar, Heading, Fl
 import TimeAgo from 'react-timeago';
 import Wordcloud from './Wordcloud';
 import Transcript from './Transcript';
+import ThumbnailGenerator from './Thumbnail';
 
 // TODO: prevent errors if there is no transcript
 // TODO: make sure subtitles are still working
@@ -330,6 +331,9 @@ class VideoDetails extends Component {
                         this.state.currentVideoDetails.likesCount}
                     </Donut>
                   </Col>
+                </Row>
+                <Row>
+                  <ThumbnailGenerator />
                 </Row>
               </Text>
             </Panel>
