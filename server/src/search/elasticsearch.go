@@ -141,6 +141,11 @@ func CRUDVideo(hash string) (string) {
     Do(context.Background())
   HandleError(err)
 
+
+  // Flush to make sure the documents got written
+  _, err = client.Flush().Index("videos").Do(context.Background())
+  HandleError(err)
+
   out := fmt.Sprintf("Indexed metadata for video: %s to index %s, type %s\n", put.Id, put.Index, put.Type)
 
   return out
@@ -149,16 +154,12 @@ func CRUDVideo(hash string) (string) {
 func SearchTranscripts(query string) ([]byte) {
   termQuery := elastic.NewTermQuery("transcript", query)
   searchResult, err := client.Search().
-    Index("videos").        // search in index "twitter"
-    Query(termQuery).        // specify the query
-    // Sort("user", true).      // sort by "user" field, ascending
-    // From(0).Size(10).        // take documents 0-9
-    Pretty(true).            // pretty print request and response JSON
-    Do(context.Background()) // execute
-  if err != nil {
-    // Handle error
-    panic(err)
-  }
+    Index("videos").
+    Query(termQuery).
+    SearchType("dfs_query_then_fetch").
+    Pretty(true).
+    Do(context.Background())
+  HandleError(err)
 
   out, err := json.Marshal(searchResult)
 

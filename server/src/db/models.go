@@ -163,22 +163,20 @@ func GetVideoTranscript(hash string) (watson.Text, error) {
 
   var transcript watson.Text
   err = json.Unmarshal(transcriptBytes, &transcript)
-  HandleError(err)
 
   return transcript, err
 }
 
-func AddTranscript(hash string, transcript *watson.Text) (string, error) {
+func AddTranscript(hash string, transcript *watson.Text) { 
   conn := Pool.Get()
   defer conn.Close()
   t, _ := json.Marshal(transcript)
 
-  reply, err := redis.StringMap(conn.Do("HSET", "video:" + hash, "transcript", t))
-  HandleError(err)
+  conn.Do("HSET", "video:" + hash, "transcript", t)
 
-  rep, err := json.Marshal(reply)
+  // rep, err := json.Marshal(reply)
 
-  return string(rep), err
+  // return string(rep), err
 }
 
 func UpdateTranscript(hash string, transcript *Transcript) {
