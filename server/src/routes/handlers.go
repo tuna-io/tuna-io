@@ -151,6 +151,32 @@ func UpdateTranscriptHandler(w http.ResponseWriter, req *http.Request, ps httpro
   fmt.Fprintln(w, string(j))
 }
 
+func UpdateThumbnailHandler(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  fmt.Println("POST /api/videos/thumbnail/{hash}")
+
+  hash := ps.ByName("hash")
+
+  // Decode the thumbnail from JSON binary data
+  decoder := json.NewDecoder(req.Body)
+  var thumbnail db.Thumbnail
+  err := decoder.Decode(&thumbnail)
+  HandleError(err)
+
+  // Helper function to update thumbnail
+  db.UpdateThumbnail(hash, &thumbnail)
+
+  // Craft response
+  u := Response{
+    Success: "Successfully updated video thumbnail",
+    Hash: hash,
+  }
+
+  j, err := json.Marshal(u)
+
+  w.WriteHeader(http.StatusOK)
+  fmt.Fprintln(w, string(j))
+}
+
 /**
 * @api {get} /api/videos/{hash} Retrieve a stored video
 * @apiName GetVideo
@@ -499,7 +525,7 @@ func TranscribeAudio(audioPath string) (*watson.Text) {
  *         S3 VIDEO UPLOADING
  *------------------------------------*/
 
-type Vidfile struct {
+type File struct {
   Filename string `json:"filename"`
   Filetype string `json:"filetype"`
 }
@@ -529,7 +555,7 @@ func SignVideo(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
   decoder := json.NewDecoder(r.Body)
 
-  v := new(Vidfile)
+  v := new(File)
   err := decoder.Decode(&v)
   HandleError(err)
 

@@ -6,6 +6,7 @@ import { Badge, Space, InlineForm, Panel, PanelHeader, Text, Avatar, Heading, Fl
 import TimeAgo from 'react-timeago';
 import Wordcloud from './Wordcloud';
 import Transcript from './Transcript';
+import ThumbnailGenerator from './Thumbnail';
 
 // TODO: prevent errors if there is no transcript
 // TODO: make sure subtitles are still working
@@ -255,12 +256,15 @@ class VideoDetails extends Component {
 
   render() {
     if (this.state.currentVideoDetails) {
+      const dataUrl = this.state.currentVideoDetails.thumbnail ?
+        JSON.parse(this.state.currentVideoDetails.thumbnail).DataUrl : null;
+
       return (
         <Row>
           <Space x={4} />
           <Col xs={8}>
             <div>
-              <video ref={input => this.loadVideoJS(input)} id="my-video"
+              <video crossOrigin="anonymous" ref={input => this.loadVideoJS(input)} id="my-video"
                 className="video-js vjs-sublime-skin vjs-16-9" controls preload="auto"
                 width="640" height="264" poster="" data-setup="{}"
                 src={this.state.currentVideoDetails.url} type="video/webm"
@@ -330,6 +334,9 @@ class VideoDetails extends Component {
                         this.state.currentVideoDetails.likesCount}
                     </Donut>
                   </Col>
+                </Row>
+                <Row>
+                  <ThumbnailGenerator videoID={this.props.params.videoId} dataUrl={dataUrl} />
                 </Row>
               </Text>
             </Panel>

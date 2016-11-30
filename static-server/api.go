@@ -31,6 +31,7 @@ func (s *Server) DefineEndpoints() {
 	s.Endpoint("videos/search/:hash/:query", API_GET, routes.SearchVideo)
 
 	s.Endpoint("videos/transcript/:hash", API_POST, routes.UpdateTranscriptHandler)
+	s.Endpoint("videos/thumbnail/:hash", API_POST, routes.UpdateThumbnailHandler)
 
 	// sign aws upload link
 	s.Endpoint("s3", API_POST, routes.SignVideo)
