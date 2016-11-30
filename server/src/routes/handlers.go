@@ -151,6 +151,32 @@ func UpdateTranscriptHandler(w http.ResponseWriter, req *http.Request, ps httpro
   fmt.Fprintln(w, string(j))
 }
 
+func UpdateThumbnailHandler(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  fmt.Println("POST /api/videos/thumbnail/{hash}")
+
+  hash := ps.ByName("hash")
+
+  // Decode the transcript from JSON binary data
+  decoder := json.NewDecoder(req.Body)
+  var transcript db.Transcript
+  err := decoder.Decode(&transcript)
+  HandleError(err)
+
+  // Helper function to update transcript
+  db.UpdateTranscript(hash, &transcript)
+
+  // Craft response
+  u := Response{
+    Success: "Successfully updated video transcript",
+    Hash: hash,
+  }
+
+  j, err := json.Marshal(u)
+
+  w.WriteHeader(http.StatusOK)
+  fmt.Fprintln(w, string(j))
+}
+
 /**
 * @api {get} /api/videos/{hash} Retrieve a stored video
 * @apiName GetVideo
@@ -538,34 +564,6 @@ func SignVideo(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
   req, _ := svc.PutObjectRequest(&s3.PutObjectInput{
     Bucket: aws.String("invalidmemories"),
     Key:    aws.String(v.Filename),
-    ACL:    aws.String("public-read"),
-  })
-
-  // allow upload with url for 5min
-  urlStr, err := req.Presign(5 * time.Minute)
-  HandleError(err)
-
-  j, err := json.Marshal(urlStr)
-  HandleError(err)
-
-  w.Header().Set("Access-Control-Allow-Origin", "*")
-  w.Header().Set("Content-Type", "application/json")
-  w.Write(j)
-}
-
-func SignThumbnailHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-
-  decoder := json.NewDecoder(r.Body)
-
-  f := new(File)
-  err := decoder.Decode(&f)
-  HandleError(err)
-
-  // get presigned url to allow upload on client side
-  svc := s3.New(session.New(&aws.Config{Region: aws.String("us-west-1")}))
-  req, _ := svc.PutObjectRequest(&s3.PutObjectInput{
-    Bucket: aws.String("invalidmemories"),
-    Key:    aws.String(f.Filename),
     ACL:    aws.String("public-read"),
   })
 

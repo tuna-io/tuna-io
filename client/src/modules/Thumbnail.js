@@ -10,6 +10,8 @@ class ThumbnailGenerator extends React.Component {
     };
 
     this.handleShowThumbnailPicker = this.handleShowThumbnailPicker.bind(this);
+    this.handleThumbnailCapture = this.handleThumbnailCapture.bind(this);
+    this.handleThumbnailSave = this.handleThumbnailSave.bind(this);
     this.renderThumbnailPicker = this.renderThumbnailPicker.bind(this);
   }
 
@@ -36,39 +38,45 @@ class ThumbnailGenerator extends React.Component {
   handleThumbnailSave(event) {
     event.preventDefault();
 
-    // Retrieve the signed URL from server
-    fetch('/api/s3/thumbnail', { // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
-      method: 'POST',
-      body: JSON.stringify({
-        filename: `${this.props.videoID}_thumbnail`,
-        filetype: 'image/png',
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then(res => res.json())
-    .then((url) => {
-      console.log('Retrieved signed URL:', url);
+    console.log('data url:', this.state.imageDataUrl);
 
-      // Given the signed URL, submit to the CDN
-      fetch(url, {
-        method: 'PUT',
-        body: 'TODO.file',
+    if (this.state.imageDataUrl) {
+      console.log(`https://s3-us-west-1.amazonaws.com/invalidmemories/${this.props.videoID}_thumbnail`);
+
+      // Retrieve the signed URL from server
+      fetch('/api/s3/thumbnail', { // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
+        method: 'POST',
+        body: JSON.stringify({
+          filename: `${this.props.videoID}_thumbnail`,
+          filetype: 'image/png',
+        }),
         headers: {
-          'x-amz-acl': 'public-read',
+          'Content-Type': 'application/json',
         },
       })
-      .then(() => {
-        console.log('Success putting into Amazon');
+      .then(res => res.json())
+      .then((url) => {
+        console.log('Retrieved signed URL:', url);
+
+        // Given the signed URL, submit to the CDN
+        fetch(url, {
+          method: 'PUT',
+          body: this.state.imageDataUrl,
+          headers: {
+            'x-amz-acl': 'public-read',
+          },
+        })
+        .then(() => {
+          console.log('Success putting into Amazon');
+        })
+        .catch((err) => {
+          console.log('Error putting thumbnail in AWS', err);
+        });
       })
       .catch((err) => {
-        console.log('Error putting thumbnail in AWS', err);
+        console.log("Error getting signed URL:", err);
       });
-    })
-    .catch((err) => {
-      console.log("Error getting signed URL:", err);
-    });
+    }
   }
 
   renderThumbnailPicker() {
@@ -98,13 +106,14 @@ class ThumbnailGenerator extends React.Component {
             (
               <span>
                 <button onClick={this.handleThumbnailCapture}>Capture</button>
-                <button onClick={this.handleThumbnailCapture}>Save</button>
+                <button onClick={this.handleThumbnailSave}>Save</button>
               </span>
             )
              : null
           }
         </form>
         {this.renderThumbnailPicker()}
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQwAAACXCAYAAADgWmWnAAAEEklEQVR4Xu3UsQ0AMAzDsPr/o1ugF+gAZs5EGNrO7nEECBAIAhOMoOSFAIEvIBiGQIBAFhCMTOWRAAHBsAECBLKAYGQqjwQICIYNECCQBQQjU3kkQEAwbIAAgSwgGJnKIwECgmEDBAhkAcHIVB4JEBAMGyBAIAsIRqbySICAYNgAAQJZQDAylUcCBATDBggQyAKCkak8EiAgGDZAgEAWEIxM5ZEAAcGwAQIEsoBgZCqPBAgIhg0QIJAFBCNTeSRAQDBsgACBLCAYmcojAQKCYQMECGQBwchUHgkQEAwbIEAgCwhGpvJIgIBg2AABAllAMDKVRwIEBMMGCBDIAoKRqTwSICAYNkCAQBYQjEzlkQABwbABAgSygGBkKo8ECAiGDRAgkAUEI1N5JEBAMGyAAIEsIBiZyiMBAoJhAwQIZAHByFQeCRAQDBsgQCALCEam8kiAgGDYAAECWUAwMpVHAgQEwwYIEMgCgpGpPBIgIBg2QIBAFhCMTOWRAAHBsAECBLKAYGQqjwQICIYNECCQBQQjU3kkQEAwbIAAgSwgGJnKIwECgmEDBAhkAcHIVB4JEBAMGyBAIAsIRqbySICAYNgAAQJZQDAylUcCBATDBggQyAKCkak8EiAgGDZAgEAWEIxM5ZEAAcGwAQIEsoBgZCqPBAgIhg0QIJAFBCNTeSRAQDBsgACBLCAYmcojAQKCYQMECGQBwchUHgkQEAwbIEAgCwhGpvJIgIBg2AABAllAMDKVRwIEBMMGCBDIAoKRqTwSICAYNkCAQBYQjEzlkQABwbABAgSygGBkKo8ECAiGDRAgkAUEI1N5JEBAMGyAAIEsIBiZyiMBAoJhAwQIZAHByFQeCRAQDBsgQCALCEam8kiAgGDYAAECWUAwMpVHAgQEwwYIEMgCgpGpPBIgIBg2QIBAFhCMTOWRAAHBsAECBLKAYGQqjwQICIYNECCQBQQjU3kkQEAwbIAAgSwgGJnKIwECgmEDBAhkAcHIVB4JEBAMGyBAIAsIRqbySICAYNgAAQJZQDAylUcCBATDBggQyAKCkak8EiAgGDZAgEAWEIxM5ZEAAcGwAQIEsoBgZCqPBAgIhg0QIJAFBCNTeSRAQDBsgACBLCAYmcojAQKCYQMECGQBwchUHgkQEAwbIEAgCwhGpvJIgIBg2AABAllAMDKVRwIEBMMGCBDIAoKRqTwSICAYNkCAQBYQjEzlkQABwbABAgSygGBkKo8ECAiGDRAgkAUEI1N5JEBAMGyAAIEsIBiZyiMBAoJhAwQIZAHByFQeCRAQDBsgQCALCEam8kiAgGDYAAECWUAwMpVHAgQEwwYIEMgCgpGpPBIgIBg2QIBAFhCMTOWRAAHBsAECBLKAYGQqjwQICIYNECCQBR6TGJgvND+ZvgAAAABJRU5ErkJggg==" />
       </div>
     );
   }

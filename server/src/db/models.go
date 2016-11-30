@@ -29,6 +29,7 @@ type Video struct {
   Dislikes    []string    `json:"dislikes"`
   Comments    []int       `json:"comments"`
   Transcript  Transcript  `json:"transcript"`
+  Thumbnail   string      `json:"thumbnail"`
 }
 
 type Videos []Video
