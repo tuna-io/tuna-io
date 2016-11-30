@@ -14,6 +14,8 @@ class ThumbnailGenerator extends React.Component {
     this.handleThumbnailCapture = this.handleThumbnailCapture.bind(this);
     this.handleThumbnailSave = this.handleThumbnailSave.bind(this);
     this.renderThumbnailPicker = this.renderThumbnailPicker.bind(this);
+    this.renderCaptureButton = this.renderCaptureButton.bind(this);
+    this.renderSaveButton = this.renderSaveButton.bind(this);
   }
 
   handleShowThumbnailPicker(event) {
@@ -85,22 +87,28 @@ class ThumbnailGenerator extends React.Component {
     return null;
   }
 
+  renderCaptureButton() {
+    return this.state.showPicker ?
+    (
+      <button onClick={this.handleThumbnailCapture}>Capture</button>
+    ) : null;
+  }
+
+  renderSaveButton() {
+    return this.state.newDataUrl ?
+    (
+      <button onClick={this.handleThumbnailSave}>Save</button>
+    ) : null;
+  }
+
   render() {
     return (
       <div>
         <form>
           <span>Show thumbnail picker </span>
           <input type="checkbox" onChange={this.handleShowThumbnailPicker} />
-          {
-            this.state.showPicker ?
-            (
-              <span>
-                <button onClick={this.handleThumbnailCapture}>Capture</button>
-                <button onClick={this.handleThumbnailSave}>Save</button>
-              </span>
-            )
-             : null
-          }
+          {this.renderCaptureButton()}
+          {this.renderSaveButton()}
         </form>
         {this.renderThumbnailPicker()}
       </div>
