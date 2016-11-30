@@ -56,6 +56,7 @@ class ThumbnailGenerator extends React.Component {
       .then(res => res.json())
       .then(() => {
         this.setState({ currentDataUrl: this.state.newDataUrl });
+        this.setState({ newDataUrl: null });
       })
       .catch((err) => {
         console.log("Error persisting thumbnail:", err);
