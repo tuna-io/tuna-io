@@ -6,15 +6,14 @@ class ThumbnailGenerator extends React.Component {
 
     this.state = {
       showPicker: false,
-      imageDataUrl: null,
+      newDataUrl: null,
+      currentDataUrl: props.dataUrl,
     };
 
     this.handleShowThumbnailPicker = this.handleShowThumbnailPicker.bind(this);
     this.handleThumbnailCapture = this.handleThumbnailCapture.bind(this);
     this.handleThumbnailSave = this.handleThumbnailSave.bind(this);
     this.renderThumbnailPicker = this.renderThumbnailPicker.bind(this);
-
-    console.log('current tn:', props.thumbnail);
   }
 
   handleShowThumbnailPicker(event) {
@@ -35,25 +34,26 @@ class ThumbnailGenerator extends React.Component {
       0, 0, videoWidth / 2, videoHeight / 2);
 
     // Create Data URL and save to statej.
-    this.setState({ imageDataUrl: canvas.toDataURL() });
+    this.setState({ newDataUrl: canvas.toDataURL() });
   }
 
   handleThumbnailSave(event) {
     event.preventDefault();
 
-    if (this.state.imageDataUrl) {
+    if (this.state.newDataUrl) {
       // Retrieve the signed URL from server
       fetch(`/api/videos/thumbnail/${this.props.videoID}`, {
         method: 'POST',
         body: JSON.stringify({
-          DataUrl: this.state.imageDataUrl,
+          DataUrl: this.state.newDataUrl,
         }),
         headers: {
           'Content-Type': 'application/json',
         },
       })
       .then(res => res.json())
-      .then(() => { // Do nothing on successful response
+      .then(() => {
+        this.setState({ currentDataUrl: this.state.newDataUrl });
       })
       .catch((err) => {
         console.log("Error persisting thumbnail:", err);
@@ -69,7 +69,15 @@ class ThumbnailGenerator extends React.Component {
 
       return (
         <div>
+          <div>Press Capture to select a new thumbnail!</div>
           <canvas id="canvas" width={canvasWidth} height={canvasHeight}></canvas>
+          {
+            this.state.currentDataUrl ?
+            (<div>
+              <div>Current thumbnail</div>
+              <img src={this.state.currentDataUrl} />
+            </div>) : null
+          }
         </div>
       );
     }

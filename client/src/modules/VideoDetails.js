@@ -256,6 +256,9 @@ class VideoDetails extends Component {
 
   render() {
     if (this.state.currentVideoDetails) {
+      const dataUrl = this.state.currentVideoDetails.thumbnail ?
+        JSON.parse(this.state.currentVideoDetails.thumbnail).DataUrl : null;
+
       return (
         <Row>
           <Space x={4} />
@@ -333,7 +336,7 @@ class VideoDetails extends Component {
                   </Col>
                 </Row>
                 <Row>
-                  <ThumbnailGenerator videoID={this.props.params.videoId} thumbnail={this.state.currentVideoDetails.thumbnail} />
+                  <ThumbnailGenerator videoID={this.props.params.videoId} dataUrl={dataUrl} />
                 </Row>
               </Text>
             </Panel>
