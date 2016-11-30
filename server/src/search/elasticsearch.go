@@ -95,3 +95,46 @@ func CRUDVideo(hash string) (string) {
 
   return "Done"
 }
+
+// Used as a **TESTING** endpoint to ensure that data is correctly inserted
+func GetVideo(hash string) (string) {
+  get, err := client.Get().
+      Index("videos").
+      Type("public").
+      Id(hash).
+      Do(context.Background())
+  HandleError(err)
+  
+  if get.Found {
+      fmt.Printf("Got document %s in version %d from index %s, type %s\n", get.Id, get.Version, get.Index, get.Type)
+  }
+
+  fmt.Println(get)
+
+  out, err := json.Marshal(get)
+  HandleError(err)
+
+  fmt.Println(string(out))
+  return "Found"
+}
+
+func SearchQuery(query string) (string) {
+
+
+  termQuery := elastic.NewTermQuery("transcript", query)
+  searchResult, err := client.Search().
+      Index("videos").        // search in index "twitter"
+      Query(termQuery).        // specify the query
+      // Sort("user", true).      // sort by "user" field, ascending
+      // From(0).Size(10).        // take documents 0-9
+      Pretty(true).            // pretty print request and response JSON
+      Do(context.Background()) // execute
+  if err != nil {
+      // Handle error
+      panic(err)
+  }
+
+  out, err := json.Marshal(searchResult)
+  fmt.Println(string(out))
+  return "Done"
+}

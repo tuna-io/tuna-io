@@ -896,3 +896,21 @@ func CRUDVideoDocuments(w http.ResponseWriter, req *http.Request, ps httprouter.
   w.WriteHeader(http.StatusOK)
   w.Write([]byte(c))
 }
+
+func GetVideoES(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  hash := ps.ByName("hash")
+
+  g := search.GetVideo(hash)
+
+  w.WriteHeader(http.StatusOK)
+  w.Write([]byte(g))
+}
+
+func ESSearchQuery(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  query := ps.ByName("query")
+
+  s := search.SearchQuery(query)
+
+  w.WriteHeader(http.StatusOK)
+  w.Write([]byte(s))
+}
