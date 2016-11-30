@@ -6,6 +6,7 @@ class ThumbnailGenerator extends React.Component {
 
     this.state = {
       showPicker: false,
+      imageDataUrl: null,
     };
 
     this.handleShowThumbnailPicker = this.handleShowThumbnailPicker.bind(this);
@@ -23,8 +24,13 @@ class ThumbnailGenerator extends React.Component {
     const videoWidth = video.getBoundingClientRect().width;
     const videoHeight = video.getBoundingClientRect().height;
     const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
 
-    canvas.getContext('2d').drawImage(video, 0, 0, videoWidth * 2, videoHeight * 2, 0, 0, videoWidth / 2, videoHeight / 2);
+    // Draw the screenshot on the canvas
+    context.drawImage(video, 0, 0, videoWidth * 2, videoHeight * 2, 0, 0, videoWidth / 2, videoHeight / 2);
+
+    // Create Data URL and save to state
+    this.setState({ imageDataUrl: canvas.toDataURL() });
   }
 
   handleThumbnailSave(event) {

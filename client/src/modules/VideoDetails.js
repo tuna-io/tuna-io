@@ -261,7 +261,7 @@ class VideoDetails extends Component {
           <Space x={4} />
           <Col xs={8}>
             <div>
-              <video ref={input => this.loadVideoJS(input)} id="my-video"
+              <video crossOrigin="anonymous" ref={input => this.loadVideoJS(input)} id="my-video"
                 className="video-js vjs-sublime-skin vjs-16-9" controls preload="auto"
                 width="640" height="264" poster="" data-setup="{}"
                 src={this.state.currentVideoDetails.url} type="video/webm"
