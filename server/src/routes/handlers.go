@@ -156,18 +156,18 @@ func UpdateThumbnailHandler(w http.ResponseWriter, req *http.Request, ps httprou
 
   hash := ps.ByName("hash")
 
-  // Decode the transcript from JSON binary data
+  // Decode the thumbnail from JSON binary data
   decoder := json.NewDecoder(req.Body)
-  var transcript db.Transcript
-  err := decoder.Decode(&transcript)
+  var thumbnail db.Thumbnail
+  err := decoder.Decode(&thumbnail)
   HandleError(err)
 
-  // Helper function to update transcript
-  db.UpdateTranscript(hash, &transcript)
+  // Helper function to update thumbnail
+  db.UpdateThumbnail(hash, &thumbnail)
 
   // Craft response
   u := Response{
-    Success: "Successfully updated video transcript",
+    Success: "Successfully updated video thumbnail",
     Hash: hash,
   }
 

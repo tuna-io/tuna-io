@@ -29,7 +29,7 @@ type Video struct {
   Dislikes    []string    `json:"dislikes"`
   Comments    []int       `json:"comments"`
   Transcript  Transcript  `json:"transcript"`
-  Thumbnail   string      `json:"thumbnail"`
+  Thumbnail   Thumbnail   `json:"thumbnail"`
 }
 
 type Videos []Video
@@ -45,6 +45,9 @@ type Transcript struct {
   Words []Word  `json:"Words"`
 }
 
+type Thumbnail struct {
+  DataUrl     string     `json:"Thumbnail"`
+}
 
 /*-------------------------------------
  *      USER MODEL STRUCTURE
@@ -186,6 +189,14 @@ func UpdateTranscript(hash string, transcript *Transcript) {
   t, _ := json.Marshal(transcript)
 
   _, _ = redis.StringMap(conn.Do("HSET", "video:" + hash, "transcript", t))
+}
+
+func UpdateThumbnail(hash string, thumbnail *Thumbnail) {
+  conn := Pool.Get()
+  defer conn.Close()
+  t, _ := json.Marshal(thumbnail)
+
+  _, _ = redis.StringMap(conn.Do("HSET", "video:" + hash, "thumbnail", t))
 }
 
 func GetLatestVideos() (string, error) {
