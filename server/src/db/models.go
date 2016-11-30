@@ -5,11 +5,23 @@ import (
   "fmt"
   "time"
   "strings"
+  // "strconv"
   "crypto/md5"
   "encoding/json"
   "github.com/garyburd/redigo/redis"
   "github.com/mediawen/watson-go-sdk"
 )
+
+/*-------------------------------------
+ *          ERROR HANDLER
+ *------------------------------------*/
+
+func HandleError(err error) {
+  if err != nil {
+    panic(err)
+  }
+}
+
 
 /*-------------------------------------
  *      VIDEO MODEL STRUCTURE
@@ -82,13 +94,6 @@ func newPool() *redis.Pool {
   }
 }
 
-func HandleError(err error) {
-  if err != nil {
-    panic(err)
-  }
-}
-
-
 /*-------------------------------------
  *        VIDEO DB CONTROLLERS
  *------------------------------------*/
@@ -144,6 +149,7 @@ func GetVideo(hash string) (string, error) {
   reply["likes"] = strings.Join(likes[:], ",")
   reply["dislikes"] = strings.Join(dislikes[:], ",")
   reply["comments"] = strings.Join(comments[:], ",")
+  // reply["transcript"], _ = strconv.Unquote(reply["transcript"])
 
   rep, err := json.Marshal(reply)
 
@@ -155,19 +161,13 @@ func GetVideoTranscript(hash string) (watson.Text, error) {
   defer conn.Close()
 
   transcriptBytes, err := redis.Bytes(conn.Do("HGET", "video:" + hash, "transcript"))
-
-  if err != nil{
-    fmt.Println("error getting from db", err)
-  }
+  HandleError(err)
 
   var transcript watson.Text
-  newErr := json.Unmarshal(transcriptBytes, &transcript)
+  err = json.Unmarshal(transcriptBytes, &transcript)
+  HandleError(err)
 
-  if newErr != nil{
-    fmt.Println("error unmarshalling", newErr)
-  }
-
-  return transcript, newErr
+  return transcript, err
 }
 
 func AddTranscript(hash string, transcript *watson.Text) (string, error) {
@@ -176,10 +176,10 @@ func AddTranscript(hash string, transcript *watson.Text) (string, error) {
   t, _ := json.Marshal(transcript)
 
   reply, err := redis.StringMap(conn.Do("HSET", "video:" + hash, "transcript", t))
+  HandleError(err)
 
-  rep, _ := json.Marshal(reply)
+  rep, err := json.Marshal(reply)
 
-  // TODO: check if we want to stringify this --chris
   return string(rep), err
 }
 
@@ -205,9 +205,7 @@ func GetLatestVideos() (string, error) {
 
   // Get all the video-specific keys within the array.
   keys, err := redis.Strings(conn.Do("KEYS", "video:*"))
-  if err != nil {
-    fmt.Println("Error getting all the video keys:", err)
-  }
+  HandleError(err)
 
   // Create an array of map of string => string to store video hash information
   var resultData []map[string]string
@@ -215,9 +213,7 @@ func GetLatestVideos() (string, error) {
   for _, key := range keys {
     // Get all key-value pairs within a hash and store as a map of string => string
     keyValueMap, err := redis.StringMap(conn.Do("HGETALL", key))
-    if err != nil {
-      fmt.Println("Error getting hash information for", key, err)
-    }
+    HandleError(err)
 
     resultData = append(resultData, keyValueMap)
   }
@@ -225,7 +221,7 @@ func GetLatestVideos() (string, error) {
   // TODO sort by latest results eventually: https://golang.org/pkg/sort/
 
   // Marshal the results array and cast to string before sending back
-  results, _ := json.Marshal(resultData) 
+  results, err := json.Marshal(resultData) 
 
   return string(results), err
 }

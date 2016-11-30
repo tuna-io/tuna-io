@@ -98,8 +98,6 @@ func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) 
 
   db.CreateVideo(*video)
 
-  w.Header().Set("Content-Type", "application/json")
-
   t, err := ProcessVideo(video.Url, hash)
   HandleError(err)
 
@@ -126,7 +124,6 @@ func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) 
 }
 
 func UpdateTranscriptHandler(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-  fmt.Println("POST /api/videos/transcript/{hash}")
 
   hash := ps.ByName("hash")
 
@@ -891,3 +888,8 @@ func GetElasticSearchVersion(w http.ResponseWriter, req *http.Request, _ httprou
   w.Write([]byte(v))
 }
 
+func CRUDVideoDocuments(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  hash := ps.ByName("hash")
+
+  search.CRUDVideo(hash)
+}
