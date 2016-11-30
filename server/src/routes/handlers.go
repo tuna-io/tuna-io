@@ -866,12 +866,28 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request, _ httprouter.Par
   }
 }
 
+
 /*-------------------------------------
  *         ELASTIC SEARCH
  *------------------------------------*/
-func GetVersion(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+
+/**
+ * @api {get} /api/search/get/version Check ElasticSearch version
+ * @apiName GetElasticSearchVersion
+ * @apiGroup ElasticSearch
+ *
+ * @apiSuccessExample Success-Response:
+ *   HTTP/1.1 200 OK
+ *   Elasticsearch version 5.0.2
+ * 
+ * @apiErrorExample Error-Response:
+ *   HTTP/1.1 404 Not Found
+ *   Failed to connect to localhost port 3000: Connection refused
+ */
+func GetElasticSearchVersion(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
   v := search.GetVersion()
 
   w.WriteHeader(http.StatusOK)
   w.Write([]byte(v))
 }
+

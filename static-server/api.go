@@ -42,7 +42,7 @@ func (s *Server) DefineEndpoints() {
 	s.Endpoint("users/register", API_POST, routes.RegisterUser)
 	s.Endpoint("users/authenticate", API_GET, routes.AuthenticateUser)
 
-	s.Endpoint("search/version", API_GET, routes.GetVersion)
+	s.Endpoint("search/get/version", API_GET, routes.GetElasticSearchVersion)
 }
 
 // set server version
