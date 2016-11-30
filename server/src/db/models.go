@@ -46,7 +46,7 @@ type Transcript struct {
 }
 
 type Thumbnail struct {
-  DataUrl     string     `json:"Thumbnail"`
+  DataUrl     string     `json:"DataUrl"`
 }
 
 /*-------------------------------------
