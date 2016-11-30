@@ -891,5 +891,8 @@ func GetElasticSearchVersion(w http.ResponseWriter, req *http.Request, _ httprou
 func CRUDVideoDocuments(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
   hash := ps.ByName("hash")
 
-  search.CRUDVideo(hash)
+  c := search.CRUDVideo(hash)
+
+  w.WriteHeader(http.StatusOK)
+  w.Write([]byte(c))
 }
