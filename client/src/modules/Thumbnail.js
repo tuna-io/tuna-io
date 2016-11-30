@@ -43,7 +43,7 @@ class ThumbnailGenerator extends React.Component {
     event.preventDefault();
 
     if (this.state.newDataUrl) {
-      // Retrieve the signed URL from server
+      // Persist DataUrl in Redis
       fetch(`/api/videos/thumbnail/${this.props.videoID}`, {
         method: 'POST',
         body: JSON.stringify({
@@ -65,8 +65,8 @@ class ThumbnailGenerator extends React.Component {
   }
 
   renderThumbnailPicker() {
-    if (this.state.showPicker) { // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
-      const video = document.getElementById('my-video_html5_api'); // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Pixel_manipulation_with_canvas
+    if (this.state.showPicker) {
+      const video = document.getElementById('my-video_html5_api');
       const canvasWidth = video.getBoundingClientRect().width / 2;
       const canvasHeight = video.getBoundingClientRect().height / 2;
 
