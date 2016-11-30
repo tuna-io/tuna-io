@@ -4,22 +4,32 @@ import (
   "os"
   "db"
   "fmt"
-  // "time"
-  "reflect"
-  // "strings"
   "context"
   "encoding/json"
   elastic "gopkg.in/olivere/elastic.v5"
 )
 
+
+/*-------------------------------------
+ *       CONFIGURATION CONSTANTS
+ *------------------------------------*/
+
 const ElasticCloud string = "https://80e85ae743dc1b19dad959655738362f.us-west-1.aws.found.io:9243"
 
+
+/*-------------------------------------
+ *        GLOBAL FUNCTIONALITY
+ *------------------------------------*/
 func HandleError(err error) {
   if err != nil {
     panic(err)
   }
 }
 
+
+/*-------------------------------------
+ *       STRUCTS (FOR DECODING)
+ *------------------------------------*/
 type Configuration struct {
   User        string
   Pass        string
@@ -61,6 +71,11 @@ type Transcript struct {
   Words []Word  `json:"Words"`
 }
 
+
+/*-------------------------------------
+ *      ELASTIC SEARCH CONNECTION
+ *------------------------------------*/
+
 func GetKeys() (string, string) {
   file, _ := os.Open("server/src/cfg/keys.json")
   decoder := json.NewDecoder(file)
@@ -82,6 +97,10 @@ var client, _ = elastic.NewClient(
   elastic.SetSniff(false),
   elastic.SetBasicAuth(user, pass))
 
+
+/*-------------------------------------
+ *      ELASTIC SEARCH HANDLERS
+ *------------------------------------*/
 func GetVersion() (string) {
   esversion, err := client.ElasticsearchVersion(ElasticCloud)
   HandleError(err)
@@ -92,56 +111,39 @@ func GetVersion() (string) {
 }
 
 func CRUDVideo(hash string) (string) {
-  // exists, err := client.IndexExists("videos").Do(context.Background())
-  // HandleError(err)
-
-  // if !exists {
-  //   var createIndex, err = client.CreateIndex("videos").Do(context.Background())
-  //   HandleError(err)
-
-  //   if !createIndex.Acknowledged {
-  //     fmt.Println("Index creation failed")
-  //   } else {
-  //     fmt.Println(createIndex.Acknowledged)
-  //   }
-  // }
-
   v, err := db.GetVideo(hash)
   HandleError(err)
 
-  // Strings need to be cleaned of '\' before indexing them
-  // cv := strings.Replace(v, "\\", "", -1)
-  // fmt.Println(cv)
-
+  // Decode the entire hash into a `Video` struct
   var video Video
   err = json.Unmarshal([]byte(v), &video)
   HandleError(err)
 
+  // Decode the stringified transcript into a `Transcript` struct
   var transcript Transcript
   err = json.Unmarshal([]byte(video.Transcript), &transcript)
+  HandleError(err)
 
-  // for k, v := range transcript {
-  //   fmt.Println(k, v)
-  // }
-  fmt.Println(reflect.TypeOf(transcript))
+  // Extract the individual tokens to minimize noise
+  var result string
+  var words = transcript.Words
+  for i := 0; i < len(words); i++ {
+    result += " " + words[i].Token
+  }
+
+  video.Transcript = result
 
   put, err := client.Index().
     Index("videos").
     Type("public").
     Id(hash).
-    BodyJson(v).
+    BodyJson(video).
     Do(context.Background())
-  
-  if err != nil {
-    fmt.Println(err)
-  }
+  HandleError(err)
 
-  fmt.Println(put)
+  out := fmt.Sprintf("Indexed metadata for video: %s to index %s, type %s\n", put.Id, put.Index, put.Type)
 
-  // fmt.Println(put.Id, put.Index, put.Type)
-  // out := fmt.Sprintf("Indexed tweet %s to index %s, type %s\n", put.Id, put.Index, put.Type)
-
-  return "Done"
+  return string(out)
 }
 
 // Used as a **TESTING** endpoint to ensure that data is correctly inserted
