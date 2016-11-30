@@ -43,9 +43,8 @@ func (s *Server) DefineEndpoints() {
 	s.Endpoint("users/authenticate", API_GET, routes.AuthenticateUser)
 
 	s.Endpoint("search/get/version", API_GET, routes.GetElasticSearchVersion)
-	s.Endpoint("search/videos/update/:hash", API_GET, routes.CRUDVideoDocuments)
-	s.Endpoint("search/videos/get/:hash", API_GET, routes.GetVideoES)
-	s.Endpoint("search/videos/find/:query", API_GET, routes.ESSearchQuery)
+	s.Endpoint("search/crud/videos/:hash", API_GET, routes.CRUDVideoDocuments)
+	s.Endpoint("search/videos/:query", API_GET, routes.SearchTranscripts)
 }
 
 // set server version

@@ -888,6 +888,19 @@ func GetElasticSearchVersion(w http.ResponseWriter, req *http.Request, _ httprou
   w.Write([]byte(v))
 }
 
+/**
+ * @api {get} /api/search/crud/videos/:hash Update video metadata
+ * @apiName CRUDVideoDocuments
+ * @apiGroup ElasticSearch
+ *
+ * @apiSuccessExample Success-Response:
+ *   HTTP/1.1 200 OK
+ *   Indexed metadata for video: GdBnPHLNs9 to index videos, type public
+ * 
+ * @apiErrorExample Error-Response:
+ *   HTTP/1.1 404 Not Found
+ *   Failed to connect to localhost port 3000: Connection refused
+ */
 func CRUDVideoDocuments(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
   hash := ps.ByName("hash")
 
@@ -897,20 +910,29 @@ func CRUDVideoDocuments(w http.ResponseWriter, req *http.Request, ps httprouter.
   w.Write([]byte(c))
 }
 
-func GetVideoES(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-  hash := ps.ByName("hash")
-
-  g := search.GetVideo(hash)
-
-  w.WriteHeader(http.StatusOK)
-  w.Write([]byte(g))
-}
-
-func ESSearchQuery(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+/**
+ * @api {get} /api/search/videos/:hash Find a query term in all transcripts
+ * @apiName SearchTranscripts
+ * @apiGroup ElasticSearch
+ *
+ * @apiSuccessExample Success-Response:
+ *   HTTP/1.1 200 OK
+ *   {"took":2,"_scroll_id":"","hits":{"total":1,"max_score":0.2551992,"hits":[
+ *     {"_score":0.2551992,"_index":"videos","_type":"public",
+ *      "_id":"GdBnPHLNs9","_uid":"","_routing":"","_parent":"",
+ *      "_version":null,"sort":null,"highlight":null,"_source": <VIDEO DATA>
+ *      }, <OTHER MATCHES>
+ *    ]
+ * 
+ * @apiErrorExample Error-Response:
+ *   HTTP/1.1 404 Not Found
+ *   Failed to connect to localhost port 3000: Connection refused
+ */
+func SearchTranscripts(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
   query := ps.ByName("query")
 
-  s := search.SearchQuery(query)
+  s := search.SearchTranscripts(query)
 
   w.WriteHeader(http.StatusOK)
-  w.Write([]byte(s))
+  w.Write(s)
 }
