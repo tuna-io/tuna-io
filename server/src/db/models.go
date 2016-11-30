@@ -173,10 +173,6 @@ func AddTranscript(hash string, transcript *watson.Text) {
   t, _ := json.Marshal(transcript)
 
   conn.Do("HSET", "video:" + hash, "transcript", t)
-
-  // rep, err := json.Marshal(reply)
-
-  // return string(rep), err
 }
 
 func UpdateTranscript(hash string, transcript *Transcript) {

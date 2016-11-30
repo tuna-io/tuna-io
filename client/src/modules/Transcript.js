@@ -51,6 +51,15 @@ class Transcript extends React.Component {
     .catch((err) => {
       console.log('Error updating transcript:', err);
     });
+
+    fetch(`/api/search/crud/videos/${this.props.videoId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(data => console.log('Successfully updated ElasticSearch', data))
+    .catch(err => console.log('Error updating ElasticSearch', err));
   }
 
   // Handles editing of every transcript word

@@ -142,7 +142,8 @@ func CRUDVideo(hash string) (string) {
   HandleError(err)
 
 
-  // Flush to make sure the documents got written
+  // Flushing triggers a lucene commit, which ensures that incremental
+  // ...updates occur after a document is written
   _, err = client.Flush().Index("videos").Do(context.Background())
   HandleError(err)
 
@@ -151,6 +152,8 @@ func CRUDVideo(hash string) (string) {
   return out
 }
 
+// `dfs_query_then_fetch` looks across all shards in our `elastic.co` instance
+// ...(5 of them) before re-scoring all documents on query term
 func SearchTranscripts(query string) ([]byte) {
   termQuery := elastic.NewTermQuery("transcript", query)
   searchResult, err := client.Search().
