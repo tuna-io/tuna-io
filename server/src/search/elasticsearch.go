@@ -4,6 +4,8 @@ import (
   "os"
   "db"
   "fmt"
+  // "time"
+  "reflect"
   // "strings"
   "context"
   "encoding/json"
@@ -23,6 +25,40 @@ type Configuration struct {
   Pass        string
   ElasticUser string
   ElasticPass string
+}
+
+// NOTE: tech debt, it appears data is all of type `string` when retrieved
+// ...Timestamp, Private, Views, Likes, Dislikes, Comments, Transcript
+// ...should not be of type `string` but this is a short-term hack for
+// ...data extraction.
+type Video struct {
+  Title       string      `json:"title"`
+  Url         string      `json:"url"`
+  Hash        string      `json:"hash"`
+  Creator     string      `json:"creator"`
+  Extension   string      `json:"extension"`
+  Description string      `json:"description"`
+  Timestamp   string      `json:"timestamp"`
+  Private     string      `json:"private"`
+  Views       string      `json:"views"`
+  Likes       string      `json:"likes"`
+  Dislikes    string      `json:"dislikes"`
+  Comments    string      `json:"comments"`
+  Transcript  string      `json:"transcript"`
+  // TODO: update struct for similar_videos
+}
+
+type Videos []Video
+
+type Word struct {
+  Token       string    `json:"Token"`
+  Begin       float64   `json:"Begin"`
+  End         float64   `json:"End"`
+  Confidence  float64   `json:"Confidence"`
+}
+
+type Transcript struct {
+  Words []Word  `json:"Words"`
 }
 
 func GetKeys() (string, string) {
@@ -76,6 +112,18 @@ func CRUDVideo(hash string) (string) {
   // Strings need to be cleaned of '\' before indexing them
   // cv := strings.Replace(v, "\\", "", -1)
   // fmt.Println(cv)
+
+  var video Video
+  err = json.Unmarshal([]byte(v), &video)
+  HandleError(err)
+
+  var transcript Transcript
+  err = json.Unmarshal([]byte(video.Transcript), &transcript)
+
+  // for k, v := range transcript {
+  //   fmt.Println(k, v)
+  // }
+  fmt.Println(reflect.TypeOf(transcript))
 
   put, err := client.Index().
     Index("videos").
