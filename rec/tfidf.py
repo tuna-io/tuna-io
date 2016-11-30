@@ -1,78 +1,146 @@
+#!/usr/bin/env python3
 from __future__ import division
 import string
 import math
+import redis
+import json
 
-# Splits a document into words
-tokenize = lambda doc: doc.lower().split(" ")
+class Tfidf:
+  def __init__(self):
+    self.all_transcripts = {}
+    self.all_documents = []
+    self.tokenized_documents = []
+    self.all_tokens_set = set()
+    self.idf_values = {}
+    self.our_tfidf_comparisons = {}
+    self.r = redis.StrictRedis(host="localhost", port=6379, db=0, charset="utf-8", decode_responses=True)
 
-# Currently hardcoded, change to read from redis pipe
-document_0 = "China has a strong economy that is growing at a rapid pace. However politically it differs greatly from the US Economy."
-document_1 = "At last, China seems serious about confronting an endemic problem: domestic violence and corruption."
-document_2 = "Japan's prime minister, Shinzo Abe, is working towards healing the economic turmoil in his own country for his view on the future of his people."
-document_3 = "Vladimir Putin is working hard to fix the economy in Russia as the Ruble has tumbled."
-document_4 = "What's the future of Abenomics? We asked Shinzo Abe for his views"
-document_5 = "Obama has eased sanctions on Cuba while accelerating those against the Russian Economy, even as the Ruble's value falls almost daily."
-document_6 = "Vladimir Putin was found to be riding a horse, again, without a shirt on while hunting deer. Vladimir Putin always seems so serious about things - even riding horses."
 
-# Collect all documents into a list
-all_documents = [document_0, document_1, document_2, document_3, document_4, document_5, document_6]
+  """
+  pipe in all transcripts from redis
+  """
+  def get_latest_transcripts(self): 
+    #set up connection to redis
+    # get all keys
+    keys = self.r.keys("video:*")
 
-tokenized_documents = [tokenize(d) for d in all_documents]
+    #create pipeline
+    pipe = self.r.pipeline()
 
-# Removes all duplicates
-all_tokens_set = set([item for sublist in tokenized_documents for item in sublist])
+    # hgetall each one (or get just the transcript)
+    for key in keys: 
+      pipe.hgetall(key)
 
-# Retrieve normalized frequency of words
-def sublinear_term_frequency(term, tokenized_document):
-  count = tokenized_document.count(term)
+    all_videos_array = pipe.execute()
 
-  # log(0) returns undefined, so return 0 if word not found in doc
-  if count == 0:
-    return 0
+    for video in all_videos_array:
+      self.all_transcripts[video["hash"]] = ""
 
-  # Otherwise, return normalized frequency of word in document
-  return 1 + math.log(tokenized_document.count(term))
+      #for each token in transcript
+      transcript = json.loads(video["transcript"])
 
-def inverse_document_frequencies(tokenized_documents):
-  idf_values = {}
+      # print words
+      for word in transcript["Words"]:
+        self.all_transcripts[video["hash"]] += " " + word["Token"]
 
-  # For each token in the unique token set, see if token exists in all other docs
-  # The weighted sum of its existence is our IDF score (importance of word) for the token
-  for tkn in all_tokens_set:
-    contains_token = map(lambda doc: tkn in doc, tokenized_documents)
-    idf_values[tkn] = 1 + math.log(len(tokenized_documents) / (sum(contains_token)))
+  def tokenize_all_documents(self):
+    # Splits a document into words
+    tokenize = lambda doc: doc.lower().split(" ")
 
-  return idf_values
+    # Collect all documents into a list
+    for key, value in self.all_transcripts.items():
+      self.all_documents.append((key, value))
 
-# Generate idf values for all documents
-idf_values = inverse_document_frequencies(tokenized_documents)
+    self.tokenized_documents = [tokenize(d[1]) for d in self.all_documents]
 
-# Vectorize documents (transform into matrices)
-def tfidf(documents):
-  tfidf_documents = []
-  for document in tokenized_documents:
-    doc_tfidf = []
-    for term in idf_values.keys():
-      tf = sublinear_term_frequency(term, document)
-      doc_tfidf.append(tf * idf_values[term])
-    tfidf_documents.append(doc_tfidf)
-  return tfidf_documents
+    # Removes all duplicates
+    self.all_tokens_set = set([item for sublist in self.tokenized_documents for item in sublist])
 
-# Generate tf-idf representation for all documents
-tfidf_representation = tfidf(all_documents)
 
-# Generate cosine similarity between 2 vectors
-def cosine_similarity(vector1, vector2):
-  dot_product = sum(p*q for p,q in zip(vector1, vector2))
-  magnitude = math.sqrt(sum([val**2 for val in vector1])) * math.sqrt(sum([val**2 for val in vector2]))
-  if not magnitude:
-    return 0
-  return dot_product/magnitude
+  # Retrieve normalized frequency of words
+  def sublinear_term_frequency(self, term, tokenized_document):
+    count = tokenized_document.count(term)
 
-# Generate similarity ranking of all documents
-our_tfidf_comparisons = []
+    # log(0) returns undefined, so return 0 if word not found in doc
+    if count == 0:
+      return 0
 
-for count_0, doc_0 in enumerate(tfidf_representation):
-  for count_1, doc_1 in enumerate(tfidf_representation):
-    our_tfidf_comparisons.append((cosine_similarity(doc_0, doc_1), count_0, count_1))
+    # Otherwise, return normalized frequency of word in document
+    return 1 + math.log(tokenized_document.count(term))
+
+  def inverse_document_frequencies(self, tokenized_documents):
+    idf_values = {}
+
+    # For each token in the unique token set, see if token exists in all other docs
+    # The weighted sum of its existence is our IDF score (importance of word) for the token
+    for tkn in self.all_tokens_set:
+      contains_token = map(lambda doc: tkn in doc, tokenized_documents)
+      idf_values[tkn] = 1 + math.log(len(tokenized_documents) / (sum(contains_token)))
+
+    return idf_values
+
+  # Vectorize documents (transform into matrices)
+  def tfidf(self, documents):
+    tfidf_documents = []
+    for document in self.tokenized_documents:
+      doc_tfidf = []
+      for term in self.idf_values.keys():
+        tf = self.sublinear_term_frequency(term, document)
+        doc_tfidf.append(tf * self.idf_values[term])
+      tfidf_documents.append(doc_tfidf)
+    return tfidf_documents
+
+  # Generate cosine similarity between 2 vectors
+  def cosine_similarity(self, vector1, vector2):
+    dot_product = sum(p*q for p,q in zip(vector1, vector2))
+    magnitude = math.sqrt(sum([val**2 for val in vector1])) * math.sqrt(sum([val**2 for val in vector2]))
+    if not magnitude:
+      return 0
+    return dot_product/magnitude
+
+  # Generate similarity ranking of all documents
+
+  def generate_similarity_rankings(self):
+    self.get_latest_transcripts()
+    self.tokenize_all_documents()
+    self.idf_values = self.inverse_document_frequencies(self.tokenized_documents)
+    # Generate tf-idf representation for all documents
+    self.tfidf_representation = self.tfidf(self.all_documents)    
+
+    for count_0, doc_0 in enumerate(self.tfidf_representation):
+      for count_1, doc_1 in enumerate(self.tfidf_representation):
+        if self.our_tfidf_comparisons.get(self.all_documents[count_0][0]) == None: 
+          self.our_tfidf_comparisons[self.all_documents[count_0][0]] = []
+        else: 
+          self.our_tfidf_comparisons[self.all_documents[count_0][0]].append((self.cosine_similarity(doc_0, doc_1), self.all_documents[count_1][0]))
+        # self.our_tfidf_comparisons.append((self.cosine_similarity(doc_0, doc_1), self.all_documents[count_0][0], self.all_documents[count_1][0]))
+
+    for key in self.our_tfidf_comparisons:
+      self.our_tfidf_comparisons[key] = sorted(self.our_tfidf_comparisons[key], key=lambda element: (-element[0]))
+
+  """
+  pipe all results back to redis
+  in form: string({video: score})
+  """
+  def send_top_rankings(self):
+    pipe = self.r.pipeline()
+
+
+    #for each key
+    for key in self.our_tfidf_comparisons:
+      #dictionary of top videos
+      pipe.hset("video:%s" % (key), "similar_videos", json.dumps(self.our_tfidf_comparisons[key][0:10]))
+
+    pipe.execute()
+
+
+if __name__ == "__main__":
+  similar_videos = Tfidf()
+
+  # save top comparisons into our_tfidf_comparisons
+  similar_videos.generate_similarity_rankings()
+  print(similar_videos.our_tfidf_comparisons)
+
+  # send similar videos to redis
+  similar_videos.send_top_rankings()
 

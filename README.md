@@ -195,6 +195,12 @@ go get (and go get *filename* if you're having issues)
 make run-server
 ```
 
+Set up crontab to update recommendations 
+```
+crontab -e
+* * * * * /Library/Frameworks/Python.framework/Versions/3.5/bin/python3 /Users/billzito/Documents/HR/projects/tuna-io/rec/tfidf.py
+```
+
 Open up 127.0.0.1:3000 and have fun!
 
 ### Roadmap
