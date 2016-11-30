@@ -5,7 +5,6 @@ import (
   "fmt"
   "time"
   "strings"
-  // "strconv"
   "crypto/md5"
   "encoding/json"
   "github.com/garyburd/redigo/redis"
@@ -132,9 +131,9 @@ func GetVideo(hash string) (string, error) {
   _, err := conn.Do("HINCRBY", "video:" + hash, "views", 1)
   HandleError(err)
 
-  // each returns type []string, redis cannot bulk convert
-  // bulk would return a slice of interfaces (type: []interface{})
-  // => nightmare conversion
+  // Each returns type []string, redis cannot bulk convert
+  // ...bulk would return a slice of interfaces (type: []interface{})
+  // ...=> nightmare conversion
   likes, err := redis.Strings(conn.Do("SMEMBERS", "video_likes:" + hash))
   HandleError(err)
   dislikes, err := redis.Strings(conn.Do("SMEMBERS", "video_dislikes:" + hash))
@@ -144,12 +143,11 @@ func GetVideo(hash string) (string, error) {
 
   reply, err := redis.StringMap(conn.Do("HGETALL", "video:" + hash))
 
-  // type []string must be type asserted to type string
-  // in order to be inserted into type map[string]string
+  // Type []string must be type asserted to type string
+  // ...in order to be inserted into type map[string]string
   reply["likes"] = strings.Join(likes[:], ",")
   reply["dislikes"] = strings.Join(dislikes[:], ",")
   reply["comments"] = strings.Join(comments[:], ",")
-  // reply["transcript"], _ = strconv.Unquote(reply["transcript"])
 
   rep, err := json.Marshal(reply)
 
@@ -211,7 +209,8 @@ func GetLatestVideos() (string, error) {
   var resultData []map[string]string
 
   for _, key := range keys {
-    // Get all key-value pairs within a hash and store as a map of string => string
+    // Get all key-value pairs within a hash and store as a map of string 
+    // ... => string
     keyValueMap, err := redis.StringMap(conn.Do("HGETALL", key))
     HandleError(err)
 

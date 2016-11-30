@@ -5,8 +5,6 @@ import (
   "db"
   "fmt"
   "strings"
-  // "strconv"
-  // "reflect"
   "encoding/json"
   elastic "gopkg.in/olivere/elastic.v5"
 )
@@ -26,35 +24,6 @@ type Configuration struct {
   ElasticPass string
 }
 
-// type Video struct {
-//   Title       string      `json:"title"`
-//   Url         string      `json:"url"`
-//   Hash        string      `json:"hash"`
-//   Creator     string      `json:"creator"`
-//   Extension   string      `json:"extension"`
-//   Description string      `json:"description"`
-//   Timestamp   time.Time   `json:"timestamp"`
-//   Private     bool        `json:"private"`
-//   Views       int         `json:"views"`
-//   Likes       []string    `json:"likes"`
-//   Dislikes    []string    `json:"dislikes"`
-//   Comments    []int       `json:"comments"`
-//   Transcript  Transcript  `json:"transcript"`
-// }
-
-// type Videos []Video
-
-// type Word struct {
-//   Token       string    `json:"Token"`
-//   Begin       float64   `json:"Begin"`
-//   End         float64   `json:"End"`
-//   Confidence  float64   `json:"Confidence"`
-// }
-
-// type Transcript struct {
-//   Words []Word  `json:"Words"`
-// }
-
 func GetKeys() (string, string) {
   file, _ := os.Open("server/src/cfg/keys.json")
   decoder := json.NewDecoder(file)
@@ -67,9 +36,12 @@ func GetKeys() (string, string) {
 
 var user, pass = GetKeys()
 
+// Establish an ElasticSearch client
 var client, err = elastic.NewClient(
   elastic.SetURL(ElasticCloud),
   elastic.SetMaxRetries(10),
+  // Sniffing (finding nodes in the same cluster) throws an error
+  // ... when connecting to `elastic.co` instance
   elastic.SetSniff(false),
   elastic.SetBasicAuth(user, pass))
 
@@ -85,8 +57,8 @@ func GetVersion() (string) {
 func CRUDVideo(hash string) {
   v, err := db.GetVideo(hash)
   HandleError(err)
-  // t, err := json.Marshal(v)
-  // HandleError(err)
+
+  // Strings need to be cleaned of '\' before indexing them
   cv := strings.Replace(v, "\\", "", -1)
   fmt.Println(cv)
 }

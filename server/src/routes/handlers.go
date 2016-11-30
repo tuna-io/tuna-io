@@ -290,9 +290,9 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
 
 func GetVideoMetadata(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
-  // Note: ffmpeg and ffprobe does not support https protocol out of box
-  // Note: passing in whole path seems to result in react router taking over
-  // Note: executing command as single string seems to cause errors
+  // `ffmpeg` and `ffprobe` does not support https protocol out of box
+  // ...passing in whole path seems to result in react router taking over
+  // ...executing command as single string seems to cause errors
   fmt.Println("getvideo metadata called on url", ps.ByName("url"))
   s := []string{"http://s3-us-west-1.amazonaws.com/invalidmemories/", ps.ByName("url")}
   video := strings.Join(s, "")
