@@ -41,6 +41,8 @@ func (s *Server) DefineEndpoints() {
 	s.Endpoint("users/logout", API_GET, routes.LogoutUser)
 	s.Endpoint("users/register", API_POST, routes.RegisterUser)
 	s.Endpoint("users/authenticate", API_GET, routes.AuthenticateUser)
+
+	s.Endpoint("search/version", API_GET, routes.GetVersion)
 }
 
 // set server version

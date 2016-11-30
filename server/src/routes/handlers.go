@@ -5,19 +5,19 @@ import (
   "os"
   "fmt"
   "time"
+  "search"
   "strings"
   "os/exec"
   "net/http"
   "encoding/json"
-  . "github.com/KeluDiao/gotube/api"
   "github.com/gorilla/sessions"
   "github.com/aws/aws-sdk-go/aws"
+  . "github.com/KeluDiao/gotube/api"
   "github.com/mediawen/watson-go-sdk"
   "github.com/julienschmidt/httprouter"
   "github.com/aws/aws-sdk-go/service/s3"
   "github.com/aws/aws-sdk-go/aws/session"
   "github.com/aws/aws-sdk-go/service/s3/s3manager"
-
 )
 
 func HandleError(err error) {
@@ -476,8 +476,10 @@ func UploadVideo(directory string, filename string) (string) {
  *------------------------------------*/
 
 type Configuration struct {
-  User string
-  Pass string
+  User        string
+  Pass        string
+  ElasticUser string
+  ElasticPass string
 }
 
 type Word struct {
@@ -498,11 +500,6 @@ func GetKeys() (string, string) {
   err := decoder.Decode(&cfg)
   HandleError(err)
 
-  if (err != nil) {
-    fmt.Println("err:", err)
-  }
-
-  fmt.Println(cfg.User, cfg.Pass)
   return cfg.User, cfg.Pass
 }
 
@@ -867,4 +864,14 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request, _ httprouter.Par
     w.WriteHeader(http.StatusOK)
     w.Write(j)
   }
+}
+
+/*-------------------------------------
+ *         ELASTIC SEARCH
+ *------------------------------------*/
+func GetVersion(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+  v := search.GetVersion()
+
+  w.WriteHeader(http.StatusOK)
+  w.Write([]byte(v))
 }

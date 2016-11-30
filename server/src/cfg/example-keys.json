@@ -1,4 +1,6 @@
 {
   "User": "IBM Watson API User",
-  "Pass": "IBM Watson API Pass"
+  "Pass": "IBM Watson API Pass",
+  "ElasticUser": "Elastic.co Username",
+  "ElasticPass": "Elastic.co Password",
 }
