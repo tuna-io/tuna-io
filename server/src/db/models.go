@@ -227,14 +227,13 @@ func GetRecommendedVideos(hash string) (string, error) {
   defer conn.Close()
 
   // for a given hash, return the list of recommended videos
-  stringRecommended, err := conn.Do("HGET", "video:" + hash, "similar_videos")
+  stringRecommended, err := redis.String(conn.Do("HGET", "video:" + hash, "similar_videos"))
   HandleError(err)
 
   fmt.Println("models string recommended is", stringRecommended)
+ 
   // return in 
-  rep, err := json.Marshal(stringRecommended)
-
-  return string(rep), err
+  return stringRecommended, err
 }
 
 

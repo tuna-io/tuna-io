@@ -268,12 +268,25 @@ func GetLatestVideos(w http.ResponseWriter, req *http.Request, _ httprouter.Para
   }
 }
 
+// TODO: store in redis as strings
 func GetRecommended(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
   fmt.Println("get recommended called")
   recommended, err := db.GetRecommendedVideos("13cbaXRKSj")
   HandleError(err)
-  fmt.Println("in handlers recommended is", recommended)
-  // err = json.Unmarshal(stringRecommended)
+
+  // var topVideos [][]string
+  // err = json.Unmarshal([]byte(recommended), &topVideos)
+
+  // fmt.Println("in handlers recommended is", topVideos[0], topVideos[1])
+  w.Header().Set("Content-Type", "application/json")
+
+  if (err != nil) {
+    w.WriteHeader(http.StatusNotFound)
+    fmt.Fprintln(w, err)
+  } else {
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte(recommended))
+  }
 }
 
 func ProcessVideo(url string, hash string) (*watson.Text, error) {
