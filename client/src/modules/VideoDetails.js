@@ -354,7 +354,9 @@ class VideoDetails extends Component {
                   }
                 </TabPanel>
                 <TabPanel>
-                  <div>Transcript</div>
+                  {
+                    this.renderTranscript()
+                  }
                 </TabPanel>
                 <TabPanel>
                   <div>Edit transcript</div>
@@ -369,9 +371,6 @@ class VideoDetails extends Component {
           <Col xs={3}>
             {
               this.renderSearchForm()
-            }
-            {
-              this.renderTranscript()
             }
             {
               this.renderSearchResults()
