@@ -165,6 +165,7 @@ class VideoDetails extends Component {
   // Inform the retrieval and rendering of suggestions
   getSuggestionValue(suggestion) {
     console.log('getSuggestionValue called with arg:', suggestion);
+    this.findTime.call(this, suggestion.Begin);
     return suggestion.Token;
   }
 
@@ -216,6 +217,7 @@ class VideoDetails extends Component {
 
 
   findTime(time) {
+    console.log('findTime called with:', time);
     this.myVideo.currentTime = time;
   }
 
@@ -295,13 +297,11 @@ class VideoDetails extends Component {
           suggestions={suggestions}
           onSuggestionsFetchRequested ={this.onSuggestionsFetchRequested}
           onSuggestionsClearRequested ={this.onSuggestionsClearRequested}
-          getSuggestionValue={this.getSuggestionValue}
+          getSuggestionValue={this.getSuggestionValue.bind(this)}
           renderSuggestion={this.renderSuggestion}
           inputProps={inputProps}
-        />
-        <InlineForm
-          buttonLabel="Search" label="InlineForm" name="query"
-          onChange={this.handleChange} onClick={this.search}
+          onChange={this.handleChange}
+          onClick={this.search}
         />
         </div>
       );
