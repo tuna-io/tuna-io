@@ -46,6 +46,10 @@ class VideoDetails extends Component {
     this.myVideo;
     // Fetch initial video data. This is only called once
     this.fetchVideoFromAPI(props.params.videoId);
+
+    this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
+    this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this);
+    this.onChange = this.onChange.bind(this);
   }
 
   // Upon going to a different video details page, fetch video data
@@ -145,24 +149,27 @@ class VideoDetails extends Component {
   }
 
   getSuggestions(value) {
+    console.log('Get suggestions called with arg:', value);
     const tokens = this.state.transcript;
 
     // Sanitize input data
-    const inputValue = value.trim().toLowerCase();
+    const inputValue = value.value.trim().toLowerCase();
     const inputLength = inputValue.length;
 
     // Find typeahead suggestions by slicing candidates
     return inputLength === 0 ? [] : tokens.filter(token => 
-      token.name.toLowerCase().slice(0, inputLength) === inputValue
+      token.Token.toLowerCase().slice(0, inputLength) === inputValue
     );
   }
 
   // Inform the retrieval and rendering of suggestions
   getSuggestionValue(suggestion) {
+    console.log('getSuggestionValue called with arg:', suggestion);
     return suggestion.Token;
   }
 
   renderSuggestion(suggestion) {
+    console.log('renderSuggestion called with:', suggestion);
     return (
       <div>
         {suggestion.Token}
@@ -174,12 +181,17 @@ class VideoDetails extends Component {
   
   // Update suggestions when required
   onSuggestionsFetchRequested(value) {
+    console.log('onSuggestionsFetchRequested called with:', value);
     this.setState({ suggestions: this.getSuggestions(value) });
   }
 
   // Clear suggestions when required
-  onSuggestionClearRequested() {
+  onSuggestionsClearRequested() {
     this.setState({ suggestions: [] });
+  }
+
+  onChange(event, { newValue }) {
+    this.setState({ value: newValue });
   }
 
   search(e) {
