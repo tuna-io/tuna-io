@@ -1,5 +1,8 @@
 import React from 'react';
-import { Grid, Row, Col } from 'react-flexgrid';
+import TimeAgo from 'react-timeago';
+import { Row, Col } from 'react-flexgrid';
+import { Badge, Avatar, Heading, Donut, Stat } from 'rebass';
+
 
 class VideoMetadata extends React.Component {
   render() {
