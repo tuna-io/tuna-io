@@ -19,6 +19,10 @@ export default class Upload extends React.Component {
       private: false,
       hash: '',
 
+      // upload data
+      uploadTime: 10,
+      uploadProgress: '',
+
       // metadata
       duration: '',
       progress: '',
@@ -179,6 +183,8 @@ export default class Upload extends React.Component {
     // Prevent page refresh
     event.preventDefault();
 
+    this.trackUploadProgress();
+
     if (this.state.signedUrl) {
       // Upload video into CDN
       return fetch(this.state.signedUrl, {
@@ -225,6 +231,8 @@ export default class Upload extends React.Component {
   downloadYoutube(event) {
     event.preventDefault();
 
+    this.trackUploadProgress();
+
     console.log('called downloadyoutube', this.state.file.name);
 
     // send video info to server for donwload
@@ -263,11 +271,23 @@ export default class Upload extends React.Component {
     }, 100);
   }
 
+  trackUploadProgress() {
+    let timer = 0;
+
+    setInterval(() => {
+      if (timer <= this.state.uploadDuration) {
+        timer += 0.1;
+        const uploadProgress = timer / this.state.uploadDuration;
+        this.setState({ uploadProgress: uploadProgress });
+      }
+    }, 100);
+  }
+
   // Video options form is rendered when the user has attached a file using Dropzone
   // or linked to a youtube clip
   renderVideoOptionsForm() {
     return (this.state.signedUrl || this.state.youtubeID)
-      && !this.state.duration && !this.state.hash ?
+      && !this.state.duration && !this.state.hash && !this.state.uploadProgress ?
     (
       <div>
         <h3>Upload options</h3>
@@ -285,6 +305,11 @@ export default class Upload extends React.Component {
             />
           </div>
           <div>
+            <input name="videoduration" type="text" onChange={this.handleChange}
+              placeholder="duration"
+            />
+          </div>
+          <div>
             <span>Private:</span>
             <input name="private" type="checkbox" onChange={this.handleChange} />
           </div>
@@ -297,11 +322,25 @@ export default class Upload extends React.Component {
     ) : null;
   }
 
+
+  // demo video
+  renderSampleVideo() {
+    return (
+      <div>
+        <div>
+         A. Try a demo video
+        </div>
+        <button onClick={this.runSample}> Select </button>
+        <img width="240px" src="https://s3-us-west-1.amazonaws.com/invalidmemories/ohmygod.png"/>
+      </div>
+    );
+  }
+
   // form for getting a youtube link
   renderYoutubeUploadForm() {
     return this.state.signedUrl ? null : (
       <div>
-        <div>Enter youtube link</div>
+        <div>B. Enter youtube link</div>
         <form onSubmit={this.getYoutubeID}>
           <input
             name="link" type="text"
@@ -313,27 +352,32 @@ export default class Upload extends React.Component {
     );
   }
 
-  // demo video
-  renderSampleVideo() {
-    return (
-      <div>
-        <div>
-         Try a demo video
-        </div>
-        <button onClick={this.runSample}> Select </button>
-        <img width="240px" src="https://s3-us-west-1.amazonaws.com/invalidmemories/ohmygod.png"/>
-      </div>
-    );
-  }
-
   // circular progress bar
-  renderProgressBar() {
+  renderTranscribingProgress() {
     return this.state.duration ?
     (
       <div>
         <Circle
           progress={this.state.progress}
           text={"Transcribing video... " + Math.floor(this.state.progress * 100, 2) + "%"}
+          options={{ strokeWidth: 5 }}
+          initialAnimate
+          containerStyle={{
+            width: "200px",
+            height: "200px",
+          }}
+          containerClassName={".progressbar"} />
+      </div>
+    ) : null;
+  }
+
+  renderAWSProgress() {
+    return this.state.signedUrl || this.state.youtubeID && !this.state.duration ?
+    (
+      <div>
+        <Circle
+          progress={this.state.uploadProgress}
+          text={"Transcribing video... " + Math.floor(this.state.uploadProgress * 100, 2) + "%"}
           options={{ strokeWidth: 5 }}
           initialAnimate
           containerStyle={{
@@ -369,8 +413,7 @@ export default class Upload extends React.Component {
       addedfile: this.attachUsingDropzone.bind(this),
     };
 
-    return (this.state.signedUrl || this.state.youtubeID)
-      && !this.state.duration && !this.state.hash ? (
+    return (this.state.signedUrl || this.state.youtubeID) ? (
         <div>
           <h1>
               Step (2/2): Edit video info
@@ -379,7 +422,10 @@ export default class Upload extends React.Component {
             this.renderVideoOptionsForm()
           }
           {
-            this.renderProgressBar()
+            this.renderAWSProgress()
+          }
+          {
+            this.renderTranscribingProgress()
           }
           {
             this.renderVideoLink()
@@ -402,7 +448,7 @@ export default class Upload extends React.Component {
               }
             </Col>
             <Col xs={3}>
-              <div>Or choose a file</div>
+              <div>C. Or choose a file</div>
               <DropzoneComponent
                 config={config}
                 eventHandlers={eventHandlers}
