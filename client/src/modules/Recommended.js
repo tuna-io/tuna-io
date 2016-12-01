@@ -6,7 +6,7 @@ export default class Recommended extends React.Component {
 
   constructor(props) {
     super(props);
-    
+
     this.state = {
       recVideos: [],
     };
@@ -33,7 +33,7 @@ export default class Recommended extends React.Component {
       return data.json();
     })
     .then((videos) => {
-      const topVids = videos.map((video) => { return {hash: video[1], dataUrl: JSON.parse(video[2]).DataUrl}})
+      const topVids = videos.map((video) => { return {hash: video[1], dataUrl: JSON.parse(video[2]).DataUrl }})
                             .filter(vidObj => vidObj.hash !== this.props.currVid);
       this.setState({
         recVideos: topVids,

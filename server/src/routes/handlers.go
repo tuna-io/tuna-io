@@ -320,8 +320,22 @@ func GetThumbnails(topVideos [][]string) ([][]string){
   topVideosAndThumbnails := topVideos
 
   for i := 0; i < len(topVideos); i++{
-    thumbnail := db.GetThumbnail(topVideos[i][1])
-    topVideosAndThumbnails[i] = append(topVideosAndThumbnails[i], thumbnail)
+    thumbnail, err := db.GetThumbnail(topVideos[i][1])
+    if err != nil {
+      fmt.Println("error getting thumbnail", err)
+
+      type img struct{
+        DataUrl string
+      }
+
+      emptyImg := img{DataUrl: "null"}
+      j, err := json.Marshal(emptyImg)
+      HandleError(err)
+      topVideosAndThumbnails[i] = append(topVideosAndThumbnails[i], string(j))
+    } else {
+      fmt.Println("got thumbnail successfully")
+      topVideosAndThumbnails[i] = append(topVideosAndThumbnails[i], thumbnail)
+    }
   }
 
   return topVideosAndThumbnails

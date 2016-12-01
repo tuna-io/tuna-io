@@ -193,14 +193,17 @@ func UpdateThumbnail(hash string, thumbnail *Thumbnail) {
   _, _ = redis.StringMap(conn.Do("HSET", "video:" + hash, "thumbnail", t))
 }
 
-func GetThumbnail(hash string) (string) {
+func GetThumbnail(hash string) (string, error) {
   conn := Pool.Get()
   defer conn.Close()
 
   thumbnail, err := redis.String(conn.Do("HGET", "video:" + hash, "thumbnail"))
-  HandleError(err)
+  // HandleError(err)
+  if err != nil {
+    thumbnail = "{DataUrl: 'null'}"
+  }
 
-  return thumbnail
+  return thumbnail, err
 }
 
 func GetLatestVideos() (string, error) {
