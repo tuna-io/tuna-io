@@ -49,7 +49,10 @@ export default class App extends React.Component {
     return (
       <Row>
         <Col xs={2}>
-          <Nav loggedIn={this.state.loggedIn} auth={this.authenticateUser} currVid={this.state.currentVideo}/>
+          <Nav 
+            loggedIn={this.state.loggedIn} auth={this.authenticateUser}
+            currVid={this.state.currentVideo} updateCurrent={this.updateCurrent}
+          />
         </Col>
         <Col xs={10}>
         {

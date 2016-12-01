@@ -1,6 +1,6 @@
 import React from 'react';
 import { browserHistory, Link } from 'react-router';
-import { Menu, NavItem, Media, Heading, Text, Divider, InlineForm } from 'rebass';
+import { Menu, NavItem, Media, Heading, Text, Divider } from 'rebass';
 
 export default class Nav extends React.Component {
 
@@ -115,14 +115,18 @@ export default class Nav extends React.Component {
         {this.state.recVideos.map(videoHash =>
           (
             <NavItem>
-              <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
-                <Heading level={3}>
-                  Video
-                </Heading>
-                <Text>
-                  {videoHash}
-                </Text>
-              </Media>
+              <Link to={`/videos/${videoHash}`} onClick={() => this.props.updateCurrent(videoHash)}>
+                <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
+                <ThumbnailGenerator videoID={this.props.params.videoId} dataUrl={dataUrl} />
+
+                  <Heading level={3}>
+                    Video
+                  </Heading>
+                  <Text>
+                    {videoHash}
+                  </Text>
+                </Media>
+              </Link>
             </NavItem>
           ))
         }
