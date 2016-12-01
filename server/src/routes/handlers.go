@@ -5,19 +5,19 @@ import (
   "os"
   "fmt"
   "time"
+  "search"
   "strings"
   "os/exec"
   "net/http"
   "encoding/json"
-  . "github.com/KeluDiao/gotube/api"
   "github.com/gorilla/sessions"
   "github.com/aws/aws-sdk-go/aws"
+  . "github.com/KeluDiao/gotube/api"
   "github.com/mediawen/watson-go-sdk"
   "github.com/julienschmidt/httprouter"
   "github.com/aws/aws-sdk-go/service/s3"
   "github.com/aws/aws-sdk-go/aws/session"
   "github.com/aws/aws-sdk-go/service/s3/s3manager"
-
 )
 
 func HandleError(err error) {
@@ -98,8 +98,6 @@ func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) 
 
   db.CreateVideo(*video)
 
-  w.Header().Set("Content-Type", "application/json")
-
   t, err := ProcessVideo(video.Url, hash)
   HandleError(err)
 
@@ -126,7 +124,6 @@ func CreateVideo(w http.ResponseWriter, req *http.Request, _ httprouter.Params) 
 }
 
 func UpdateTranscriptHandler(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-  fmt.Println("POST /api/videos/transcript/{hash}")
 
   hash := ps.ByName("hash")
 
@@ -293,9 +290,9 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
 
 func GetVideoMetadata(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
-  // Note: ffmpeg and ffprobe does not support https protocol out of box
-  // Note: passing in whole path seems to result in react router taking over
-  // Note: executing command as single string seems to cause errors
+  // `ffmpeg` and `ffprobe` does not support https protocol out of box
+  // ...passing in whole path seems to result in react router taking over
+  // ...executing command as single string seems to cause errors
   fmt.Println("getvideo metadata called on url", ps.ByName("url"))
   s := []string{"http://s3-us-west-1.amazonaws.com/invalidmemories/", ps.ByName("url")}
   video := strings.Join(s, "")
@@ -476,8 +473,10 @@ func UploadVideo(directory string, filename string) (string) {
  *------------------------------------*/
 
 type Configuration struct {
-  User string
-  Pass string
+  User        string
+  Pass        string
+  ElasticUser string
+  ElasticPass string
 }
 
 type Word struct {
@@ -498,11 +497,6 @@ func GetKeys() (string, string) {
   err := decoder.Decode(&cfg)
   HandleError(err)
 
-  if (err != nil) {
-    fmt.Println("err:", err)
-  }
-
-  fmt.Println(cfg.User, cfg.Pass)
   return cfg.User, cfg.Pass
 }
 
@@ -867,4 +861,78 @@ func AuthenticateUser(w http.ResponseWriter, req *http.Request, _ httprouter.Par
     w.WriteHeader(http.StatusOK)
     w.Write(j)
   }
+}
+
+
+/*-------------------------------------
+ *         ELASTIC SEARCH
+ *------------------------------------*/
+
+/**
+ * @api {get} /api/search/get/version Check ElasticSearch version
+ * @apiName GetElasticSearchVersion
+ * @apiGroup ElasticSearch
+ *
+ * @apiSuccessExample Success-Response:
+ *   HTTP/1.1 200 OK
+ *   Elasticsearch version 5.0.2
+ * 
+ * @apiErrorExample Error-Response:
+ *   HTTP/1.1 404 Not Found
+ *   Failed to connect to localhost port 3000: Connection refused
+ */
+func GetElasticSearchVersion(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+  v := search.GetVersion()
+
+  w.WriteHeader(http.StatusOK)
+  w.Write([]byte(v))
+}
+
+/**
+ * @api {get} /api/search/crud/videos/:hash Update video metadata
+ * @apiName CRUDVideoDocuments
+ * @apiGroup ElasticSearch
+ *
+ * @apiSuccessExample Success-Response:
+ *   HTTP/1.1 200 OK
+ *   Indexed metadata for video: GdBnPHLNs9 to index videos, type public
+ * 
+ * @apiErrorExample Error-Response:
+ *   HTTP/1.1 404 Not Found
+ *   Failed to connect to localhost port 3000: Connection refused
+ */
+func CRUDVideoDocuments(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  hash := ps.ByName("hash")
+
+  c := search.CRUDVideo(hash)
+
+  w.WriteHeader(http.StatusOK)
+  w.Write([]byte(c))
+}
+
+/**
+ * @api {get} /api/search/videos/:hash Find a query term in all transcripts
+ * @apiName SearchTranscripts
+ * @apiGroup ElasticSearch
+ *
+ * @apiSuccessExample Success-Response:
+ *   HTTP/1.1 200 OK
+ *   {"took":2,"_scroll_id":"","hits":{"total":1,"max_score":0.2551992,"hits":[
+ *     {"_score":0.2551992,"_index":"videos","_type":"public",
+ *      "_id":"GdBnPHLNs9","_uid":"","_routing":"","_parent":"",
+ *      "_version":null,"sort":null,"highlight":null,"_source": <VIDEO DATA>
+ *      }, <OTHER MATCHES>
+ *    ]
+ * 
+ * @apiErrorExample Error-Response:
+ *   HTTP/1.1 404 Not Found
+ *   Failed to connect to localhost port 3000: Connection refused
+ */
+func SearchTranscripts(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  query := ps.ByName("query")
+
+  s := search.SearchTranscripts(query)
+
+  w.WriteHeader(http.StatusOK)
+  w.Write(s)
 }

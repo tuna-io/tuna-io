@@ -13,33 +13,28 @@ class Tfidf:
     self.all_tokens_set = set()
     self.idf_values = {}
     self.our_tfidf_comparisons = {}
+
+    # Redis connection configuration
     self.r = redis.StrictRedis(host="localhost", port=6379, db=0, charset="utf-8", decode_responses=True)
 
-
   """
-  pipe in all transcripts from redis
+  Pipe in all transcripts from redis
   """
   def get_latest_transcripts(self): 
-    #set up connection to redis
-    # get all keys
-    keys = self.r.keys("video:*")
+    keys = self.r.keys("video:*") # Get all `video:*` keys
+    pipe = self.r.pipeline() # Create pipeline to execute multi-commands
 
-    #create pipeline
-    pipe = self.r.pipeline()
-
-    # hgetall each one (or get just the transcript)
-    for key in keys: 
-      pipe.hgetall(key)
+    for key in keys:
+      pipe.hgetall(key) # Get all k/v pairs in hash
 
     all_videos_array = pipe.execute()
 
     for video in all_videos_array:
       self.all_transcripts[video["hash"]] = ""
 
-      #for each token in transcript
       transcript = json.loads(video["transcript"])
 
-      # print words
+      # Convert JSON transcript into string representation
       for word in transcript["Words"]:
         self.all_transcripts[video["hash"]] += " " + word["Token"]
 
@@ -55,7 +50,6 @@ class Tfidf:
 
     # Removes all duplicates
     self.all_tokens_set = set([item for sublist in self.tokenized_documents for item in sublist])
-
 
   # Retrieve normalized frequency of words
   def sublinear_term_frequency(self, term, tokenized_document):
@@ -99,48 +93,40 @@ class Tfidf:
     return dot_product/magnitude
 
   # Generate similarity ranking of all documents
-
   def generate_similarity_rankings(self):
     self.get_latest_transcripts()
     self.tokenize_all_documents()
     self.idf_values = self.inverse_document_frequencies(self.tokenized_documents)
-    # Generate tf-idf representation for all documents
     self.tfidf_representation = self.tfidf(self.all_documents)    
 
     for count_0, doc_0 in enumerate(self.tfidf_representation):
       for count_1, doc_1 in enumerate(self.tfidf_representation):
-        if self.our_tfidf_comparisons.get(self.all_documents[count_0][0]) == None: 
+        if self.our_tfidf_comparisons.get(self.all_documents[count_0][0]) == None:
           self.our_tfidf_comparisons[self.all_documents[count_0][0]] = []
-        else: 
+        else:
           self.our_tfidf_comparisons[self.all_documents[count_0][0]].append((self.cosine_similarity(doc_0, doc_1), self.all_documents[count_1][0]))
-        # self.our_tfidf_comparisons.append((self.cosine_similarity(doc_0, doc_1), self.all_documents[count_0][0], self.all_documents[count_1][0]))
 
     for key in self.our_tfidf_comparisons:
       self.our_tfidf_comparisons[key] = sorted(self.our_tfidf_comparisons[key], key=lambda element: (-element[0]))
 
   """
-  pipe all results back to redis
-  in form: string({video: score})
+  Pipe all results back to Redis
+  ...string({video#hash: score, ...})
   """
   def send_top_rankings(self):
     pipe = self.r.pipeline()
 
-
-    #for each key
+    # For each video, save the 10 closest matches
     for key in self.our_tfidf_comparisons:
-      #dictionary of top videos
       pipe.hset("video:%s" % (key), "similar_videos", json.dumps(self.our_tfidf_comparisons[key][0:10]))
 
     pipe.execute()
 
-
 if __name__ == "__main__":
   similar_videos = Tfidf()
 
-  # save top comparisons into our_tfidf_comparisons
+  # Save top comparisons into `our_tfidf_comparisons`
   similar_videos.generate_similarity_rankings()
-  print(similar_videos.our_tfidf_comparisons)
 
-  # send similar videos to redis
+  # Update Redis with the latest rankings
   similar_videos.send_top_rankings()
-

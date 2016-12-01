@@ -11,6 +11,7 @@ import Settings from './modules/Settings';
 import Upload from './modules/Upload';
 import VideoDetails from './modules/VideoDetails';
 import Home from './modules/Home';
+import Search from './modules/Search';
 import './index.css';
 import './flexgrid.css';
 import '../node_modules/react-dropzone-component/styles/filepicker.css';
@@ -31,7 +32,8 @@ const routes = {
         { path: 'upload', component: Upload }
       ]
     },
-    { path: 'videos/:videoId', component: VideoDetails }
+    { path: 'videos/:videoId', component: VideoDetails },
+    { path: 'search/&q=:query', component: Search }
   ]
 }
 

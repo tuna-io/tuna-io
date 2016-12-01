@@ -12,6 +12,17 @@ import (
 )
 
 /*-------------------------------------
+ *          ERROR HANDLER
+ *------------------------------------*/
+
+func HandleError(err error) {
+  if err != nil {
+    panic(err)
+  }
+}
+
+
+/*-------------------------------------
  *      VIDEO MODEL STRUCTURE
  *------------------------------------*/
 
@@ -82,13 +93,6 @@ func newPool() *redis.Pool {
   }
 }
 
-func HandleError(err error) {
-  if err != nil {
-    panic(err)
-  }
-}
-
-
 /*-------------------------------------
  *        VIDEO DB CONTROLLERS
  *------------------------------------*/
@@ -127,9 +131,9 @@ func GetVideo(hash string) (string, error) {
   _, err := conn.Do("HINCRBY", "video:" + hash, "views", 1)
   HandleError(err)
 
-  // each returns type []string, redis cannot bulk convert
-  // bulk would return a slice of interfaces (type: []interface{})
-  // => nightmare conversion
+  // Each returns type []string, redis cannot bulk convert
+  // ...bulk would return a slice of interfaces (type: []interface{})
+  // ...=> nightmare conversion
   likes, err := redis.Strings(conn.Do("SMEMBERS", "video_likes:" + hash))
   HandleError(err)
   dislikes, err := redis.Strings(conn.Do("SMEMBERS", "video_dislikes:" + hash))
@@ -139,8 +143,8 @@ func GetVideo(hash string) (string, error) {
 
   reply, err := redis.StringMap(conn.Do("HGETALL", "video:" + hash))
 
-  // type []string must be type asserted to type string
-  // in order to be inserted into type map[string]string
+  // Type []string must be type asserted to type string
+  // ...in order to be inserted into type map[string]string
   reply["likes"] = strings.Join(likes[:], ",")
   reply["dislikes"] = strings.Join(dislikes[:], ",")
   reply["comments"] = strings.Join(comments[:], ",")
@@ -155,32 +159,20 @@ func GetVideoTranscript(hash string) (watson.Text, error) {
   defer conn.Close()
 
   transcriptBytes, err := redis.Bytes(conn.Do("HGET", "video:" + hash, "transcript"))
-
-  if err != nil{
-    fmt.Println("error getting from db", err)
-  }
+  HandleError(err)
 
   var transcript watson.Text
-  newErr := json.Unmarshal(transcriptBytes, &transcript)
+  err = json.Unmarshal(transcriptBytes, &transcript)
 
-  if newErr != nil{
-    fmt.Println("error unmarshalling", newErr)
-  }
-
-  return transcript, newErr
+  return transcript, err
 }
 
-func AddTranscript(hash string, transcript *watson.Text) (string, error) {
+func AddTranscript(hash string, transcript *watson.Text) { 
   conn := Pool.Get()
   defer conn.Close()
   t, _ := json.Marshal(transcript)
 
-  reply, err := redis.StringMap(conn.Do("HSET", "video:" + hash, "transcript", t))
-
-  rep, _ := json.Marshal(reply)
-
-  // TODO: check if we want to stringify this --chris
-  return string(rep), err
+  conn.Do("HSET", "video:" + hash, "transcript", t)
 }
 
 func UpdateTranscript(hash string, transcript *Transcript) {
@@ -205,19 +197,16 @@ func GetLatestVideos() (string, error) {
 
   // Get all the video-specific keys within the array.
   keys, err := redis.Strings(conn.Do("KEYS", "video:*"))
-  if err != nil {
-    fmt.Println("Error getting all the video keys:", err)
-  }
+  HandleError(err)
 
   // Create an array of map of string => string to store video hash information
   var resultData []map[string]string
 
   for _, key := range keys {
-    // Get all key-value pairs within a hash and store as a map of string => string
+    // Get all key-value pairs within a hash and store as a map of string 
+    // ... => string
     keyValueMap, err := redis.StringMap(conn.Do("HGETALL", key))
-    if err != nil {
-      fmt.Println("Error getting hash information for", key, err)
-    }
+    HandleError(err)
 
     resultData = append(resultData, keyValueMap)
   }
@@ -225,7 +214,7 @@ func GetLatestVideos() (string, error) {
   // TODO sort by latest results eventually: https://golang.org/pkg/sort/
 
   // Marshal the results array and cast to string before sending back
-  results, _ := json.Marshal(resultData) 
+  results, err := json.Marshal(resultData) 
 
   return string(results), err
 }

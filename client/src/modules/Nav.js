@@ -1,13 +1,18 @@
 import React from 'react';
 import { browserHistory, Link } from 'react-router';
-import { Menu, NavItem, Media, Heading, Text, Divider } from 'rebass';
+import { Menu, NavItem, Media, Heading, Text, Divider, InlineForm } from 'rebass';
 
 export default class Nav extends React.Component {
 
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      query: '',
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
   }
 
   logout() {
@@ -28,6 +33,16 @@ export default class Nav extends React.Component {
     });
   }
 
+  handleChange(event) {
+    this.setState({ [event.target.name]: event.target.value });
+  }
+
+  handleSearch(event) {
+    event.preventDefault();
+
+    browserHistory.push('/search/&q=' + this.state.query);
+  }
+
   render() {
     return (
       <Menu rounded style={{
@@ -35,6 +50,15 @@ export default class Nav extends React.Component {
         height: '100vh',
         color: 'white',
       }}>
+        <NavItem>
+          <InlineForm
+            buttonLabel="Search"
+            label="PlatformSearch"
+            name="query"
+            onChange={this.handleChange}
+            onClick={this.handleSearch}
+          />
+        </NavItem>
         <Link to="/">
           <NavItem>Home</NavItem>
         </Link>

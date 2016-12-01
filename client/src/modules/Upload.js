@@ -50,7 +50,7 @@ export default class Upload extends React.Component {
     this.dropzone = null;
   }
 
-  // given title, make unique hash id for video
+  // Make a unique alphanumeric hash for each video being uploaded
   hash(len, an) {
     an = an && an.toLowerCase();
     var str = '', i = 0, min = an == 'a' ? 10 : 0, max = an == 'n' ? 10 : 62;
@@ -61,7 +61,6 @@ export default class Upload extends React.Component {
     return str;
   }
 
-  // TODO: make this work for dragged files
   // Triggered when user selects file for Dropzone
   // Use file information to retrieve signed URL
   attachUsingDropzone(files) {
@@ -120,7 +119,7 @@ export default class Upload extends React.Component {
     .catch(err => console.log('Error retrieving metadata:', err));
   }
 
-  // send video info to server
+  // Send video info to server
   addToDb(){
     return fetch('/api/videos', {
       method: 'POST',
@@ -158,6 +157,15 @@ export default class Upload extends React.Component {
         hash: resp.hash,
         duration: '',
       });
+
+      fetch(`/api/search/crud/videos/${this.state.file.hash.slice(0, 10)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(data => console.log('Successfully updated ElasticSearch', data))
+      .catch(err => console.log('Error updating ElasticSearch', err));
     })
     .catch(err => console.log('Error adding to db', err));
   }
