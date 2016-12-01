@@ -37,6 +37,7 @@ export default class Upload extends React.Component {
     this.processVideo = this.processVideo.bind(this);
     this.getYoutubeID = this.getYoutubeID.bind(this);
     this.runSample = this.runSample.bind(this);
+    this.removeVideo = this.removeVideo.bind(this);
 
     this.djsConfig = {
       addRemoveLinks: true,
@@ -291,6 +292,7 @@ export default class Upload extends React.Component {
             <input name="submit" type="submit" value="Upload into cloud" />
           </div>
         </form>
+        <button onClick={this.removeVideo}> Cancel </button>
       </div>
     ) : null;
   }
@@ -318,8 +320,8 @@ export default class Upload extends React.Component {
         <div>
          Try a demo video
         </div>
-        <button onClick={this.runSample}> Start upload </button>
-        <img width="190px" src="https://s3-us-west-1.amazonaws.com/invalidmemories/ohmygod.png"/>
+        <button onClick={this.runSample}> Select </button>
+        <img width="240px" src="https://s3-us-west-1.amazonaws.com/invalidmemories/ohmygod.png"/>
       </div>
     );
   }
@@ -351,7 +353,10 @@ export default class Upload extends React.Component {
 
   removeVideo() {
     console.log('this.signedurl', this.state.signedUrl);
-    return this.setState({ signedUrl: '' });
+    return this.setState({ 
+      signedUrl: '',
+      youtubeID: '',
+    });
   }
 
   // TODO: determine if event handlers can go in constructor
@@ -364,41 +369,48 @@ export default class Upload extends React.Component {
       addedfile: this.attachUsingDropzone.bind(this),
     };
 
-    return (
-      <div>
-        <h1>
-          Upload a video
-        </h1>
-        <Row>
-          <Col xs={2}>
-            {
-              this.renderYoutubeUploadForm()
-            }
-          </Col>
-          <Col xs={3}>
-            {
-              this.renderSampleVideo()
-            }
-          </Col>
-          <Col xs={3}>
-            <div>Or choose a file</div>
-            <DropzoneComponent
-              config={config}
-              eventHandlers={eventHandlers}
-              djsConfig={djsConfig}
-            />
-          </Col>
-        </Row>
-        {
-          this.renderVideoOptionsForm()
-        }
-        {
-          this.renderProgressBar()
-        }
-        {
-          this.renderVideoLink()
-        }
-      </div>
-    );
+    return (this.state.signedUrl || this.state.youtubeID)
+      && !this.state.duration && !this.state.hash ? (
+        <div>
+          <h1>
+              Step (2/2): Edit video info
+          </h1>
+          {
+            this.renderVideoOptionsForm()
+          }
+          {
+            this.renderProgressBar()
+          }
+          {
+            this.renderVideoLink()
+          }
+        </div>
+      ) : (
+        <div>
+          <h1>
+            Step (1/2): Select a video
+          </h1>
+          <Row>
+            <Col xs={3}>
+              {
+                this.renderSampleVideo()
+              }
+            </Col>
+            <Col xs={3}>
+              {
+                this.renderYoutubeUploadForm()
+              }
+            </Col>
+            <Col xs={3}>
+              <div>Or choose a file</div>
+              <DropzoneComponent
+                config={config}
+                eventHandlers={eventHandlers}
+                djsConfig={djsConfig}
+              />
+            </Col>
+          </Row>
+        </div>
+      );
   }
 }
