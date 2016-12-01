@@ -1,4 +1,5 @@
 import React from 'react';
+import '../index.css';
 
 class TranscriptEditor extends React.Component {
   constructor(props) {
@@ -66,34 +67,38 @@ class TranscriptEditor extends React.Component {
   // Render an editable table
   renderEditableTranscript() {
     return (
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th>Start</th>
-              <th>End</th>
-              <th>Word</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.transcript.map((pair, index) => (
+      <div id="transcript-editor">
+        <div className="transcript-table transcript-editor-box">
+          <table>
+            <thead>
               <tr>
-                <td>
-                  {pair.Begin}
-                </td>
-                <td>
-                  {pair.End}
-                </td>
-                <td>
-                  <input type="text" key={index} name={index} onChange={this.handleTranscriptEdit} defaultValue={pair.Token}></input>
-                </td>
+                <th>Start</th>
+                <th>End</th>
+                <th>Word</th>
               </tr>
-              ))}
-          </tbody>
-        </table>
-        <form onSubmit={this.submitTranscriptForm}>
-          <input type="submit" value="Submit" />
-        </form>
+            </thead>
+            <tbody>
+              {this.state.transcript.map((pair, index) => (
+                <tr>
+                  <td>
+                    {pair.Begin}
+                  </td>
+                  <td>
+                    {pair.End}
+                  </td>
+                  <td>
+                    <input type="text" key={index} name={index} onChange={this.handleTranscriptEdit} defaultValue={pair.Token}></input>
+                  </td>
+                </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="transcript-editor-box transcript-editor-submit">
+          <form onSubmit={this.submitTranscriptForm}>
+            <input type="submit" value="Submit" />
+          </form>
+        </div>
       </div>
     );
   }

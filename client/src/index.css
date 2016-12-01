@@ -226,3 +226,17 @@ a {
   min-width: 80%;
   margin-left: -40% !important;
 }
+
+div.transcript-table {
+  height: 300px;
+  overflow: auto;
+}
+
+div.transcript-editor-box {
+  display: inline-block;
+}
+
+div.transcript-editor-submit {
+  vertical-align: top;
+  padding-left: 20px;
+}
