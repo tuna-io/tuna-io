@@ -3,6 +3,7 @@ import TimeAgo from 'react-timeago';
 import { PageHeader, Block, Media, Heading, Text } from 'rebass';
 import { Grid, Row, Col } from 'react-flexgrid';
 import { Link } from 'react-router';
+import Nav from './Nav';
 
 export default class Search extends React.Component {
   constructor(props) {
@@ -47,46 +48,54 @@ export default class Search extends React.Component {
     console.log()
     return (
       <div>
-        <PageHeader
-          description={`Search returned ${this.state.total} result(s), taking ${this.state.took / 1000}s.`}
-          heading={`Results for "${this.state.query}"`}
-        />
-        {this.state.results && this.state.results.map(video =>
-          (
-          <Grid>
-            <Block
-              borderLeft
-              borderColor="red"
-              color="black"
-              px={2}
-            >
-              <Row>
-                <Col xs={2}>
-                  <img src={JSON.parse(video._source.thumbnail).DataUrl} height="86" width="153" />
-                </Col>
-                <Col xs={10}>
-                  <Heading
-                    level={2}
-                    size={0}
+        <Grid>
+          <Row>
+            <Col xs={2}>
+              <Nav loggedIn={this.props.loggedIn} auth={this.props.auth} />
+            </Col>
+
+            <Col xs={10}>
+              <PageHeader
+                description={`Search returned ${this.state.total} result(s), taking ${this.state.took / 1000}s.`}
+                heading={`Results for "${this.state.query}"`}
+              />
+              {this.state.results && this.state.results.map(video =>
+                (
+                  <Block
+                    borderLeft
+                    borderColor="red"
+                    color="black"
+                    px={2}
                   >
-                    <Link to={`/videos/${video._source.hash}`}>
-                      {video._source.title}
-                    </Link>
-                  </Heading>
-                  <Text>
-                    <Col xs={2}>
-                      {video._source.creator}
-                    </Col>
-                    <Col xs={3}>
-                      <TimeAgo date={new Date(video._source.timestamp)} />
-                    </Col>
-                  </Text>
-                </Col>
-              </Row>
-            </Block>
-          </Grid>
-          )
-        )}
+
+                      <Col xs={2}>
+                        <img src={JSON.parse(video._source.thumbnail).DataUrl} height="86" width="153" />
+                      </Col>
+                      <Col xs={10}>
+                        <Heading
+                          level={2}
+                          size={0}
+                        >
+                          <Link to={`/videos/${video._source.hash}`}>
+                            {video._source.title}
+                          </Link>
+                        </Heading>
+                        <Text>
+                          <Col xs={2}>
+                            {video._source.creator}
+                          </Col>
+                          <Col xs={3}>
+                            <TimeAgo date={new Date(video._source.timestamp)} />
+                          </Col>
+                        </Text>
+                      </Col>
+
+                  </Block>
+                )
+              )}
+            </Col>
+          </Row>
+        </Grid>
       </div>
     )
   }
