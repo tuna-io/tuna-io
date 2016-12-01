@@ -157,9 +157,23 @@ class VideoDetails extends Component {
     const inputLength = inputValue.length;
 
     // Find typeahead suggestions by slicing candidates
-    return inputLength === 0 ? [] : tokens.filter(token => 
-      token.Token.toLowerCase().slice(0, inputLength) === inputValue
-    );
+    if (inputLength === 0) {
+      return [];
+    } else {
+      const subset = [];
+      tokens.forEach((token, i) => {
+        if (token.Token.toLowerCase().slice(0, inputLength) === inputValue) {
+          subset.push({
+            Token: token.Token,
+            Begin: token.Begin,
+            End: token.End,
+            Index: i,
+          });
+        }
+      });
+
+      return subset;
+    } 
   }
 
   // Inform the retrieval and rendering of suggestions
@@ -171,11 +185,28 @@ class VideoDetails extends Component {
 
   renderSuggestion(suggestion) {
     console.log('renderSuggestion called with:', suggestion);
+    var pre = '';
+    var post = '';
+    var candidate = this.state.transcript[suggestion.Index].Token + ' ';
+
+    for (var i = suggestion.Index - 4; i < suggestion.Index; i++) {
+      pre += this.state.transcript[i].Token + ' ';
+    }
+    for (var i = suggestion.Index + 1; i <= suggestion.Index + 4; i++) {
+      post += this.state.transcript[i].Token + ' ';
+    }
+
+    const start = this.state.transcript[suggestion.Index - 4].Begin;
+    const end = this.state.transcript[suggestion.Index + 4].End;
     return (
       <div>
-        {suggestion.Token}
-        {suggestion.Begin}
-        {suggestion.End}
+        {pre}
+        <span style={{'fontWeight': 'bold'}}> 
+          {candidate}
+        </span> 
+        {post}
+        {start}
+        {end}
       </div>
     );
   }
@@ -298,7 +329,7 @@ class VideoDetails extends Component {
           onSuggestionsFetchRequested ={this.onSuggestionsFetchRequested}
           onSuggestionsClearRequested ={this.onSuggestionsClearRequested}
           getSuggestionValue={this.getSuggestionValue.bind(this)}
-          renderSuggestion={this.renderSuggestion}
+          renderSuggestion={this.renderSuggestion.bind(this)}
           inputProps={inputProps}
           onChange={this.handleChange}
           onClick={this.search}
