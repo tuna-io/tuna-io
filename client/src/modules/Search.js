@@ -1,6 +1,8 @@
 import React from 'react';
 import TimeAgo from 'react-timeago';
-import { PageHeader } from 'rebass';
+import { PageHeader, Block, Media, Heading, Text } from 'rebass';
+import { Grid, Row, Col } from 'react-flexgrid';
+import { Link } from 'react-router';
 
 export default class Search extends React.Component {
   constructor(props) {
@@ -46,19 +48,43 @@ export default class Search extends React.Component {
     return (
       <div>
         <PageHeader
-          description={`Search returned ${this.state.total} results, taking ${this.state.took / 1000}s.`}
-          heading={`Results for ${this.state.query}`}
+          description={`Search returned ${this.state.total} result(s), taking ${this.state.took / 1000}s.`}
+          heading={`Results for "${this.state.query}"`}
         />
-        Your search for {this.state.query} returned {this.state.total} results and took {this.state.took / 1000}s.
         {this.state.results && this.state.results.map(video =>
           (
-            <div>
-            {video._source.title}
-            {video._source.url}
-            {video._source.creator}
-            <img src={JSON.parse(video._source.thumbnail).DataUrl} />
-            <TimeAgo date={new Date(video._source.timestamp)} />
-            </div>
+          <Grid>
+            <Block
+              borderLeft
+              borderColor="red"
+              color="black"
+              px={2}
+            >
+              <Row>
+                <Col xs={2}>
+                  <img src={JSON.parse(video._source.thumbnail).DataUrl} height="86" width="153" />
+                </Col>
+                <Col xs={10}>
+                  <Heading
+                    level={2}
+                    size={0}
+                  >
+                    <Link to={`/videos/${video._source.hash}`}>
+                      {video._source.title}
+                    </Link>
+                  </Heading>
+                  <Text>
+                    <Col xs={2}>
+                      {video._source.creator}
+                    </Col>
+                    <Col xs={3}>
+                      <TimeAgo date={new Date(video._source.timestamp)} />
+                    </Col>
+                  </Text>
+                </Col>
+              </Row>
+            </Block>
+          </Grid>
           )
         )}
       </div>
