@@ -10,7 +10,6 @@ import Wordcloud from './Wordcloud';
 import Transcript from './Transcript';
 import ThumbnailEditor from './ThumbnailEditor';
 import TranscriptEditor from './TranscriptEditor';
-import ThumbnailGenerator from './Thumbnail';
 import Recommended from './Recommended';
 import Nav from './Nav';
 

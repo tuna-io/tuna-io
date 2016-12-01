@@ -1,6 +1,6 @@
 import React from 'react';
 import { browserHistory, Link } from 'react-router';
-import { Menu, NavItem, Media, Heading, Text, Divider } from 'rebass';
+import { Menu, NavItem, Media, Heading, Text, Divider, InlineForm } from 'rebass';
 import Recommended from './Recommended';
 
 export default class Nav extends React.Component {
@@ -17,42 +17,11 @@ export default class Nav extends React.Component {
     this.handleSearch = this.handleSearch.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    console.log('componentprops called', this.props.currVid, 'next', nextProps.currVid);
-    if (this.props.currVid !== nextProps.currVid) {
-      fetch(`/api/videos/recommended/${nextProps.currVid}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      .then(data=> {
-        console.log("data is");
-        return data.json();
-      })
-      .then((videos) => {
-        const topVids = videos.map(video => video[1]).filter(hash => hash !== nextProps.currVid);
-        this.setState({
-          recVideos: topVids,
-        });
-        console.log(topVids);
-      })
-      .catch((err) => {
-        console.log('error getting last vid', err);
-      });
-    }
-
-    this.setState({
-      currVid: this.props.currVid,
-    });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    console.log("nav rendered", nextProps.currVid);
-    this.setState({
-      currVid: nextProps.currVid,
-    });
-  }
+  // componentWillReceiveProps(nextProps) {
+  //   // this.setState({
+  //   //   currVid: nextProps.currVid,
+  //   // });
+  // }
 
   logout() {
     fetch('/api/users/logout', {

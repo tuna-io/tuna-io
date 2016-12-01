@@ -232,17 +232,14 @@ func GetLatestVideos() (string, error) {
 }
 
 func GetRecommendedVideos(hash string) (string, error) {
-  fmt.Println("models get recommended called")
   conn := Pool.Get()
   defer conn.Close()
 
   // for a given hash, return the list of recommended videos
   stringRecommended, err := redis.String(conn.Do("HGET", "video:" + hash, "similar_videos"))
   HandleError(err)
-
-  fmt.Println("models string recommended is", stringRecommended)
  
-  // return in 
+  // return jsonified string
   return stringRecommended, err
 }
 

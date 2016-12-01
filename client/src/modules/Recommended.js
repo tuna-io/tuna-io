@@ -6,8 +6,7 @@ export default class Recommended extends React.Component {
 
   constructor(props) {
     super(props);
-    console.log('constructor called', this.props.currVid);
-
+    
     this.state = {
       recVideos: [],
     };
@@ -18,9 +17,7 @@ export default class Recommended extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("old props were", this.props);
     this.props = nextProps;
-    console.log("now props are", this.props);
     this.getRecommended();
   }
 
