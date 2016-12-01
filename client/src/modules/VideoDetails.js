@@ -112,8 +112,8 @@ class VideoDetails extends Component {
 
     videoDetails.likesCount = videoDetails.likes.length;
     videoDetails.dislikesCount = videoDetails.dislikes.length;
-    videoDetails.ldRatio =
-      videoDetails.likes.length / (videoDetails.likes.length + videoDetails.dislikes.length);
+    videoDetails.ldRatio = videoDetails.likes.length / 
+      (videoDetails.likes.length + videoDetails.dislikes.length);
     this.setState({ currentVideoDetails: videoDetails });
   }
 
@@ -184,7 +184,7 @@ class VideoDetails extends Component {
 
   search(e) {
     e.preventDefault();
-    fetch(`api/videos/search/${this.state.currentVideoDetails.hash}/${this.state.query}`, {
+    fetch(`/api/videos/search/${this.state.currentVideoDetails.hash}/${this.state.query}`, {
       method: 'GET',
       credentials: 'same-origin',
       headers: {
@@ -269,12 +269,29 @@ class VideoDetails extends Component {
 
   renderSearchForm() {
     if (this.state.transcript.length) {
+      const value = this.state.value;
+      const suggestions = this.state.suggestions;
+      const inputProps = {
+        placeholder: 'Search for a word in this video',
+        value,
+        onChange: this.onChange,
+      };
 
       return (
+        <div>
+        <Autosuggest
+          suggestions={suggestions}
+          onSuggestionsFetchRequested ={this.onSuggestionsFetchRequested}
+          onSuggestionsClearRequested ={this.onSuggestionsClearRequested}
+          getSuggestionValue={this.getSuggestionValue}
+          renderSuggestion={this.renderSuggestion}
+          inputProps={inputProps}
+        />
         <InlineForm
           buttonLabel="Search" label="InlineForm" name="query"
           onChange={this.handleChange} onClick={this.search}
         />
+        </div>
       );
     }
     return null;
