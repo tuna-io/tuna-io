@@ -283,10 +283,10 @@ class VideoDetails extends Component {
                   <Tab>Wordcloud</Tab>
                   <Tab>Transcript</Tab>
                   <Tab>Edit transcript</Tab>
+                  <Tab>Thumbnails</Tab>
                 </TabList>
 
                 <TabPanel>
-                  <Text>
                     <Row>
                       <Col xs={0}>
                         <Avatar circle size={48} src="http://lorempixel.com/output/animals-q-c-64-64-8.jpg" />
@@ -346,10 +346,7 @@ class VideoDetails extends Component {
                         </Donut>
                       </Col>
                     </Row>
-                    <Row>
-                      <ThumbnailGenerator videoID={this.props.params.videoId} dataUrl={dataUrl} />
-                    </Row>
-                  </Text>
+
                 </TabPanel>
                 <TabPanel>
                   <div>Wordcloud</div>
@@ -360,9 +357,10 @@ class VideoDetails extends Component {
                 <TabPanel>
                   <div>Edit transcript</div>
                 </TabPanel>
+                <TabPanel>
+                  <ThumbnailGenerator videoID={this.props.params.videoId} dataUrl={dataUrl} />
+                </TabPanel>
               </Tabs>
-
-              
             </Panel>
           </Col>
           <Space x={4} />
