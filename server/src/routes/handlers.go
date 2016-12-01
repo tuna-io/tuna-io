@@ -269,9 +269,10 @@ func GetLatestVideos(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 }
 
 // TODO: store in redis as strings
-func GetRecommended(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func GetRecommended(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
   fmt.Println("get recommended called")
-  recommended, err := db.GetRecommendedVideos("13cbaXRKSj")
+  hash := ps.ByName("hash")
+  recommended, err := db.GetRecommendedVideos(hash)
   HandleError(err)
 
   // var topVideos [][]string

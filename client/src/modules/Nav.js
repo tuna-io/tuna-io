@@ -9,10 +9,34 @@ export default class Nav extends React.Component {
 
     this.state = {
       query: '',
+      videos: [],
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log('componentprops called', this.props.currVid, 'next', nextProps.currVid);
+    if (this.props.currVid !== nextProps.currVid) {
+      fetch(`/api/videos/recommended/${nextProps.currVid}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(data=> {
+        console.log("data is");
+        return data.json();
+      })
+      .then((videos) => {
+        const topVids = videos.map(video => video[1]).filter(hash => hash !== this.props.currVid);
+        console.log(topVids);
+      })
+      .catch((err) => {
+        console.log('error getting last vid', err);
+      });
+    }
   }
 
   logout() {
