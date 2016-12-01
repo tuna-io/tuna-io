@@ -7,6 +7,7 @@ import TimeAgo from 'react-timeago';
 import { Tabs, TabList, TabPanel, Tab } from 'react-tabs';
 import Wordcloud from './Wordcloud';
 import Transcript from './Transcript';
+import TranscriptEditor from './TranscriptEditor';
 import ThumbnailGenerator from './Thumbnail';
 
 // TODO: prevent errors if there is no transcript
@@ -199,6 +200,17 @@ class VideoDetails extends Component {
     );
   }
 
+  renderTranscriptEditor() {
+    return (
+      <div>
+        {this.state.transcript.length ? (
+          <TranscriptEditor transcript={this.state.transcript} videoId={this.props.params.videoId} />
+          ) : null
+        }
+      </div>
+    );
+  }
+
   renderWordcloud() {
     return this.state.transcript.length ?
       (
@@ -359,7 +371,9 @@ class VideoDetails extends Component {
                   }
                 </TabPanel>
                 <TabPanel>
-                  <div>Edit transcript</div>
+                  {
+                    this.renderTranscriptEditor()
+                  }
                 </TabPanel>
                 <TabPanel>
                   <ThumbnailGenerator videoID={this.props.params.videoId} dataUrl={dataUrl} />
