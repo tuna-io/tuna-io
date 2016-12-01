@@ -237,7 +237,17 @@ class VideoDetails extends Component {
         return inputLength === 0 ? [] : tokens.filter(token => 
           token.name.toLowerCase().slice(0, inputLength) === inputValue
         );
-      }
+      };
+
+      // Inform the retrieval and rendering of suggestions
+      const getSuggestionValue = suggestion => suggestion.Token;
+      const renderSuggestion = suggestion => (
+        <div>
+          {suggestion.Token}
+          {suggestion.Begin}
+          {suggestion.End}
+        </div>
+      );
 
       return (
         <InlineForm
