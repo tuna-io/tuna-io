@@ -191,9 +191,8 @@ class VideoDetails extends Component {
   renderTranscript() {
     return (
       <div>
-        <h3>Transcript: </h3>
         {this.state.transcript.length ? (
-          <Transcript transcript={this.state.transcript} videoId={this.props.params.videoId} />
+          <Transcript transcript={this.state.transcript} />
           ) : null
         }
       </div>
