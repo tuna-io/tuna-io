@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import videojs from 'video.js';
 import overlay from 'videojs-overlay';
 import { Grid, Row, Col } from 'react-flexgrid';
-import { Badge, Space, InlineForm, Panel, PanelHeader, Text, Avatar, Heading, Flex, Donut, Stat } from 'rebass';
+import { Badge, Space, InlineForm, Panel, PanelHeader, 
+  Text, Avatar, Heading, Flex, Donut, Stat } from 'rebass';
 import TimeAgo from 'react-timeago';
 import { Tabs, TabList, TabPanel, Tab } from 'react-tabs';
 import VideoMetadata from './VideoMetadata';
@@ -25,7 +26,11 @@ class VideoDetails extends Component {
       currentVideoId: props.params.videoId,
       currentVideoDetails: null,
 
-      // Transcript format: [{'word': 'coming', 'time': 1}, {'word': 'soon', 'time': 2}]
+      // Transcript format: [
+      //   {'word': 'coming', 'time': 1},
+      //   {'word': 'soon', 'time': 2}
+      // ]
+      //
       transcript: [],
       query: '',
       searchResults: [],
@@ -43,7 +48,6 @@ class VideoDetails extends Component {
     this.search = this.search.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.findTime = this.findTime.bind(this);
-    this.myVideo;
     // Fetch initial video data. This is only called once
     this.fetchVideoFromAPI(props.params.videoId);
 
@@ -58,7 +62,7 @@ class VideoDetails extends Component {
     this.setState({
       currentVideoId: nextProps.params.videoId,
     });
-    console.log("video details videoid", nextProps.params.videoId);
+    console.log('video details videoid', nextProps.params.videoId);
   }
 
   // Helper function to fetch video data
@@ -192,8 +196,8 @@ class VideoDetails extends Component {
     for (var i = suggestion.Index - 4; i < suggestion.Index; i++) {
       pre += this.state.transcript[i].Token + ' ';
     }
-    for (var i = suggestion.Index + 1; i <= suggestion.Index + 4; i++) {
-      post += this.state.transcript[i].Token + ' ';
+    for (var j = suggestion.Index + 1; j <= suggestion.Index + 4; j++) {
+      post += this.state.transcript[j].Token + ' ';
     }
 
     const start = this.state.transcript[suggestion.Index - 4].Begin;
