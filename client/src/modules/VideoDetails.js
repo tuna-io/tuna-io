@@ -12,6 +12,7 @@ import ThumbnailEditor from './ThumbnailEditor';
 import TranscriptEditor from './TranscriptEditor';
 import Recommended from './Recommended';
 import Nav from './Nav';
+import Autosuggest from 'react-autosuggest';
 
 // TODO: prevent errors if there is no transcript
 // TODO: make sure subtitles are still working
@@ -225,6 +226,19 @@ class VideoDetails extends Component {
 
   renderSearchForm() {
     if (this.state.transcript.length) {
+      const tokens = this.state.transcript;
+
+      const getSuggestions = value => {
+        // Sanitize input data
+        const inputValue = value.trim().toLowerCase();
+        const inputLength = inputValue.length;
+
+        // Find typeahead suggestions by slicing candidates
+        return inputLength === 0 ? [] : tokens.filter(token => 
+          token.name.toLowerCase().slice(0, inputLength) === inputValue
+        );
+      }
+
       return (
         <InlineForm
           buttonLabel="Search" label="InlineForm" name="query"
