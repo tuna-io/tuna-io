@@ -1,25 +1,18 @@
 import React from 'react';
 
-class ThumbnailGenerator extends React.Component {
+class ThumbnailEditor extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      showPicker: false,
       newDataUrl: null,
       currentDataUrl: props.dataUrl,
     };
 
-    this.handleShowThumbnailPicker = this.handleShowThumbnailPicker.bind(this);
     this.handleThumbnailCapture = this.handleThumbnailCapture.bind(this);
     this.handleThumbnailSave = this.handleThumbnailSave.bind(this);
     this.renderThumbnailPicker = this.renderThumbnailPicker.bind(this);
-    this.renderCaptureButton = this.renderCaptureButton.bind(this);
     this.renderSaveButton = this.renderSaveButton.bind(this);
-  }
-
-  handleShowThumbnailPicker(event) {
-    this.setState({ showPicker: event.target.checked });
   }
 
   handleThumbnailCapture(event) {
@@ -65,34 +58,22 @@ class ThumbnailGenerator extends React.Component {
   }
 
   renderThumbnailPicker() {
-    if (this.state.showPicker) {
-      const video = document.getElementById('my-video_html5_api');
-      const canvasWidth = video.getBoundingClientRect().width / 2;
-      const canvasHeight = video.getBoundingClientRect().height / 2;
+    const video = document.getElementById('my-video_html5_api');
+    const canvasWidth = video.getBoundingClientRect().width / 2;
+    const canvasHeight = video.getBoundingClientRect().height / 2;
 
-      return (
-        <div>
-          <div>Press Capture to select a new thumbnail!</div>
-          <canvas id="canvas" width={canvasWidth} height={canvasHeight}></canvas>
-          {
-            this.state.currentDataUrl ?
-            (<div>
-              <div>Current thumbnail</div>
-              <img src={this.state.currentDataUrl} />
-            </div>) : null
-          }
-        </div>
-      );
-    }
-
-    return null;
-  }
-
-  renderCaptureButton() {
-    return this.state.showPicker ?
-    (
-      <button onClick={this.handleThumbnailCapture}>Capture</button>
-    ) : null;
+    return (
+      <div>
+        <canvas id="canvas" width={canvasWidth} height={canvasHeight}></canvas>
+        {
+          this.state.currentDataUrl ?
+          (<div>
+            <div>Current thumbnail</div>
+            <img src={this.state.currentDataUrl} />
+          </div>) : null
+        }
+      </div>
+    );
   }
 
   renderSaveButton() {
@@ -105,16 +86,15 @@ class ThumbnailGenerator extends React.Component {
   render() {
     return (
       <div>
-        <form>
-          <span>Show thumbnail picker </span>
-          <input type="checkbox" onChange={this.handleShowThumbnailPicker} />
-          {this.renderCaptureButton()}
+        <div>
+          <h3>Press capture to create a new thumbnail</h3>
+          <button onClick={this.handleThumbnailCapture}>Capture</button>
           {this.renderSaveButton()}
-        </form>
+        </div>
         {this.renderThumbnailPicker()}
       </div>
     );
   }
 }
 
-export default ThumbnailGenerator;
+export default ThumbnailEditor;

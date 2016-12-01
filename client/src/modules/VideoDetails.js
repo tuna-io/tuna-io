@@ -4,9 +4,12 @@ import overlay from 'videojs-overlay';
 import { Grid, Row, Col } from 'react-flexgrid';
 import { Badge, Space, InlineForm, Panel, PanelHeader, Text, Avatar, Heading, Flex, Donut, Stat } from 'rebass';
 import TimeAgo from 'react-timeago';
+import { Tabs, TabList, TabPanel, Tab } from 'react-tabs';
+import VideoMetadata from './VideoMetadata';
 import Wordcloud from './Wordcloud';
 import Transcript from './Transcript';
-import ThumbnailGenerator from './Thumbnail';
+import TranscriptEditor from './TranscriptEditor';
+import ThumbnailEditor from './ThumbnailEditor';
 
 // TODO: prevent errors if there is no transcript
 // TODO: make sure subtitles are still working
@@ -189,9 +192,19 @@ class VideoDetails extends Component {
   renderTranscript() {
     return (
       <div>
-        <h3>Transcript: </h3>
         {this.state.transcript.length ? (
-          <Transcript transcript={this.state.transcript} videoId={this.props.params.videoId} />
+          <Transcript transcript={this.state.transcript} />
+          ) : null
+        }
+      </div>
+    );
+  }
+
+  renderTranscriptEditor() {
+    return (
+      <div>
+        {this.state.transcript.length ? (
+          <TranscriptEditor transcript={this.state.transcript} videoId={this.props.params.videoId} />
           ) : null
         }
       </div>
@@ -275,82 +288,44 @@ class VideoDetails extends Component {
               <PanelHeader inverted theme="default">
                 {this.state.currentVideoDetails.title}
               </PanelHeader>
-              <Text>
-                <Row>
-                  <Col xs={0}>
-                    <Avatar circle size={48} src="http://lorempixel.com/output/animals-q-c-64-64-8.jpg" />
-                  </Col>
-                  <Col xs={1}>
-                    <Heading size={5} alt>
-                      {this.state.currentVideoDetails.creator}
-                    </Heading>
 
-                    <Badge rounded theme="info"> 4.5M </Badge>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col xs={5}>
-                    <div>
-                      Uploaded:
-                      <TimeAgo
-                        date={this.state.currentVideoDetails.timestamp}
-                      />
-                    </div>
-                  </Col>
-                  <Col xs={3}>
-                    {this.state.currentVideoDetails.private == 1 ?
-                      <Badge pill rounded theme="warning">PRIVATE</Badge> :
-                      <Badge pill rounded theme="success">PUBLIC</Badge>
-                    }
-                  </Col>
-                </Row>
-                <div>Description: {this.state.currentVideoDetails.description}</div>
-                <Row>
-                  <Col xs={2}>
-                    <Stat
-                      label="VIEWS"
-                      value={this.state.currentVideoDetails.views}
-                    />
-                  </Col>
-                  <Col xs={2}>
-                    <Stat
-                      label="LIKES"
-                      value={this.state.currentVideoDetails.likesCount}
-                    />
-                  </Col>
-                  <Col xs={2}>
-                    <Stat
-                      label="DISLIKES"
-                      value={this.state.currentVideoDetails.dislikesCount}
-                    />
-                  </Col>
-                  <Col xs={2}>
-                    <Donut
-                      color="warning" size={100} strokeWidth={12}
-                      value={this.state.currentVideoDetails.ldRatio}
-                    >
-                      {this.state.currentVideoDetails.likesCount}/
-                      {this.state.currentVideoDetails.dislikesCount +
-                        this.state.currentVideoDetails.likesCount}
-                    </Donut>
-                  </Col>
-                </Row>
-                <Row>
-                  <ThumbnailGenerator videoID={this.props.params.videoId} dataUrl={dataUrl} />
-                </Row>
-              </Text>
+              <Tabs>
+                <TabList>
+                  <Tab>About</Tab>
+                  <Tab>Wordcloud</Tab>
+                  <Tab>Transcript</Tab>
+                  <Tab>Edit transcript</Tab>
+                  <Tab>Thumbnails</Tab>
+                </TabList>
+
+                <TabPanel>
+                  <VideoMetadata currentVideoDetails={this.state.currentVideoDetails} />
+                </TabPanel>
+                <TabPanel>
+                  {
+                    this.renderWordcloud()
+                  }
+                </TabPanel>
+                <TabPanel>
+                  {
+                    this.renderTranscript()
+                  }
+                </TabPanel>
+                <TabPanel>
+                  {
+                    this.renderTranscriptEditor()
+                  }
+                </TabPanel>
+                <TabPanel>
+                  <ThumbnailEditor videoID={this.props.params.videoId} dataUrl={dataUrl} />
+                </TabPanel>
+              </Tabs>
             </Panel>
           </Col>
           <Space x={4} />
           <Col xs={3}>
             {
               this.renderSearchForm()
-            }
-            {
-              this.renderTranscript()
-            }
-            {
-              this.renderWordcloud()
             }
             {
               this.renderSearchResults()
