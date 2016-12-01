@@ -6,6 +6,7 @@ export default class Recommended extends React.Component {
 
   constructor(props) {
     super(props);
+    console.log('constructor called', this.props.currVid);
 
     this.state = {
       recVideos: [],
@@ -13,7 +14,18 @@ export default class Recommended extends React.Component {
   }
 
   componentDidMount() {
-    console.log('componentprops called', this.props.currVid);
+    this.getRecommended();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log("old props were", this.props);
+    this.props = nextProps;
+    console.log("now props are", this.props);
+    this.getRecommended();
+  }
+
+  getRecommended() {
+    // console.log('componentprops called', this.props.currVid);
     fetch(`/api/videos/recommended/${this.props.currVid}`, {
       method: 'GET',
       headers: {
@@ -29,7 +41,7 @@ export default class Recommended extends React.Component {
       this.setState({
         recVideos: topVids,
       });
-      console.log(topVids[0]);
+      // console.log(topVids[0]);
     })
     .catch((err) => {
       console.log('error getting last vid', err);
@@ -48,7 +60,7 @@ export default class Recommended extends React.Component {
           (
             <NavItem>
               <Link to={`/videos/${video.hash}`}>
-                <img width="50px" height="50px" src={video.dataUrl} />
+                <img width="10px" height="10px" src={video.dataUrl} />
                   <Heading level={3}>
                     {video.hash}
                   </Heading>

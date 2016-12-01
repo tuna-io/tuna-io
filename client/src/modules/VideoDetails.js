@@ -32,7 +32,6 @@ class VideoDetails extends Component {
       currentTime: 24,
     };
 
-
     this.myVideo;
     this.myPlayer;
     this.overlay = [];
@@ -48,6 +47,10 @@ class VideoDetails extends Component {
   // Upon going to a different video details page, fetch video data
   componentWillReceiveProps(nextProps) {
     this.fetchVideoFromAPI(nextProps.params.videoId);
+    this.setState({
+      currentVideoId: nextProps.params.videoId,
+    });
+    console.log("video details videoid", nextProps.params.videoId);
   }
 
   // Helper function to fetch video data
@@ -277,10 +280,7 @@ class VideoDetails extends Component {
       return (
         <Row>
           <Col xs={2}>
-            <Nav loggedIn={this.props.loggedIn} auth={this.props.auth} />
-          </Col>
-          <Col xs={2}>
-            <Recommended currVid={this.state.currentVideoId} />
+            <Nav loggedIn={this.props.loggedIn} auth={this.props.auth} currVid={this.state.currentVideoId} />
           </Col>
           <Space x={4} />
           <Col xs={8}>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { browserHistory, Link } from 'react-router';
 import { Menu, NavItem, Media, Heading, Text, Divider } from 'rebass';
+import Recommended from './Recommended';
 
 export default class Nav extends React.Component {
 
@@ -40,6 +41,17 @@ export default class Nav extends React.Component {
         console.log('error getting last vid', err);
       });
     }
+
+    this.setState({
+      currVid: this.props.currVid,
+    });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log("nav rendered", nextProps.currVid);
+    this.setState({
+      currVid: nextProps.currVid,
+    });
   }
 
   logout() {
@@ -109,7 +121,8 @@ export default class Nav extends React.Component {
         }
         {this.props.loggedIn &&
           <NavItem onClick={this.logout.bind(this)}>Sign Out</NavItem>
-        }
+        }        
+        {this.props.currVid ? (<Recommended currVid={this.props.currVid}/>) : null}
       </Menu>
     );
   }
