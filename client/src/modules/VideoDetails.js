@@ -349,7 +349,9 @@ class VideoDetails extends Component {
 
                 </TabPanel>
                 <TabPanel>
-                  <div>Wordcloud</div>
+                  {
+                    this.renderWordcloud()
+                  }
                 </TabPanel>
                 <TabPanel>
                   <div>Transcript</div>
@@ -370,9 +372,6 @@ class VideoDetails extends Component {
             }
             {
               this.renderTranscript()
-            }
-            {
-              this.renderWordcloud()
             }
             {
               this.renderSearchResults()
