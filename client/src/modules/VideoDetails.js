@@ -30,6 +30,10 @@ class VideoDetails extends Component {
       query: '',
       searchResults: [],
       currentTime: 24,
+
+      // Autosuggest related states
+      value: '',
+      suggestions: [],
     };
 
     this.myVideo;
@@ -135,14 +139,53 @@ class VideoDetails extends Component {
 
   handleChange(event) {
     // Retrieve checkbox data using event.target.checked
-    const value = event.target.name === 'private' ? event.target.checked : event.target.value;
+    const value = event.target.name === 'private' ? event.target.checked 
+      : event.target.value;
     this.setState({ [event.target.name]: value });
+  }
+
+  getSuggestions(value) {
+    const tokens = this.state.transcript;
+
+    // Sanitize input data
+    const inputValue = value.trim().toLowerCase();
+    const inputLength = inputValue.length;
+
+    // Find typeahead suggestions by slicing candidates
+    return inputLength === 0 ? [] : tokens.filter(token => 
+      token.name.toLowerCase().slice(0, inputLength) === inputValue
+    );
+  }
+
+  // Inform the retrieval and rendering of suggestions
+  getSuggestionValue(suggestion) {
+    return suggestion.Token;
+  }
+
+  renderSuggestion(suggestion) {
+    return (
+      <div>
+        {suggestion.Token}
+        {suggestion.Begin}
+        {suggestion.End}
+      </div>
+    );
+  }
+  
+  // Update suggestions when required
+  onSuggestionsFetchRequested(value) {
+    this.setState({ suggestions: this.getSuggestions(value) });
+  }
+
+  // Clear suggestions when required
+  onSuggestionClearRequested() {
+    this.setState({ suggestions: [] });
   }
 
   search(e) {
     e.preventDefault();
-    fetch('/api/videos/search/' + this.state.currentVideoDetails.hash + '/' + this.state.query, {
-      method: "GET",
+    fetch(`api/videos/search/${this.state.currentVideoDetails.hash}/${this.state.query}`, {
+      method: 'GET',
       credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
@@ -226,28 +269,6 @@ class VideoDetails extends Component {
 
   renderSearchForm() {
     if (this.state.transcript.length) {
-      const tokens = this.state.transcript;
-
-      const getSuggestions = value => {
-        // Sanitize input data
-        const inputValue = value.trim().toLowerCase();
-        const inputLength = inputValue.length;
-
-        // Find typeahead suggestions by slicing candidates
-        return inputLength === 0 ? [] : tokens.filter(token => 
-          token.name.toLowerCase().slice(0, inputLength) === inputValue
-        );
-      };
-
-      // Inform the retrieval and rendering of suggestions
-      const getSuggestionValue = suggestion => suggestion.Token;
-      const renderSuggestion = suggestion => (
-        <div>
-          {suggestion.Token}
-          {suggestion.Begin}
-          {suggestion.End}
-        </div>
-      );
 
       return (
         <InlineForm
@@ -370,3 +391,4 @@ class VideoDetails extends Component {
 }
 
 export default VideoDetails;
+
