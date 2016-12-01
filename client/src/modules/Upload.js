@@ -20,7 +20,8 @@ export default class Upload extends React.Component {
       hash: '',
 
       // upload data
-      uploadTime: 10,
+      sentToAws: false,
+      uploadDuration: 10,
       uploadProgress: '',
 
       // metadata
@@ -121,7 +122,10 @@ export default class Upload extends React.Component {
     .then(data => data.json())
     .then((time) => {
       console.log("metadata time is", time);
-      this.setState({ duration: time });
+      this.setState({ 
+        duration: time,
+        sentToAws: false
+      });
       this.trackProgress();
     })
     .catch(err => console.log('Error retrieving metadata:', err));
@@ -184,6 +188,9 @@ export default class Upload extends React.Component {
     event.preventDefault();
 
     this.trackUploadProgress();
+    this.setState({
+      sentToAws: true,
+    });
 
     if (this.state.signedUrl) {
       // Upload video into CDN
@@ -232,6 +239,9 @@ export default class Upload extends React.Component {
     event.preventDefault();
 
     this.trackUploadProgress();
+    this.setState({
+      sentToAws: true,
+    });
 
     console.log('called downloadyoutube', this.state.file.name);
 
@@ -372,12 +382,12 @@ export default class Upload extends React.Component {
   }
 
   renderAWSProgress() {
-    return this.state.signedUrl || this.state.youtubeID && !this.state.duration ?
+    return this.state.sentToAws ?
     (
       <div>
         <Circle
           progress={this.state.uploadProgress}
-          text={"Transcribing video... " + Math.floor(this.state.uploadProgress * 100, 2) + "%"}
+          text={"Uploading video... " + Math.floor(this.state.uploadProgress * 100, 2) + "%"}
           options={{ strokeWidth: 5 }}
           initialAnimate
           containerStyle={{
