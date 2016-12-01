@@ -70,9 +70,6 @@ export default class Nav extends React.Component {
         <Link to="/">
           <NavItem>Home</NavItem>
         </Link>
-        <Link to="/about">
-          <NavItem>About</NavItem>
-        </Link>
         {!this.props.loggedIn &&
           <Link to="/signin">
             <NavItem>Sign In</NavItem>
@@ -84,8 +81,8 @@ export default class Nav extends React.Component {
           </Link>
         }
         {this.props.loggedIn &&
-          <Link to="/dashboard">
-            <NavItem>Dashboard</NavItem>
+          <Link to="/dashboard/upload">
+            <NavItem>Upload</NavItem>
           </Link>
         }
         {this.props.loggedIn &&
