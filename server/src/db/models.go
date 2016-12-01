@@ -198,10 +198,10 @@ func GetThumbnail(hash string) (string, error) {
   defer conn.Close()
 
   thumbnail, err := redis.String(conn.Do("HGET", "video:" + hash, "thumbnail"))
-  HandleError(err)
-  // if err != nil {
-  //   thumbnail = "{DataUrl: 'null'}"
-  // }
+  // HandleError(err)
+  if err != nil {
+    thumbnail = "{DataUrl: 'null'}"
+  }
 
   return thumbnail, err
 }
