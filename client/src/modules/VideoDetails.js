@@ -8,8 +8,10 @@ import { Tabs, TabList, TabPanel, Tab } from 'react-tabs';
 import VideoMetadata from './VideoMetadata';
 import Wordcloud from './Wordcloud';
 import Transcript from './Transcript';
-import TranscriptEditor from './TranscriptEditor';
 import ThumbnailEditor from './ThumbnailEditor';
+import TranscriptEditor from './TranscriptEditor';
+import ThumbnailGenerator from './Thumbnail';
+import Recommended from './Recommended';
 
 // TODO: prevent errors if there is no transcript
 // TODO: make sure subtitles are still working
@@ -258,7 +260,6 @@ class VideoDetails extends Component {
     return null;
   }
 
-
   renderOverlay() {
     videojs(document.getElementById('my-video')).overlay({
       overlays: this.overlay,
@@ -330,6 +331,7 @@ class VideoDetails extends Component {
             {
               this.renderSearchResults()
             }
+            <Recommended currVid={this.state.currentVideoId} />
           </Col>
         </Row>
       );

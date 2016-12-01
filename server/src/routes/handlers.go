@@ -272,13 +272,20 @@ func GetLatestVideos(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 func GetRecommended(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
   fmt.Println("get recommended called")
   hash := ps.ByName("hash")
+
+
   recommended, err := db.GetRecommendedVideos(hash)
   HandleError(err)
 
-  // var topVideos [][]string
-  // err = json.Unmarshal([]byte(recommended), &topVideos)
+  var topVideos [][]string
+  err = json.Unmarshal([]byte(recommended), &topVideos)
 
-  // fmt.Println("in handlers recommended is", topVideos[0], topVideos[1])
+  fmt.Println("in handlers recommended is", topVideos[0], topVideos[1])
+
+  topVideoAndThumbnails := GetThumbnails(topVideos)
+  j, err := json.Marshal(topVideoAndThumbnails)
+  HandleError(err)
+
   w.Header().Set("Content-Type", "application/json")
 
   if (err != nil) {
@@ -286,8 +293,19 @@ func GetRecommended(w http.ResponseWriter, req *http.Request, ps httprouter.Para
     fmt.Fprintln(w, err)
   } else {
     w.WriteHeader(http.StatusOK)
-    w.Write([]byte(recommended))
+    w.Write([]byte(j))
   }
+}
+
+func GetThumbnails(topVideos [][]string) ([][]string){
+  topVideosAndThumbnails := topVideos
+
+  for i := 0; i < len(topVideos); i++{
+    thumbnail := db.GetThumbnail(topVideos[i][1])
+    topVideosAndThumbnails[i] = append(topVideosAndThumbnails[i], thumbnail)
+  }
+
+  return topVideosAndThumbnails
 }
 
 func ProcessVideo(url string, hash string) (*watson.Text, error) {

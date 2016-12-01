@@ -62,7 +62,7 @@ export default class Home extends React.Component {
             { this.state.latestVideos.map(video =>
               (
                 <div className="video-preview" key={video.creator + video.url}>
-                  <div><Link to={`/videos/${video.hash}`} onClick={() => this.props.updateCurrent(video.hash)}>{ video.title }</Link></div>
+                  <div><Link to={`/videos/${video.hash}`}>{ video.title }</Link></div>
                   <video width="400" controls>
                     <source src={video.url} type="video/mp4" />
                   </video>

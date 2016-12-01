@@ -110,26 +110,6 @@ export default class Nav extends React.Component {
         {this.props.loggedIn &&
           <NavItem onClick={this.logout.bind(this)}>Sign Out</NavItem>
         }
-        <br /> <br />
-        <Divider width={1000} style={{ background: 'white' }} />
-        {this.state.recVideos.map(videoHash =>
-          (
-            <NavItem>
-              <Link to={`/videos/${videoHash}`} onClick={() => this.props.updateCurrent(videoHash)}>
-                <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
-                <ThumbnailGenerator videoID={this.props.params.videoId} dataUrl={dataUrl} />
-
-                  <Heading level={3}>
-                    Video
-                  </Heading>
-                  <Text>
-                    {videoHash}
-                  </Text>
-                </Media>
-              </Link>
-            </NavItem>
-          ))
-        }
       </Menu>
     );
   }
