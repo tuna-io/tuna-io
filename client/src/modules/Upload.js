@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router';
 import { Circle } from 'react-progressbar.js';
+import { Grid, Row, Col } from 'react-flexgrid';
 import DropzoneComponent from 'react-dropzone-component';
+
 
 export default class Upload extends React.Component {
   constructor(props) {
@@ -34,6 +36,7 @@ export default class Upload extends React.Component {
     this.downloadYoutube = this.downloadYoutube.bind(this);
     this.processVideo = this.processVideo.bind(this);
     this.getYoutubeID = this.getYoutubeID.bind(this);
+    this.runSample = this.runSample.bind(this);
 
     this.djsConfig = {
       addRemoveLinks: true,
@@ -208,6 +211,14 @@ export default class Upload extends React.Component {
     });
   }
 
+  runSample() {
+    this.setState({
+      youtubeID: "jLO1CPYv0hc",
+      file: { name: "ohmygod.mp4", type: 'video/mp4', hash: "ohmygod.mp4" },
+      title: "Oh my god",
+    });
+  }
+
   // Send to server to donwload vid and then processes video
   // we can refactor this to support multiple youtube links at once
   downloadYoutube(event) {
@@ -288,14 +299,27 @@ export default class Upload extends React.Component {
   renderYoutubeUploadForm() {
     return this.state.signedUrl ? null : (
       <div>
+        <div>Enter youtube link</div>
         <form onSubmit={this.getYoutubeID}>
-          <span>Enter youtube link:</span>
           <input
             name="link" type="text"
             onChange={this.handleChange}
           />
+          <button onClick={this.getYoutubeID}> Submit </button>
         </form>
-        <button onClick={this.getYoutubeID}> Submit </button>
+      </div>
+    );
+  }
+
+  // demo video
+  renderSampleVideo() {
+    return (
+      <div>
+        <div>
+         Try a demo video
+        </div>
+        <button onClick={this.runSample}> Start upload </button>
+        <img width="190px" src="https://s3-us-west-1.amazonaws.com/invalidmemories/ohmygod.png"/>
       </div>
     );
   }
@@ -343,16 +367,28 @@ export default class Upload extends React.Component {
     return (
       <div>
         <h1>
-          Upload a video!
+          Upload a video
         </h1>
-        <DropzoneComponent
-          config={config}
-          eventHandlers={eventHandlers}
-          djsConfig={djsConfig}
-        />
-        {
-          this.renderYoutubeUploadForm()
-        }
+        <Row>
+          <Col xs={2}>
+            {
+              this.renderYoutubeUploadForm()
+            }
+          </Col>
+          <Col xs={3}>
+            {
+              this.renderSampleVideo()
+            }
+          </Col>
+          <Col xs={3}>
+            <div>Or choose a file</div>
+            <DropzoneComponent
+              config={config}
+              eventHandlers={eventHandlers}
+              djsConfig={djsConfig}
+            />
+          </Col>
+        </Row>
         {
           this.renderVideoOptionsForm()
         }
