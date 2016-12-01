@@ -9,7 +9,7 @@ export default class Nav extends React.Component {
 
     this.state = {
       query: '',
-      videos: [],
+      recVideos: [],
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -30,7 +30,10 @@ export default class Nav extends React.Component {
         return data.json();
       })
       .then((videos) => {
-        const topVids = videos.map(video => video[1]).filter(hash => hash !== this.props.currVid);
+        const topVids = videos.map(video => video[1]).filter(hash => hash !== nextProps.currVid);
+        this.setState({
+          recVideos: topVids,
+        });
         console.log(topVids);
       })
       .catch((err) => {
@@ -108,47 +111,21 @@ export default class Nav extends React.Component {
           <NavItem onClick={this.logout.bind(this)}>Sign Out</NavItem>
         }
         <br /> <br />
-        <Divider width={1000} style={{background: 'white'}} />
-        <NavItem>
-          <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
-            <Heading level={3}>
-              Video
-            </Heading>
-            <Text>
-              {this.props.currVid}
-            </Text>
-          </Media>
-        </NavItem>
-        <NavItem>
-          <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
-            <Heading level={3}>
-              Video
-            </Heading>
-            <Text>
-              {this.props.currVid}
-            </Text>
-          </Media>
-        </NavItem>
-        <NavItem>
-          <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
-            <Heading level={3}>
-              Video
-            </Heading>
-            <Text>
-              {this.props.currVid}
-            </Text>
-          </Media>
-        </NavItem>
-        <NavItem>
-          <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
-            <Heading level={3}>
-              Video
-            </Heading>
-            <Text>
-              {this.props.currVid}
-            </Text>
-          </Media>
-        </NavItem>
+        <Divider width={1000} style={{ background: 'white' }} />
+        {this.state.recVideos.map(videoHash =>
+          (
+            <NavItem>
+              <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
+                <Heading level={3}>
+                  Video
+                </Heading>
+                <Text>
+                  {videoHash}
+                </Text>
+              </Media>
+            </NavItem>
+          ))
+        }
       </Menu>
     );
   }
