@@ -355,8 +355,7 @@ class VideoDetails extends Component {
           <Col xs={2}>
             <Nav loggedIn={this.props.loggedIn} auth={this.props.auth} currVid={this.state.currentVideoId} />
           </Col>
-          <Space x={4} />
-          <Col xs={8}>
+          <Col xs={7}>
             <div>
               <video crossOrigin="anonymous" ref={input => this.loadVideoJS(input)} id="my-video"
                 className="video-js vjs-sublime-skin vjs-16-9" controls preload="auto"
@@ -403,7 +402,6 @@ class VideoDetails extends Component {
               </Tabs>
             </Panel>
           </Col>
-          <Space x={4} />
           <Col xs={3}>
             {
               this.renderSearchForm()
