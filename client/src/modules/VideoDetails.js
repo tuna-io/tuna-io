@@ -8,7 +8,7 @@ import { Tabs, TabList, TabPanel, Tab } from 'react-tabs';
 import Wordcloud from './Wordcloud';
 import Transcript from './Transcript';
 import TranscriptEditor from './TranscriptEditor';
-import ThumbnailGenerator from './Thumbnail';
+import ThumbnailEditor from './ThumbnailEditor';
 
 // TODO: prevent errors if there is no transcript
 // TODO: make sure subtitles are still working
@@ -375,7 +375,7 @@ class VideoDetails extends Component {
                   }
                 </TabPanel>
                 <TabPanel>
-                  <ThumbnailGenerator videoID={this.props.params.videoId} dataUrl={dataUrl} />
+                  <ThumbnailEditor videoID={this.props.params.videoId} dataUrl={dataUrl} />
                 </TabPanel>
               </Tabs>
             </Panel>
