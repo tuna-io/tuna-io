@@ -10,13 +10,22 @@ export default class App extends React.Component {
 
     this.state = {
       loggedIn: '',
+      currentVideo: '',
     };
 
     this.authenticateUser = this.authenticateUser.bind(this);
+    this.updateCurrent = this.updateCurrent.bind(this);
   }
 
   componentDidMount() {
     !this.state.loggedIn ? this.authenticateUser() : null;
+  }
+
+  updateCurrent(video) {
+    this.setState({
+      currentVideo: video,
+    });
+    console.log("app update called with", video);
   }
 
   authenticateUser() {
@@ -40,7 +49,7 @@ export default class App extends React.Component {
     return (
       <Row>
         <Col xs={2}>
-          <Nav loggedIn={this.state.loggedIn} auth={this.authenticateUser} />
+          <Nav loggedIn={this.state.loggedIn} auth={this.authenticateUser} currVid={this.state.currentVideo}/>
         </Col>
         <Col xs={10}>
         {
@@ -50,7 +59,7 @@ export default class App extends React.Component {
                 loggedIn: this.state.loggedIn,
                 auth: this.authenticateUser,
               },
-            ) : <Home loggedIn={this.state.loggedIn} auth={this.authenticateUser} />
+            ) : <Home loggedIn={this.state.loggedIn} auth={this.authenticateUser} updateCurrent={this.updateCurrent} />
         }
         </Col>
       </Row>

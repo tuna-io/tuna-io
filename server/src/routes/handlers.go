@@ -268,6 +268,14 @@ func GetLatestVideos(w http.ResponseWriter, req *http.Request, _ httprouter.Para
   }
 }
 
+func GetRecommended(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+  fmt.Println("get recommended called")
+  recommended, err := db.GetRecommendedVideos("13cbaXRKSj")
+  HandleError(err)
+  fmt.Println("in handlers recommended is", recommended)
+  // err = json.Unmarshal(stringRecommended)
+}
+
 func ProcessVideo(url string, hash string) (*watson.Text, error) {
   fmt.Println("process video called")
   applicationName := "ffmpeg"

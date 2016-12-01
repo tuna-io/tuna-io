@@ -91,7 +91,7 @@ export default class Nav extends React.Component {
               Video
             </Heading>
             <Text>
-              Metadata
+              {this.props.currVid}
             </Text>
           </Media>
         </NavItem>
@@ -101,7 +101,7 @@ export default class Nav extends React.Component {
               Video
             </Heading>
             <Text>
-              Metadata
+              {this.props.currVid}
             </Text>
           </Media>
         </NavItem>
@@ -111,7 +111,7 @@ export default class Nav extends React.Component {
               Video
             </Heading>
             <Text>
-              Metadata
+              {this.props.currVid}
             </Text>
           </Media>
         </NavItem>
@@ -121,7 +121,7 @@ export default class Nav extends React.Component {
               Video
             </Heading>
             <Text>
-              Metadata
+              {this.props.currVid}
             </Text>
           </Media>
         </NavItem>
