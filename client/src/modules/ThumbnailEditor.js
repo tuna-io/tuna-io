@@ -24,8 +24,6 @@ class ThumbnailEditor extends React.Component {
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
 
-    debugger;
-
     // Draw the screenshot on the canvas. Note: Currently canvas is not responsive for small screens
     context.drawImage(video, 0, 0, videoWidth, videoHeight, 0, 0, canvas.width, canvas.height);
 
@@ -59,13 +57,9 @@ class ThumbnailEditor extends React.Component {
   }
 
   renderThumbnailPicker() {
-    const video = document.getElementById('my-video_html5_api');
-    const canvasWidth = video.getBoundingClientRect().width / 2;
-    const canvasHeight = video.getBoundingClientRect().height / 2;
-
     return (
       <div>
-        <canvas id="canvas" width={canvasWidth} height={canvasHeight}></canvas>
+        <canvas id="canvas" width="300" height="150"></canvas>
         {
           this.state.currentDataUrl ?
           (<div>
