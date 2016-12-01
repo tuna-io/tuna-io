@@ -60,10 +60,14 @@ export default class Recommended extends React.Component {
           (
             <NavItem>
               <Link to={`/videos/${video.hash}`}>
-                <img width="10px" height="10px" src={video.dataUrl} />
+                <Media align="center" width="50px" img={video.dataUrl}>
                   <Heading level={3}>
-                    {video.hash}
+                    Video
                   </Heading>
+                  <Text>
+                    {video.hash}
+                  </Text>
+                </Media>
               </Link>
             </NavItem>
           ))
