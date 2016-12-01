@@ -1,7 +1,6 @@
 import React from 'react';
 import { browserHistory, Link } from 'react-router';
 import { Menu, NavItem, Media, Heading, Text, Divider } from 'rebass';
-import ThumbnailGenerator from './Thumbnail';
 
 export default class Recommended extends React.Component {
 
@@ -25,7 +24,8 @@ export default class Recommended extends React.Component {
       return data.json();
     })
     .then((videos) => {
-      const topVids = videos.map(video => [video[1], video[2]]).filter(hash => hash[0] !== this.props.currVid);
+      const topVids = videos.map((video) => { return {hash: video[1], dataUrl: JSON.parse(video[2]).DataUrl}})
+                            .filter(vidObj => vidObj.hash !== this.props.currVid);
       this.setState({
         recVideos: topVids,
       });
@@ -44,17 +44,14 @@ export default class Recommended extends React.Component {
         color: 'white',
       }}>
         <Divider width={1000} style={{ background: 'white' }} />
-        {this.state.recVideos.map(videoHash =>
+        {this.state.recVideos.map(video =>
           (
             <NavItem>
-              <Link to={`/videos/${videoHash}`} onClick={() => this.props.updateCurrent(videoHash)}>
-                <ThumbnailGenerator videoID={videoHash} dataUrl={dataUrl} />
+              <Link to={`/videos/${video.hash}`}>
+                <img width="50px" height="50px" src={video.dataUrl} />
                   <Heading level={3}>
-                    Video
+                    {video.hash}
                   </Heading>
-                  <Text>
-                    {videoHash}
-                  </Text>
               </Link>
             </NavItem>
           ))

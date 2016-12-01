@@ -12,6 +12,7 @@ import ThumbnailEditor from './ThumbnailEditor';
 import TranscriptEditor from './TranscriptEditor';
 import ThumbnailGenerator from './Thumbnail';
 import Recommended from './Recommended';
+import Nav from './Nav';
 
 // TODO: prevent errors if there is no transcript
 // TODO: make sure subtitles are still working
@@ -275,6 +276,12 @@ class VideoDetails extends Component {
 
       return (
         <Row>
+          <Col xs={2}>
+            <Nav loggedIn={this.props.loggedIn} auth={this.props.auth} />
+          </Col>
+          <Col xs={2}>
+            <Recommended currVid={this.state.currentVideoId} />
+          </Col>
           <Space x={4} />
           <Col xs={8}>
             <div>
@@ -331,7 +338,6 @@ class VideoDetails extends Component {
             {
               this.renderSearchResults()
             }
-            <Recommended currVid={this.state.currentVideoId} />
           </Col>
         </Row>
       );
