@@ -7,6 +7,7 @@ export default class Search extends React.Component {
     this.state = {
       query: props.params.query,
     };
+
   }
 
   componentDidMount() {
