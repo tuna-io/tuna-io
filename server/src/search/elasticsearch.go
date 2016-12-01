@@ -42,19 +42,21 @@ type Configuration struct {
 // ...should not be of type `string` but this is a short-term hack for
 // ...data extraction.
 type Video struct {
-  Title       string      `json:"title"`
-  Url         string      `json:"url"`
-  Hash        string      `json:"hash"`
-  Creator     string      `json:"creator"`
-  Extension   string      `json:"extension"`
-  Description string      `json:"description"`
-  Timestamp   string      `json:"timestamp"`
-  Private     string      `json:"private"`
-  Views       string      `json:"views"`
-  Likes       string      `json:"likes"`
-  Dislikes    string      `json:"dislikes"`
-  Comments    string      `json:"comments"`
-  Transcript  string      `json:"transcript"`
+  Title         string    `json:"title"`
+  Url           string    `json:"url"`
+  Hash          string    `json:"hash"`
+  Creator       string    `json:"creator"`
+  Extension     string    `json:"extension"`
+  Description   string    `json:"description"`
+  Timestamp     string    `json:"timestamp"`
+  Private       string    `json:"private"`
+  Views         string    `json:"views"`
+  Likes         string    `json:"likes"`
+  Dislikes      string    `json:"dislikes"`
+  Comments      string    `json:"comments"`
+  Transcript    string    `json:"transcript"`
+  Thumbnail     string    `json:"thumbnail"`
+  SimilarVideos string    `json:"similar_videos"`
   // TODO: update struct for similar_videos
 }
 
