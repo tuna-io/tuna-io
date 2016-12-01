@@ -3,7 +3,7 @@ import videojs from 'video.js';
 import overlay from 'videojs-overlay';
 import { Grid, Row, Col } from 'react-flexgrid';
 import { Badge, Space, InlineForm, Panel, PanelHeader, 
-  Text, Avatar, Heading, Flex, Donut, Stat } from 'rebass';
+  Text, Avatar, Heading, Flex, Donut, Stat, Divider } from 'rebass';
 import TimeAgo from 'react-timeago';
 import { Tabs, TabList, TabPanel, Tab } from 'react-tabs';
 import VideoMetadata from './VideoMetadata';
@@ -202,7 +202,7 @@ class VideoDetails extends Component {
       this.state.transcript[this.state.transcript.length - 1].End :
       this.state.transcript[suggestion.Index + 4].End;
     return (
-      <div>
+      <div className='drawers'>
         {pre}
         <span style={{'fontWeight': 'bold'}}> 
           {candidate}
@@ -210,6 +210,9 @@ class VideoDetails extends Component {
         {post}
         {start}
         {end}
+        <Divider
+          width={128}
+        />
       </div>
     );
   }
