@@ -40,7 +40,7 @@ export default class Nav extends React.Component {
   handleSearch(event) {
     event.preventDefault();
 
-    browserHistory.push('search/&q=' + this.state.query);
+    browserHistory.push('/search/&q=' + this.state.query);
   }
 
   render() {
