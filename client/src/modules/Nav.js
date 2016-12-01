@@ -1,6 +1,7 @@
 import React from 'react';
 import { browserHistory, Link } from 'react-router';
 import { Menu, NavItem, Media, Heading, Text, Divider, InlineForm } from 'rebass';
+import Recommended from './Recommended';
 
 export default class Nav extends React.Component {
 
@@ -9,11 +10,18 @@ export default class Nav extends React.Component {
 
     this.state = {
       query: '',
+      recVideos: [],
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
   }
+
+  // componentWillReceiveProps(nextProps) {
+  //   // this.setState({
+  //   //   currVid: nextProps.currVid,
+  //   // });
+  // }
 
   logout() {
     fetch('/api/users/logout', {
@@ -82,49 +90,8 @@ export default class Nav extends React.Component {
         }
         {this.props.loggedIn &&
           <NavItem onClick={this.logout.bind(this)}>Sign Out</NavItem>
-        }
-        <br /> <br />
-        <Divider width={1000} style={{background: 'white'}} />
-        <NavItem>
-          <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
-            <Heading level={3}>
-              Video
-            </Heading>
-            <Text>
-              Metadata
-            </Text>
-          </Media>
-        </NavItem>
-        <NavItem>
-          <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
-            <Heading level={3}>
-              Video
-            </Heading>
-            <Text>
-              Metadata
-            </Text>
-          </Media>
-        </NavItem>
-        <NavItem>
-          <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
-            <Heading level={3}>
-              Video
-            </Heading>
-            <Text>
-              Metadata
-            </Text>
-          </Media>
-        </NavItem>
-        <NavItem>
-          <Media align="center" img="https://place-hold.it/85x85/E5A1ED/FFFFFF">
-            <Heading level={3}>
-              Video
-            </Heading>
-            <Text>
-              Metadata
-            </Text>
-          </Media>
-        </NavItem>
+        }        
+        {this.props.currVid ? (<Recommended currVid={this.props.currVid}/>) : null}
       </Menu>
     );
   }

@@ -268,6 +268,80 @@ func GetLatestVideos(w http.ResponseWriter, req *http.Request, _ httprouter.Para
   }
 }
 
+
+/**
+* @api {get} /api/videos/recommended/{hash} Retrieve a stored video
+* @apiName GetRecommended
+* @apiGroup Videos
+*
+* @apiParam {String} hash Video hash
+*
+* @apiSuccessExample Success-Response:
+*   HTTP/1.1 200 OK
+*   {
+*     [
+        ['1.0', 'firstVideoHash', 'firstImgString'],
+        ['0.9'm 'secondVideoHash', 'secondImgString']
+      ]
+*   }
+* 
+* @apiErrorExample Error-Response:
+*   HTTP/1.1 404 Not Found
+*   redigo: nil return
+*/
+func GetRecommended(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
+  fmt.Println("get recommended called")
+  hash := ps.ByName("hash")
+
+
+  recommended, err := db.GetRecommendedVideos(hash)
+  HandleError(err)
+
+  var topVideos [][]string
+  err = json.Unmarshal([]byte(recommended), &topVideos)
+
+  topVideoAndThumbnails := GetThumbnails(topVideos)
+  j, err := json.Marshal(topVideoAndThumbnails)
+  HandleError(err)
+
+  w.Header().Set("Content-Type", "application/json")
+
+  if (err != nil) {
+    w.WriteHeader(http.StatusNotFound)
+    fmt.Fprintln(w, err)
+  } else {
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte(j))
+  }
+}
+
+// gets thumbnail from redis, adds to that videos' array, and returns 
+func GetThumbnails(topVideos [][]string) ([][]string){
+  topVideosAndThumbnails := topVideos
+
+  for i := 0; i < len(topVideos); i++{
+    thumbnail, err := db.GetThumbnail(topVideos[i][1])
+    if err != nil {
+      fmt.Println("error getting thumbnail", err)
+
+      type img struct{
+        DataUrl string
+      }
+
+      emptyImg := img{DataUrl: "null"}
+      j, err := json.Marshal(emptyImg)
+      HandleError(err)
+      topVideosAndThumbnails[i] = append(topVideosAndThumbnails[i], string(j))
+    } else {
+      fmt.Println("got thumbnail successfully")
+      topVideosAndThumbnails[i] = append(topVideosAndThumbnails[i], thumbnail)
+    }
+  }
+
+  return topVideosAndThumbnails
+}
+
+// converts to .wav, transcribes, and returns transcript
 func ProcessVideo(url string, hash string) (*watson.Text, error) {
   fmt.Println("process video called")
   applicationName := "ffmpeg"
@@ -288,6 +362,7 @@ func ProcessVideo(url string, hash string) (*watson.Text, error) {
   return t, err
 }
 
+// gets extra information about video for loading times
 func GetVideoMetadata(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
   // `ffmpeg` and `ffprobe` does not support https protocol out of box

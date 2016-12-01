@@ -27,20 +27,21 @@ func HandleError(err error) {
  *------------------------------------*/
 
 type Video struct {
-  Title       string      `json:"title"`
-  Url         string      `json:"url"`
-  Hash        string      `json:"hash"`
-  Creator     string      `json:"creator"`
-  Extension   string      `json:"extension"`
-  Description string      `json:"description"`
-  Timestamp   time.Time   `json:"timestamp"`
-  Private     bool        `json:"private"`
-  Views       int         `json:"views"`
-  Likes       []string    `json:"likes"`
-  Dislikes    []string    `json:"dislikes"`
-  Comments    []int       `json:"comments"`
-  Transcript  Transcript  `json:"transcript"`
-  Thumbnail   Thumbnail   `json:"thumbnail"`
+  Title          string      `json:"title"`
+  Url            string      `json:"url"`
+  Hash           string      `json:"hash"`
+  Creator        string      `json:"creator"`
+  Extension      string      `json:"extension"`
+  Description    string      `json:"description"`
+  Timestamp      time.Time   `json:"timestamp"`
+  Private        bool        `json:"private"`
+  Views          int         `json:"views"`
+  Likes          []string    `json:"likes"`
+  Dislikes       []string    `json:"dislikes"`
+  Comments       []int       `json:"comments"`
+  Transcript     Transcript  `json:"transcript"`
+  Thumbnail      Thumbnail   `json:"thumbnail"`
+  Similar_Videos []string    `json:"similar_videos"`
 }
 
 type Videos []Video
@@ -163,6 +164,7 @@ func GetVideoTranscript(hash string) (watson.Text, error) {
 
   var transcript watson.Text
   err = json.Unmarshal(transcriptBytes, &transcript)
+  HandleError(err)
 
   return transcript, err
 }
@@ -191,6 +193,19 @@ func UpdateThumbnail(hash string, thumbnail *Thumbnail) {
   _, _ = redis.StringMap(conn.Do("HSET", "video:" + hash, "thumbnail", t))
 }
 
+func GetThumbnail(hash string) (string, error) {
+  conn := Pool.Get()
+  defer conn.Close()
+
+  thumbnail, err := redis.String(conn.Do("HGET", "video:" + hash, "thumbnail"))
+  // HandleError(err)
+  if err != nil {
+    thumbnail = "{DataUrl: 'null'}"
+  }
+
+  return thumbnail, err
+}
+
 func GetLatestVideos() (string, error) {
   conn := Pool.Get()
   defer conn.Close()
@@ -217,6 +232,18 @@ func GetLatestVideos() (string, error) {
   results, err := json.Marshal(resultData) 
 
   return string(results), err
+}
+
+func GetRecommendedVideos(hash string) (string, error) {
+  conn := Pool.Get()
+  defer conn.Close()
+
+  // for a given hash, return the list of recommended videos
+  stringRecommended, err := redis.String(conn.Do("HGET", "video:" + hash, "similar_videos"))
+  HandleError(err)
+ 
+  // return jsonified string
+  return stringRecommended, err
 }
 
 

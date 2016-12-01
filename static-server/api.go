@@ -25,6 +25,7 @@ func (s *Server) DefineEndpoints() {
 	// get desired videos
 	s.Endpoint("videos/latest", API_GET, routes.GetLatestVideos)
 	s.Endpoint("videos/get/:hash", API_GET, routes.GetVideo)
+	s.Endpoint("videos/recommended/:hash", API_GET, routes.GetRecommended)
 
 	// get information about one video
 	s.Endpoint("videos/metadata/:url", API_GET, routes.GetVideoMetadata)

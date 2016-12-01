@@ -103,12 +103,12 @@ class Tfidf:
       for count_1, doc_1 in enumerate(self.tfidf_representation):
         if self.our_tfidf_comparisons.get(self.all_documents[count_0][0]) == None:
           self.our_tfidf_comparisons[self.all_documents[count_0][0]] = []
-        else:
-          self.our_tfidf_comparisons[self.all_documents[count_0][0]].append((self.cosine_similarity(doc_0, doc_1), self.all_documents[count_1][0]))
+        else: 
+          self.our_tfidf_comparisons[self.all_documents[count_0][0]].append((str(self.cosine_similarity(doc_0, doc_1)), self.all_documents[count_1][0]))
 
     for key in self.our_tfidf_comparisons:
-      self.our_tfidf_comparisons[key] = sorted(self.our_tfidf_comparisons[key], key=lambda element: (-element[0]))
-
+      self.our_tfidf_comparisons[key] = sorted(self.our_tfidf_comparisons[key], key=lambda element: (element[0]), reverse=True)
+  
   """
   Pipe all results back to Redis
   ...string({video#hash: score, ...})

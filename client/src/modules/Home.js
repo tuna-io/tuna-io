@@ -1,5 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router';
+import { Grid, Row, Col } from 'react-flexgrid';
+import Nav from './Nav';
+
 
 export default class Home extends React.Component {
   constructor(props) {
@@ -51,27 +54,34 @@ export default class Home extends React.Component {
 
   render() {
     return (
-      <div>
-        <h1>TunaVid.io - the 6th fastest fish in the sea</h1>
-        <div id="latest-videos">
-          {this.props.loggedIn &&
-            <div>Welcome back, {this.props.loggedIn}, here are your personal recommendations</div>
-          }
-          <div>Latest videos</div>
+      <Row>
+        <Col xs={2}>
+          <Nav loggedIn={this.props.loggedIn} auth={this.props.auth} />
+        </Col>
+        <Col xs={10}>
           <div>
-            { this.state.latestVideos.map(video =>
-              (
-                <div className="video-preview" key={video.creator + video.url}>
-                  <div><Link to={`/videos/${video.hash}`}>{ video.title }</Link></div>
-                  <video width="400" controls>
-                    <source src={video.url} type="video/mp4" />
-                  </video>
-                </div>
-              ),
-            ) }
+            <h1>TunaVid.io - the 6th fastest fish in the sea</h1>
+            <div id="latest-videos">
+              {this.props.loggedIn &&
+                <div>Welcome back, {this.props.loggedIn}, here are your personal recommendations</div>
+              }
+              <div>Latest videos</div>
+              <div>
+                { this.state.latestVideos.map(video =>
+                  (
+                    <div className="video-preview" key={video.creator + video.url}>
+                      <div><Link to={`/videos/${video.hash}`}>{ video.title }</Link></div>
+                      <video width="400" controls>
+                        <source src={video.url} type="video/mp4" />
+                      </video>
+                    </div>
+                  ),
+                ) }
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </Col>
+      </Row>
     );
   }
 }
