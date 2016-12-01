@@ -6,6 +6,8 @@ export default class Search extends React.Component {
 
     this.state = {
       query: props.params.query,
+      took: '',
+      results: '',
     };
 
     this.renderSearchResults(props.params.query);
@@ -19,7 +21,16 @@ export default class Search extends React.Component {
       },
     })
     .then(jsonData => jsonData.json())
-    .then(data => console.log(data))
+    .then(data => {
+      console.log(data);
+      this.setState({
+        took: data.took,
+        results: data.hits.hits,
+        total: data.hits.total,
+      });
+
+      console.log(this.state.results);
+    })
     .catch(err => console.log('Error with search:', err));
   }
 
@@ -31,7 +42,9 @@ export default class Search extends React.Component {
 
   render() {
     return (
-      <div>{this.state.query}</div>
+      <div>
+        Your search for "{this.state.query}" returned {this.state.total} results and took {this.state.took / 1000}s.
+      </div>
     )
   }
 }
