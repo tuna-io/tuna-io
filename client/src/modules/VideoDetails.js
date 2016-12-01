@@ -129,8 +129,6 @@ class VideoDetails extends Component {
   saveTranscript(transcript) {
     const newTranscript = [];
 
-    console.log('transcript', transcript);
-
     transcript.Words.forEach(word =>
       newTranscript.push({
         Token: word.Token,
@@ -153,7 +151,6 @@ class VideoDetails extends Component {
   }
 
   getSuggestions(value) {
-    console.log('Get suggestions called with arg:', value);
     const tokens = this.state.transcript;
 
     // Sanitize input data
@@ -182,26 +179,28 @@ class VideoDetails extends Component {
 
   // Inform the retrieval and rendering of suggestions
   getSuggestionValue(suggestion) {
-    console.log('getSuggestionValue called with arg:', suggestion);
     this.findTime.call(this, suggestion.Begin);
     return suggestion.Token;
   }
 
   renderSuggestion(suggestion) {
-    console.log('renderSuggestion called with:', suggestion);
     var pre = '';
     var post = '';
     var candidate = this.state.transcript[suggestion.Index].Token + ' ';
 
     for (var i = suggestion.Index - 4; i < suggestion.Index; i++) {
+      if (i < 0) { continue; }
       pre += this.state.transcript[i].Token + ' ';
     }
     for (var j = suggestion.Index + 1; j <= suggestion.Index + 4; j++) {
       post += this.state.transcript[j].Token + ' ';
     }
-
-    const start = this.state.transcript[suggestion.Index - 4].Begin;
-    const end = this.state.transcript[suggestion.Index + 4].End;
+    
+    const start = suggestion.Index - 4 < 0 ? this.state.transcript[0].Begin :
+      this.state.transcript[suggestion.Index - 4].Begin;
+    const end = suggestion.Index + 4 > this.state.transcript.length - 1 ?
+      this.state.transcript[this.state.transcript.length - 1].End :
+      this.state.transcript[suggestion.Index + 4].End;
     return (
       <div>
         {pre}
@@ -217,7 +216,6 @@ class VideoDetails extends Component {
   
   // Update suggestions when required
   onSuggestionsFetchRequested(value) {
-    console.log('onSuggestionsFetchRequested called with:', value);
     this.setState({ suggestions: this.getSuggestions(value) });
   }
 
@@ -252,7 +250,6 @@ class VideoDetails extends Component {
 
 
   findTime(time) {
-    console.log('findTime called with:', time);
     this.myVideo.currentTime = time;
   }
 
