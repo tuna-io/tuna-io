@@ -1,4 +1,6 @@
 import React from 'react';
+import TimeAgo from 'react-timeago';
+import { PageHeader } from 'rebass';
 
 export default class Search extends React.Component {
   constructor(props) {
@@ -22,7 +24,6 @@ export default class Search extends React.Component {
     })
     .then(jsonData => jsonData.json())
     .then(data => {
-      console.log(data);
       this.setState({
         took: data.took,
         results: data.hits.hits,
@@ -41,9 +42,25 @@ export default class Search extends React.Component {
   }
 
   render() {
+    console.log()
     return (
       <div>
-        Your search for "{this.state.query}" returned {this.state.total} results and took {this.state.took / 1000}s.
+        <PageHeader
+          description={`Search returned ${this.state.total} results, taking ${this.state.took / 1000}s.`}
+          heading={`Results for ${this.state.query}`}
+        />
+        Your search for {this.state.query} returned {this.state.total} results and took {this.state.took / 1000}s.
+        {this.state.results && this.state.results.map(video =>
+          (
+            <div>
+            {video._source.title}
+            {video._source.url}
+            {video._source.creator}
+            <img src={JSON.parse(video._source.thumbnail).DataUrl} />
+            <TimeAgo date={new Date(video._source.timestamp)} />
+            </div>
+          )
+        )}
       </div>
     )
   }

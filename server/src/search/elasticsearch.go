@@ -57,7 +57,6 @@ type Video struct {
   Transcript    string    `json:"transcript"`
   Thumbnail     string    `json:"thumbnail"`
   SimilarVideos string    `json:"similar_videos"`
-  // TODO: update struct for similar_videos
 }
 
 type Videos []Video
