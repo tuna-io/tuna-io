@@ -188,19 +188,25 @@ class VideoDetails extends Component {
     var post = '';
     var candidate = this.state.transcript[suggestion.Index].Token + ' ';
 
+    // Perform out of bounds checks
     for (var i = suggestion.Index - 4; i < suggestion.Index; i++) {
       if (i < 0) { continue; }
       pre += this.state.transcript[i].Token + ' ';
     }
     for (var j = suggestion.Index + 1; j <= suggestion.Index + 4; j++) {
+      if (j > this.state.transcript.length - 1) { continue; }
       post += this.state.transcript[j].Token + ' ';
     }
     
-    const start = suggestion.Index - 4 < 0 ? this.state.transcript[0].Begin :
-      this.state.transcript[suggestion.Index - 4].Begin;
-    const end = suggestion.Index + 4 > this.state.transcript.length - 1 ?
-      this.state.transcript[this.state.transcript.length - 1].End :
-      this.state.transcript[suggestion.Index + 4].End;
+    // Format returned times
+    var start = suggestion.Index - 4 < 0 ? this.state.transcript[0].Begin.toString() :
+      this.state.transcript[suggestion.Index - 4].Begin.toString();
+    var end = suggestion.Index + 4 > this.state.transcript.length - 1 ?
+      this.state.transcript[this.state.transcript.length - 1].End.toString() :
+      this.state.transcript[suggestion.Index + 4].End.toString();
+    start = start.split('.')[0] + 's';
+    end = end.split('.')[0] + 's';
+
     return (
       <div className='drawers'>
         {pre}
@@ -208,8 +214,7 @@ class VideoDetails extends Component {
           {candidate}
         </span> 
         {post}
-        {start}
-        {end}
+        {start} - {end}
         <Divider
           width={128}
         />
