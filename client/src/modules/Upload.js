@@ -9,10 +9,6 @@ const backgroundStyle = {
   fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
 };
 
-// const titleStyle = {
-//   color: "#e2e2e2",
-// };
-
 export default class Upload extends React.Component {
   constructor(props) {
     super(props);
