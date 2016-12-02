@@ -4,6 +4,9 @@ import { Grid, Row, Col } from 'react-flexgrid';
 import Overview from './Overview';
 import Nav from './Nav';
 
+const backgroundStyle = {
+};
+
 export default class Dashboard extends React.Component {
   render() {
     return (
@@ -11,7 +14,7 @@ export default class Dashboard extends React.Component {
         <Col xs={2}>
           <Nav loggedIn={this.props.loggedIn} auth={this.props.auth} />
         </Col>
-        <Col xs={10}>
+        <Col style={backgroundStyle} xs={10}>
           {
             this.props.children ?
             React.cloneElement(

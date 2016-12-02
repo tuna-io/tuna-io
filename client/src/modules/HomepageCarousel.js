@@ -4,17 +4,20 @@ import { Link } from 'react-router';
 
 const vidStyle = {
   textStyle: "none",
+  fontFamily: "Helvetica Neue",
 };
 
 const vidTextStyle = {
   color: "#0088ee",
   textStyle: "none",
+  fontFamily: "Helvetica Neue",
 };
 
 const descriptStyle = {
   color: "#e2e2e2",
   textStyle: "none",
   fontSize: "12px",
+  fontFamily: "Helvetica Neue",
 };
 
 const HomepageCarousel = React.createClass({
@@ -31,9 +34,9 @@ const HomepageCarousel = React.createClass({
     });
 
     return (
-      <div>
+      <div style={vidStyle}>
         <h1>{this.props.header}</h1>
-        <Carousel style={vidStyle} slidesToShow={3} cellAlign="left">
+        <Carousel slidesToShow={3} cellAlign="left">
           {
             data.map((videoData) =>
               (

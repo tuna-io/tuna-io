@@ -4,6 +4,7 @@ import { Row, Col } from 'react-flexgrid';
 import { Badge, Avatar, Heading, Donut, Stat } from 'rebass';
 
 
+
 class VideoMetadata extends React.Component {
   render() {
     return (

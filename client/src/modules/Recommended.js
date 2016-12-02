@@ -8,6 +8,7 @@ const recVidStyle = {
 
 const titleStyle = {
   color: "#0088ee",
+  fontFamily: "Helvetica Neue",
 };
 
 export default class Recommended extends React.Component {

@@ -5,11 +5,13 @@ import Recommended from './Recommended';
 
 const titleStyle = {
   marginRight: "10px",
+  fontFamily: "Helvetica Neue",
 };
 
 const descriptStyle = {
   color: "#e2e2e2",
   textStyle: "none",
+  fontFamily: "Helvetica Neue",
 };
 
 export default class Nav extends React.Component {

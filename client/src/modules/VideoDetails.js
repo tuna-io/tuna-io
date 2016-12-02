@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import videojs from 'video.js';
 import overlay from 'videojs-overlay';
 import { Grid, Row, Col } from 'react-flexgrid';
-import { Badge, Space, InlineForm, Panel, PanelHeader, 
+import { Badge, Space, InlineForm, Panel, PanelHeader,
   Text, Avatar, Heading, Flex, Donut, Stat, Divider } from 'rebass';
 import TimeAgo from 'react-timeago';
 import { Tabs, TabList, TabPanel, Tab } from 'react-tabs';
@@ -17,14 +17,16 @@ import Autosuggest from 'react-autosuggest';
 
 const backgroundStyle = {
   backgroundColor: "#3a3a3a",
+  fontFamily: "Helvetica Neue",
 };
 
 const subtitleStyle = {
   borderRadius: "5px",
   backgroundColor: "#ffffff",
   border: "0",
-  margin: "25px 25px 10px 25px",
+  margin: "15px 25px 10px 25px",
   height: "20px",
+  fontFamily: "Helvetica Neue",
 };
 
 const vidStyle = {
@@ -34,6 +36,11 @@ const vidStyle = {
 const titleStyle = {
   margin: "-17px -17px -16px -16px",
   backgroundColor: "#000",
+  fontFamily: "Helvetica Neue",
+};
+
+const detailsBoxStyle = {
+  backgroundColor: "#e2e2e2",
 };
 // TODO: prevent errors if there is no transcript
 // TODO: make sure subtitles are still working
@@ -428,7 +435,7 @@ class VideoDetails extends Component {
               />
               <button style={subtitleStyle} onClick={() => this.renderOverlay()}>Turn on subtitles</button>
             </div>
-            <Panel theme="default">
+            <Panel style={detailsBoxStyle} theme="default">
               <Tabs>
                 <TabList>
                   <Tab>About</Tab>

@@ -4,6 +4,14 @@ import { Circle } from 'react-progressbar.js';
 import { Grid, Row, Col } from 'react-flexgrid';
 import DropzoneComponent from 'react-dropzone-component';
 
+const backgroundStyle = {
+  color: "#e2e2e2",
+  fontFamily: "Helvetica Neue",
+};
+
+// const titleStyle = {
+//   color: "#e2e2e2",
+// };
 
 export default class Upload extends React.Component {
   constructor(props) {
@@ -433,7 +441,7 @@ export default class Upload extends React.Component {
     };
 
     return (this.state.signedUrl || this.state.youtubeID) ? (
-        <div>
+        <div style={backgroundStyle}>
           <h1>
               Step (2/2): Edit video info
           </h1>
@@ -451,7 +459,7 @@ export default class Upload extends React.Component {
           }
         </div>
       ) : (
-        <div>
+        <div style={backgroundStyle}>
           <h1>
             Step (1/2): Select a video
           </h1>
