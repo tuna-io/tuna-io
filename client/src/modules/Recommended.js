@@ -2,6 +2,14 @@ import React from 'react';
 import { browserHistory, Link } from 'react-router';
 import { Menu, NavItem, Media, Heading, Text, Divider } from 'rebass';
 
+const recVidStyle = {
+  maxWidth: "180px",
+};
+
+const titleStyle = {
+  color: "#0088ee",
+};
+
 export default class Recommended extends React.Component {
 
   constructor(props) {
@@ -57,14 +65,10 @@ export default class Recommended extends React.Component {
           (
             <NavItem>
               <Link to={`/videos/${video.hash}`}>
-                <Media align="center" width="50px" img={video.dataUrl}>
-                  <Heading level={3}>
-                    Video
-                  </Heading>
-                  <Text>
-                    {video.hash}
-                  </Text>
-                </Media>
+                <img style={recVidStyle} align="center" src={video.dataUrl}/>
+                <div style={titleStyle}>
+                  {video.hash}
+                </div>
               </Link>
             </NavItem>
           ))

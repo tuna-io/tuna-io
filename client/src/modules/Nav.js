@@ -7,6 +7,11 @@ const titleStyle = {
   marginRight: "10px",
 };
 
+const descriptStyle = {
+  color: "#e2e2e2",
+  textStyle: "none",
+};
+
 export default class Nav extends React.Component {
 
   constructor(props) {
@@ -76,7 +81,7 @@ export default class Nav extends React.Component {
           />
         </NavItem>
         <Link to="/">
-          <NavItem>Home</NavItem>
+          <NavItem style={descriptStyle}>Home</NavItem>
         </Link>
         {!this.props.loggedIn &&
           <Link to="/signin">
@@ -85,16 +90,16 @@ export default class Nav extends React.Component {
         }
         {!this.props.loggedIn &&
           <Link to="/register">
-            <NavItem>Register</NavItem>
+            <NavItem style={descriptStyle}>Register</NavItem>
           </Link>
         }
         {this.props.loggedIn &&
           <Link to="/dashboard/upload">
-            <NavItem>Upload</NavItem>
+            <NavItem style={descriptStyle}>Upload</NavItem>
           </Link>
         }
         {this.props.loggedIn &&
-          <NavItem onClick={this.logout.bind(this)}>Sign Out</NavItem>
+          <NavItem style={descriptStyle} onClick={this.logout.bind(this)}>Sign Out</NavItem>
         }        
         {this.props.currVid ? (<Recommended currVid={this.props.currVid}/>) : null}
       </Menu>
