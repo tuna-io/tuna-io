@@ -8,7 +8,8 @@ const recVidStyle = {
 
 const titleStyle = {
   color: "#0088ee",
-  fontFamily: "Helvetica Neue",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+  fontWeight: "200",
 };
 
 export default class Recommended extends React.Component {

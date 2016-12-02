@@ -3,12 +3,15 @@ import TimeAgo from 'react-timeago';
 import { Row, Col } from 'react-flexgrid';
 import { Badge, Avatar, Heading, Donut, Stat } from 'rebass';
 
-
+const metaStyle = {
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+  fontWeight: "100",
+};
 
 class VideoMetadata extends React.Component {
   render() {
     return (
-      <div>
+      <div style={metaStyle}>
         <Row>
           <Col xs={0}>
             <Avatar circle size={48} src="http://lorempixel.com/output/animals-q-c-64-64-8.jpg" />

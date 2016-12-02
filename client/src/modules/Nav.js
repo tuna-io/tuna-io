@@ -5,13 +5,15 @@ import Recommended from './Recommended';
 
 const titleStyle = {
   marginRight: "10px",
-  fontFamily: "Helvetica Neue",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+  fontWeight: "100",
 };
 
 const descriptStyle = {
   color: "#e2e2e2",
   textStyle: "none",
-  fontFamily: "Helvetica Neue",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+  fontWeight: "100",
 };
 
 export default class Nav extends React.Component {

@@ -4,20 +4,23 @@ import { Link } from 'react-router';
 
 const vidStyle = {
   textStyle: "none",
-  fontFamily: "Helvetica Neue",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+  fontWeight: "200",
 };
 
 const vidTextStyle = {
   color: "#0088ee",
   textStyle: "none",
-  fontFamily: "Helvetica Neue",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+  fontWeight: "200",
 };
 
 const descriptStyle = {
   color: "#e2e2e2",
   textStyle: "none",
   fontSize: "12px",
-  fontFamily: "Helvetica Neue",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+  fontWeight: "100",
 };
 
 const HomepageCarousel = React.createClass({
@@ -34,8 +37,8 @@ const HomepageCarousel = React.createClass({
     });
 
     return (
-      <div style={vidStyle}>
-        <h1>{this.props.header}</h1>
+      <div>
+        <h1 style={vidStyle}>{this.props.header}</h1>
         <Carousel slidesToShow={3} cellAlign="left">
           {
             data.map((videoData) =>

@@ -6,7 +6,7 @@ import DropzoneComponent from 'react-dropzone-component';
 
 const backgroundStyle = {
   color: "#e2e2e2",
-  fontFamily: "Helvetica Neue",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
 };
 
 // const titleStyle = {

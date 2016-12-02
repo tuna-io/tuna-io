@@ -9,6 +9,7 @@ const carouselStyle = {
   backgroundColor: "#191919",
   padding: "10px 20px 30px",
   margin: "35px 30px 5px 15px",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
 };
 
 const homeStyle = {

@@ -17,7 +17,7 @@ import Autosuggest from 'react-autosuggest';
 
 const backgroundStyle = {
   backgroundColor: "#3a3a3a",
-  fontFamily: "Helvetica Neue",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
 };
 
 const subtitleStyle = {
@@ -26,7 +26,7 @@ const subtitleStyle = {
   border: "0",
   margin: "15px 25px 10px 25px",
   height: "20px",
-  fontFamily: "Helvetica Neue",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
 };
 
 const vidStyle = {
@@ -36,7 +36,7 @@ const vidStyle = {
 const titleStyle = {
   margin: "-17px -17px -16px -16px",
   backgroundColor: "#000",
-  fontFamily: "Helvetica Neue",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
 };
 
 const detailsBoxStyle = {
