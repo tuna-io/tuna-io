@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import videojs from 'video.js';
 import overlay from 'videojs-overlay';
 import { Grid, Row, Col } from 'react-flexgrid';
-import { Badge, Space, InlineForm, Panel, PanelHeader, 
+import { Badge, Space, InlineForm, Panel, PanelHeader,
   Text, Avatar, Heading, Flex, Donut, Stat, Divider } from 'rebass';
 import TimeAgo from 'react-timeago';
 import { Tabs, TabList, TabPanel, Tab } from 'react-tabs';
@@ -15,6 +15,33 @@ import Recommended from './Recommended';
 import Nav from './Nav';
 import Autosuggest from 'react-autosuggest';
 
+const backgroundStyle = {
+  backgroundColor: "#3a3a3a",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+};
+
+const subtitleStyle = {
+  borderRadius: "5px",
+  backgroundColor: "#ffffff",
+  border: "0",
+  margin: "15px 25px 10px 25px",
+  height: "20px",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+};
+
+const vidStyle = {
+  backgroundColor: "#000",
+};
+
+const titleStyle = {
+  margin: "-17px -17px -16px -16px",
+  backgroundColor: "#000",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+};
+
+const detailsBoxStyle = {
+  backgroundColor: "#e2e2e2",
+};
 // TODO: prevent errors if there is no transcript
 // TODO: make sure subtitles are still working
 class VideoDetails extends Component {
@@ -353,7 +380,6 @@ class VideoDetails extends Component {
     if (this.state.transcript.length) {
       return (
         <div>
-          <div> Search results: </div>
           <div>
             {this.state.searchResults ? (this.state.searchResults.map(i =>
               (
@@ -391,24 +417,25 @@ class VideoDetails extends Component {
         JSON.parse(this.state.currentVideoDetails.thumbnail).DataUrl : null;
 
       return (
-        <Row>
+        <Row style={backgroundStyle}>
           <Col xs={2}>
             <Nav loggedIn={this.props.loggedIn} auth={this.props.auth} currVid={this.state.currentVideoId} />
           </Col>
           <Col xs={7}>
-            <div>
+            <div style={vidStyle}>
+              <Panel theme="default">
+                <PanelHeader style={titleStyle} inverted theme="default">
+                {this.state.currentVideoDetails.title}
+                </PanelHeader>
+              </Panel>
               <video crossOrigin="anonymous" ref={input => this.loadVideoJS(input)} id="my-video"
                 className="video-js vjs-sublime-skin vjs-16-9" controls preload="auto"
                 width="640" height="264" poster="" data-setup="{}"
                 src={this.state.currentVideoDetails.url} type="video/webm"
               />
-              <button onClick={() => this.renderOverlay()}>Turn on subtitles</button>
+              <button style={subtitleStyle} onClick={() => this.renderOverlay()}>Turn on subtitles</button>
             </div>
-            <Panel theme="default">
-              <PanelHeader inverted theme="default">
-                {this.state.currentVideoDetails.title}
-              </PanelHeader>
-
+            <Panel style={detailsBoxStyle} theme="default">
               <Tabs>
                 <TabList>
                   <Tab>About</Tab>

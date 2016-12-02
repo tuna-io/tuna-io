@@ -3,6 +3,19 @@ import { browserHistory, Link } from 'react-router';
 import { Menu, NavItem, Media, Heading, Text, Divider, InlineForm } from 'rebass';
 import Recommended from './Recommended';
 
+const titleStyle = {
+  marginRight: "10px",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+  fontWeight: "100",
+};
+
+const descriptStyle = {
+  color: "#e2e2e2",
+  textStyle: "none",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+  fontWeight: "100",
+};
+
 export default class Nav extends React.Component {
 
   constructor(props) {
@@ -59,6 +72,10 @@ export default class Nav extends React.Component {
         color: 'white',
       }}>
         <NavItem>
+          <div style={titleStyle}> TunaVid.io </div>
+          <img width="50px" src="https://s3-us-west-1.amazonaws.com/invalidmemories/tuna.svg" alt="presentation" />
+        </NavItem>
+        <NavItem>
           <InlineForm
             buttonLabel="Search"
             label="PlatformSearch"
@@ -68,7 +85,7 @@ export default class Nav extends React.Component {
           />
         </NavItem>
         <Link to="/">
-          <NavItem>Home</NavItem>
+          <NavItem style={descriptStyle}>Home</NavItem>
         </Link>
         {!this.props.loggedIn &&
           <Link to="/signin">
@@ -77,16 +94,16 @@ export default class Nav extends React.Component {
         }
         {!this.props.loggedIn &&
           <Link to="/register">
-            <NavItem>Register</NavItem>
+            <NavItem style={descriptStyle}>Register</NavItem>
           </Link>
         }
         {this.props.loggedIn &&
           <Link to="/dashboard/upload">
-            <NavItem>Upload</NavItem>
+            <NavItem style={descriptStyle}>Upload</NavItem>
           </Link>
         }
         {this.props.loggedIn &&
-          <NavItem onClick={this.logout.bind(this)}>Sign Out</NavItem>
+          <NavItem style={descriptStyle} onClick={this.logout.bind(this)}>Sign Out</NavItem>
         }        
         {this.props.currVid ? (<Recommended currVid={this.props.currVid}/>) : null}
       </Menu>

@@ -3,6 +3,10 @@ import Home from './Home';
 import Rebass from 'rebass';
 import { Grid, Row, Col } from 'react-flexgrid';
 
+const backgroundStyle = {
+  backgroundColor: "#3a3a3a",
+};
+
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -38,7 +42,7 @@ export default class App extends React.Component {
   render() {
     return (
       <Row>
-        <Col xs={12}>
+        <Col style={backgroundStyle} xs={12}>
           {
             this.props.children ?
               React.cloneElement(

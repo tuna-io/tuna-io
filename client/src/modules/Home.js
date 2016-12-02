@@ -4,6 +4,17 @@ import { Grid, Row, Col } from 'react-flexgrid';
 import Nav from './Nav';
 import HomepageCarousel from './HomepageCarousel';
 
+const carouselStyle = {
+  color: "#e2e2e2",
+  backgroundColor: "#191919",
+  padding: "10px 20px 30px",
+  margin: "35px 30px 5px 15px",
+  fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+};
+
+const homeStyle = {
+  backgroundColor: "#3a3a3a",
+};
 
 export default class Home extends React.Component {
   constructor(props) {
@@ -57,20 +68,18 @@ export default class Home extends React.Component {
 
   render() {
     return (
-      <Row>
+      <Row style={homeStyle}>
         <Col xs={2}>
           <Nav loggedIn={this.props.loggedIn} auth={this.props.auth} />
         </Col>
         <Col xs={10}>
           <div>
-            <h1>TunaVid.io - the 6th fastest fish in the sea</h1>
-            <div id="latest-videos">
-              {this.props.loggedIn &&
-                <h3>Welcome back, {this.props.loggedIn}</h3>
-              }
+            <div style={carouselStyle}>
+              {this.renderCarousel('New uploads')}
             </div>
-            {this.renderCarousel('Latest videos')}
-            {this.renderCarousel('Hottest videos')}
+            <div style={carouselStyle}>
+              {this.renderCarousel('Trending')}
+            </div>
           </div>
         </Col>
       </Row>
