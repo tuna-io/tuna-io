@@ -226,10 +226,12 @@ export default class Upload extends React.Component {
   }
 
   runSample() {
+    // const generatedHash = this.hash(10);
+    // const newFilename = `${generatedHash}.mp4`;
     this.setState({
       youtubeID: "jLO1CPYv0hc",
-      file: { name: "ohmygod.mp4", type: 'video/mp4', hash: "ohmygod.mp4" },
-      title: "Oh my god",
+      file: { name: "ohmygod", type: 'video/mp4', hash: "ohmygod" },
+      title: "ohmygod",
     });
   }
 
