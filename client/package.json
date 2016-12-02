@@ -13,6 +13,7 @@
     "css-loader": "^0.26.0",
     "dropzone": "^4.3.0",
     "npm": "^4.0.2",
+    "nuka-carousel": "^2.0.3",
     "react": "^15.3.2",
     "react-autosuggest": "^7.0.1",
     "react-dom": "^15.3.2",
