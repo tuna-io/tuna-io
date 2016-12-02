@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router';
 import { Circle } from 'react-progressbar.js';
+import { Grid, Row, Col } from 'react-flexgrid';
 import DropzoneComponent from 'react-dropzone-component';
+
 
 export default class Upload extends React.Component {
   constructor(props) {
@@ -16,6 +18,11 @@ export default class Upload extends React.Component {
       description: '',
       private: false,
       hash: '',
+
+      // upload data
+      sentToAws: false,
+      uploadDuration: 20,
+      uploadProgress: '',
 
       // metadata
       duration: '',
@@ -34,6 +41,8 @@ export default class Upload extends React.Component {
     this.downloadYoutube = this.downloadYoutube.bind(this);
     this.processVideo = this.processVideo.bind(this);
     this.getYoutubeID = this.getYoutubeID.bind(this);
+    this.runSample = this.runSample.bind(this);
+    this.removeVideo = this.removeVideo.bind(this);
 
     this.djsConfig = {
       addRemoveLinks: true,
@@ -113,7 +122,10 @@ export default class Upload extends React.Component {
     .then(data => data.json())
     .then((time) => {
       console.log("metadata time is", time);
-      this.setState({ duration: time });
+      this.setState({ 
+        duration: time,
+        sentToAws: false
+      });
       this.trackProgress();
     })
     .catch(err => console.log('Error retrieving metadata:', err));
@@ -175,6 +187,11 @@ export default class Upload extends React.Component {
     // Prevent page refresh
     event.preventDefault();
 
+    this.trackUploadProgress();
+    this.setState({
+      sentToAws: true,
+    });
+
     if (this.state.signedUrl) {
       // Upload video into CDN
       return fetch(this.state.signedUrl, {
@@ -208,10 +225,25 @@ export default class Upload extends React.Component {
     });
   }
 
+  runSample() {
+    // const generatedHash = this.hash(10);
+    // const newFilename = `${generatedHash}.mp4`;
+    this.setState({
+      youtubeID: "jLO1CPYv0hc",
+      file: { name: "ohmygod", type: 'video/mp4', hash: "ohmygod" },
+      title: "ohmygod",
+    });
+  }
+
   // Send to server to donwload vid and then processes video
   // we can refactor this to support multiple youtube links at once
   downloadYoutube(event) {
     event.preventDefault();
+
+    this.trackUploadProgress();
+    this.setState({
+      sentToAws: true,
+    });
 
     console.log('called downloadyoutube', this.state.file.name);
 
@@ -251,11 +283,23 @@ export default class Upload extends React.Component {
     }, 100);
   }
 
+  trackUploadProgress() {
+    let timer = 0;
+
+    setInterval(() => {
+      if (timer <= this.state.uploadDuration) {
+        timer += 0.1;
+        const uploadProgress = timer / this.state.uploadDuration;
+        this.setState({ uploadProgress: uploadProgress });
+      }
+    }, 100);
+  }
+
   // Video options form is rendered when the user has attached a file using Dropzone
   // or linked to a youtube clip
   renderVideoOptionsForm() {
     return (this.state.signedUrl || this.state.youtubeID)
-      && !this.state.duration && !this.state.hash ?
+      && !this.state.duration && !this.state.hash && !this.state.uploadProgress ?
     (
       <div>
         <h3>Upload options</h3>
@@ -273,6 +317,11 @@ export default class Upload extends React.Component {
             />
           </div>
           <div>
+            <input name="videoduration" type="text" onChange={this.handleChange}
+              placeholder="duration"
+            />
+          </div>
+          <div>
             <span>Private:</span>
             <input name="private" type="checkbox" onChange={this.handleChange} />
           </div>
@@ -280,29 +329,44 @@ export default class Upload extends React.Component {
             <input name="submit" type="submit" value="Upload into cloud" />
           </div>
         </form>
+        <button onClick={this.removeVideo}> Cancel </button>
       </div>
     ) : null;
+  }
+
+
+  // demo video
+  renderSampleVideo() {
+    return (
+      <div>
+        <div>
+         A. Try a demo video
+        </div>
+        <button onClick={this.runSample}> Select </button>
+        <img width="240px" src="https://s3-us-west-1.amazonaws.com/invalidmemories/ohmygod.png"/>
+      </div>
+    );
   }
 
   // form for getting a youtube link
   renderYoutubeUploadForm() {
     return this.state.signedUrl ? null : (
       <div>
+        <div>B. Enter youtube link</div>
         <form onSubmit={this.getYoutubeID}>
-          <span>Enter youtube link:</span>
           <input
             name="link" type="text"
             onChange={this.handleChange}
           />
+          <button onClick={this.getYoutubeID}> Submit </button>
         </form>
-        <button onClick={this.getYoutubeID}> Submit </button>
       </div>
     );
   }
 
   // circular progress bar
-  renderProgressBar() {
-    return this.state.duration ?
+  renderTranscribingProgress() {
+    return this.state.duration && !this.state.hash ?
     (
       <div>
         <Circle
@@ -319,15 +383,43 @@ export default class Upload extends React.Component {
     ) : null;
   }
 
+  renderAWSProgress() {
+    return this.state.sentToAws ?
+    (
+      <div>
+        <Circle
+          progress={this.state.uploadProgress}
+          text={"Uploading video... " + Math.floor(this.state.uploadProgress * 100, 2) + "%"}
+          options={{ strokeWidth: 5 }}
+          initialAnimate
+          containerStyle={{
+            width: "200px",
+            height: "200px",
+          }}
+          containerClassName={".progressbar"} />
+      </div>
+    ) : null;
+  }
+
   // Video is rendered after a successful upload to the CDN
   renderVideoLink() {
-    return this.state.hash ? (<div>See video here: <Link to={`/videos/${this.state.hash}`}>{ this.state.title }</Link></div>)
-      : null;
+    return this.state.hash ? (
+      <div>
+        <div>Your video is ready! Watch it here:
+          <Link to={`/videos/${this.state.hash}`}>{ this.state.title }</Link>
+        </div>
+        <img width="500px" src="https://s3-us-west-1.amazonaws.com/invalidmemories/successkid.png"/>
+      </div>
+
+      ) : null;
   }
 
   removeVideo() {
     console.log('this.signedurl', this.state.signedUrl);
-    return this.setState({ signedUrl: '' });
+    return this.setState({ 
+      signedUrl: '',
+      youtubeID: '',
+    });
   }
 
   // TODO: determine if event handlers can go in constructor
@@ -340,29 +432,50 @@ export default class Upload extends React.Component {
       addedfile: this.attachUsingDropzone.bind(this),
     };
 
-    return (
-      <div>
-        <h1>
-          Upload a video!
-        </h1>
-        <DropzoneComponent
-          config={config}
-          eventHandlers={eventHandlers}
-          djsConfig={djsConfig}
-        />
-        {
-          this.renderYoutubeUploadForm()
-        }
-        {
-          this.renderVideoOptionsForm()
-        }
-        {
-          this.renderProgressBar()
-        }
-        {
-          this.renderVideoLink()
-        }
-      </div>
-    );
+    return (this.state.signedUrl || this.state.youtubeID) ? (
+        <div>
+          <h1>
+              Step (2/2): Edit video info
+          </h1>
+          {
+            this.renderVideoOptionsForm()
+          }
+          {
+            this.renderAWSProgress()
+          }
+          {
+            this.renderTranscribingProgress()
+          }
+          {
+            this.renderVideoLink()
+          }
+        </div>
+      ) : (
+        <div>
+          <h1>
+            Step (1/2): Select a video
+          </h1>
+          <Row>
+            <Col xs={3}>
+              {
+                this.renderSampleVideo()
+              }
+            </Col>
+            <Col xs={3}>
+              {
+                this.renderYoutubeUploadForm()
+              }
+            </Col>
+            <Col xs={3}>
+              <div>C. Or choose a file</div>
+              <DropzoneComponent
+                config={config}
+                eventHandlers={eventHandlers}
+                djsConfig={djsConfig}
+              />
+            </Col>
+          </Row>
+        </div>
+      );
   }
 }
