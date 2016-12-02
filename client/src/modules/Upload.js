@@ -21,7 +21,7 @@ export default class Upload extends React.Component {
 
       // upload data
       sentToAws: false,
-      uploadDuration: 10,
+      uploadDuration: 20,
       uploadProgress: '',
 
       // metadata
@@ -364,7 +364,7 @@ export default class Upload extends React.Component {
 
   // circular progress bar
   renderTranscribingProgress() {
-    return this.state.duration ?
+    return this.state.duration && !this.state.hash ?
     (
       <div>
         <Circle
@@ -401,8 +401,15 @@ export default class Upload extends React.Component {
 
   // Video is rendered after a successful upload to the CDN
   renderVideoLink() {
-    return this.state.hash ? (<div>See video here: <Link to={`/videos/${this.state.hash}`}>{ this.state.title }</Link></div>)
-      : null;
+    return this.state.hash ? (
+      <div>
+        <div>Your video is ready! Watch it here:
+          <Link to={`/videos/${this.state.hash}`}>{ this.state.title }</Link>
+        </div>
+        <img width="500px" src="https://s3-us-west-1.amazonaws.com/invalidmemories/successkid.png"/>
+      </div>
+
+      ) : null;
   }
 
   removeVideo() {
