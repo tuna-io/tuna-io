@@ -3,6 +3,10 @@ import { browserHistory, Link } from 'react-router';
 import { Menu, NavItem, Media, Heading, Text, Divider, InlineForm } from 'rebass';
 import Recommended from './Recommended';
 
+const titleStyle = {
+  marginRight: "10px",
+};
+
 export default class Nav extends React.Component {
 
   constructor(props) {
@@ -58,6 +62,10 @@ export default class Nav extends React.Component {
         height: '100vh',
         color: 'white',
       }}>
+        <NavItem>
+          <div style={titleStyle}> TunaVid.io </div>
+          <img width="50px" src="https://s3-us-west-1.amazonaws.com/invalidmemories/tuna.svg" alt="presentation" />
+        </NavItem>
         <NavItem>
           <InlineForm
             buttonLabel="Search"
